@@ -1,0 +1,194 @@
+<!DOCTYPE html>
+
+<html lang="id"><head>
+<meta charset="utf-8"/>
+<meta content="width=device-width, initial-scale=1.0" name="viewport"/>
+<title>Login - Sistem Pencocokan Data BPS</title>
+<script src="https://cdn.tailwindcss.com?plugins=forms,container-queries"></script>
+<link href="https://fonts.googleapis.com/css2?family=Material+Symbols+Outlined:wght,FILL@100..700,0..1&amp;display=swap" rel="stylesheet"/>
+<link href="https://fonts.googleapis.com/css2?family=Public+Sans:wght@400;600;700&amp;display=swap" rel="stylesheet"/>
+<link href="https://fonts.googleapis.com/css2?family=Material+Symbols+Outlined:wght,FILL@100..700,0..1&amp;display=swap" rel="stylesheet"/>
+<script id="tailwind-config">
+        tailwind.config = {
+            darkMode: "class",
+            theme: {
+                extend: {
+                    "colors": {
+                        "primary": "#002b5a",
+                        "on-error-container": "#93000a",
+                        "on-tertiary-container": "#f79564",
+                        "on-tertiary-fixed": "#351000",
+                        "on-secondary-container": "#004668",
+                        "surface-bright": "#f8f9ff",
+                        "on-primary-container": "#84aff7",
+                        "surface-container-highest": "#d3e4fe",
+                        "secondary": "#006493",
+                        "on-secondary-fixed-variant": "#004b70",
+                        "outline": "#737781",
+                        "surface-variant": "#d3e4fe",
+                        "tertiary-container": "#712d02",
+                        "secondary-fixed-dim": "#8ccdff",
+                        "tertiary-fixed": "#ffdbcb",
+                        "surface": "#f8f9ff",
+                        "primary-fixed": "#d6e3ff",
+                        "on-surface-variant": "#424750",
+                        "surface-container-high": "#dce9ff",
+                        "surface-container-low": "#eff4ff",
+                        "surface-tint": "#2f5ea1",
+                        "inverse-surface": "#213145",
+                        "secondary-container": "#44b7fd",
+                        "on-secondary-fixed": "#001e2f",
+                        "outline-variant": "#c3c6d2",
+                        "on-tertiary": "#ffffff",
+                        "on-primary-fixed": "#001b3d",
+                        "surface-container-lowest": "#ffffff",
+                        "tertiary": "#4e1c00",
+                        "surface-dim": "#cbdbf5",
+                        "on-error": "#ffffff",
+                        "on-surface": "#0b1c30",
+                        "on-background": "#0b1c30",
+                        "on-secondary": "#ffffff",
+                        "tertiary-fixed-dim": "#ffb693",
+                        "background": "#f8f9ff",
+                        "primary-fixed-dim": "#a9c7ff",
+                        "error": "#ba1a1a",
+                        "on-tertiary-fixed-variant": "#783206",
+                        "inverse-primary": "#a9c7ff",
+                        "surface-container": "#e5eeff",
+                        "inverse-on-surface": "#eaf1ff",
+                        "secondary-fixed": "#cae6ff",
+                        "on-primary-fixed-variant": "#0c4687",
+                        "on-primary": "#ffffff",
+                        "error-container": "#ffdad6",
+                        "primary-container": "#004182"
+                    },
+                    "borderRadius": {
+                        "DEFAULT": "0.125rem",
+                        "lg": "0.25rem",
+                        "xl": "0.5rem",
+                        "full": "0.75rem"
+                    },
+                    "spacing": {
+                        "sm": "8px",
+                        "margin-desktop": "32px",
+                        "base": "4px",
+                        "margin-mobile": "16px",
+                        "xl": "32px",
+                        "md": "16px",
+                        "lg": "24px",
+                        "2xl": "48px",
+                        "gutter": "20px",
+                        "xs": "4px"
+                    },
+                    "fontFamily": {
+                        "headline-lg-mobile": ["Public Sans"],
+                        "body-md": ["Public Sans"],
+                        "label-md": ["Public Sans"],
+                        "headline-sm": ["Public Sans"],
+                        "body-sm": ["Public Sans"],
+                        "data-tabular": ["Public Sans"],
+                        "headline-lg": ["Public Sans"],
+                        "body-lg": ["Public Sans"],
+                        "headline-md": ["Public Sans"]
+                    },
+                    "fontSize": {
+                        "headline-lg-mobile": ["24px", { "lineHeight": "32px", "fontWeight": "700" }],
+                        "body-md": ["14px", { "lineHeight": "20px", "fontWeight": "400" }],
+                        "label-md": ["12px", { "lineHeight": "16px", "letterSpacing": "0.05em", "fontWeight": "600" }],
+                        "headline-sm": ["20px", { "lineHeight": "28px", "fontWeight": "600" }],
+                        "body-sm": ["13px", { "lineHeight": "18px", "fontWeight": "400" }],
+                        "data-tabular": ["13px", { "lineHeight": "16px", "fontWeight": "400" }],
+                        "headline-lg": ["32px", { "lineHeight": "40px", "letterSpacing": "-0.02em", "fontWeight": "700" }],
+                        "body-lg": ["16px", { "lineHeight": "24px", "fontWeight": "400" }],
+                        "headline-md": ["24px", { "lineHeight": "32px", "letterSpacing": "-0.01em", "fontWeight": "600" }]
+                    }
+                }
+            }
+        }
+    </script>
+<style>
+        .material-symbols-outlined {
+            font-variation-settings: 'FILL' 0, 'wght' 400, 'GRAD' 0, 'opsz' 24;
+        }
+    </style>
+</head>
+<body class="bg-background min-h-screen flex items-center justify-center font-body-md text-on-surface">
+<main class="w-full max-w-md mx-auto p-margin-mobile md:p-margin-desktop flex flex-col items-center">
+<!-- Logo and Branding -->
+<div class="mb-xl text-center w-full">
+<div class="inline-flex items-center justify-center w-16 h-16 rounded-full bg-primary mb-md shadow-sm">
+<span class="material-symbols-outlined text-[32px] text-on-primary">dataset_linked</span>
+</div>
+<h1 class="font-headline-lg text-headline-lg md:font-headline-lg text-primary mb-xs">BPS Kota Malang</h1>
+<h2 class="font-headline-sm text-headline-sm text-on-surface-variant">Sistem Pencocokan Data</h2>
+</div>
+<!-- Login Card -->
+<div class="bg-surface-container-lowest border border-outline-variant shadow-sm rounded-lg w-full p-xl relative overflow-hidden">
+<!-- Decorative top line -->
+<div class="absolute top-0 left-0 w-full h-1 bg-primary"></div>
+<form action="#" class="space-y-lg" method="POST">
+<!-- Username / NIP Field -->
+<div>
+<label class="block font-label-md text-label-md text-on-surface mb-xs" for="username">Username / NIP</label>
+<div class="relative">
+<div class="absolute inset-y-0 left-0 pl-sm flex items-center pointer-events-none">
+<span class="material-symbols-outlined text-outline-variant text-[20px]">person</span>
+</div>
+<input class="block w-full pl-xl pr-sm py-sm border border-outline-variant rounded bg-surface text-on-surface focus:ring-2 focus:ring-secondary focus:border-secondary focus:outline-none transition-shadow font-body-md text-body-md" id="username" name="username" placeholder="Masukkan Username atau NIP Anda" required="" type="text"/>
+</div>
+</div>
+<!-- Password Field -->
+<div>
+<label class="block font-label-md text-label-md text-on-surface mb-xs" for="password">Kata Sandi</label>
+<div class="relative">
+<div class="absolute inset-y-0 left-0 pl-sm flex items-center pointer-events-none">
+<span class="material-symbols-outlined text-outline-variant text-[20px]">lock</span>
+</div>
+<input class="block w-full pl-xl pr-xl py-sm border border-outline-variant rounded bg-surface text-on-surface focus:ring-2 focus:ring-secondary focus:border-secondary focus:outline-none transition-shadow font-body-md text-body-md" id="password" name="password" placeholder="Masukkan Kata Sandi Anda" required="" type="password"/>
+<button class="absolute inset-y-0 right-0 pr-sm flex items-center text-outline hover:text-primary transition-colors focus:outline-none" onclick="togglePasswordVisibility()" type="button">
+<span class="material-symbols-outlined text-[20px]" id="password-toggle-icon">visibility</span>
+</button>
+</div>
+<div class="mt-sm flex justify-end">
+<a class="font-body-sm text-body-sm text-secondary hover:text-primary hover:underline transition-colors" href="#">Lupa kata sandi?</a>
+</div>
+</div>
+<!-- Submit Button -->
+<button class="w-full flex justify-center items-center py-md px-md border border-transparent rounded shadow-sm text-sm font-label-md text-label-md text-on-primary bg-primary hover:bg-on-primary-fixed-variant focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-primary transition-colors mt-lg" type="submit">
+<span class="material-symbols-outlined mr-sm text-[20px]">login</span>
+                    Masuk
+                </button>
+</form>
+<!-- Registration Link -->
+<div class="mt-xl text-center border-t border-outline-variant pt-lg">
+<p class="font-body-sm text-body-sm text-on-surface-variant">
+                    Belum memiliki akun? 
+                    <a class="font-label-md text-label-md text-primary hover:underline ml-xs" href="#">Daftar di sini</a>
+</p>
+</div>
+</div>
+<!-- Footer Note -->
+<div class="mt-xl text-center">
+<p class="font-body-sm text-body-sm text-outline">
+                © 2024 Badan Pusat Statistik Kota Malang - Tim IT BPS
+            </p>
+<p class="font-body-sm text-body-sm text-outline mt-xs">
+                Akses terbatas hanya untuk pegawai berwenang.
+            </p>
+</div>
+</main>
+<script>
+        function togglePasswordVisibility() {
+            const passwordInput = document.getElementById('password');
+            const icon = document.getElementById('password-toggle-icon');
+            
+            if (passwordInput.type === 'password') {
+                passwordInput.type = 'text';
+                icon.textContent = 'visibility_off';
+            } else {
+                passwordInput.type = 'password';
+                icon.textContent = 'visibility';
+            }
+        }
+    </script>
+</body></html>

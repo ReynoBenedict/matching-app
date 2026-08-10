@@ -1,0 +1,492 @@
+<!DOCTYPE html><html lang="en"><head>
+<meta charset="utf-8">
+<meta content="width=device-width, initial-scale=1.0" name="viewport">
+<title>Monitoring Progres Verifikasi - BPS Data Matching</title>
+<script src="https://cdn.tailwindcss.com?plugins=forms,container-queries"></script>
+<script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+<link href="https://fonts.googleapis.com/css2?family=Public+Sans:wght@400;600;700&amp;display=swap" rel="stylesheet">
+<link href="https://fonts.googleapis.com/css2?family=Material+Symbols+Outlined:wght,FILL@100..700,0..1&amp;display=swap" rel="stylesheet">
+<link href="https://fonts.googleapis.com/css2?family=Material+Symbols+Outlined:wght,FILL@100..700,0..1&amp;display=swap" rel="stylesheet">
+<script id="tailwind-config">
+        tailwind.config = {
+          darkMode: "class",
+          theme: {
+            extend: {
+              "colors": {
+                      "tertiary-fixed-dim": "#ffb693",
+                      "tertiary-container": "#712d02",
+                      "surface-tint": "#2f5ea1",
+                      "on-secondary": "#ffffff",
+                      "on-primary-fixed": "#001b3d",
+                      "surface-bright": "#f8f9ff",
+                      "surface-variant": "#d3e4fe",
+                      "on-primary-container": "#84aff7",
+                      "on-tertiary-fixed-variant": "#783206",
+                      "surface-container-low": "#eff4ff",
+                      "on-tertiary-fixed": "#351000",
+                      "surface-container-high": "#dce9ff",
+                      "surface-container": "#e5eeff",
+                      "inverse-surface": "#213145",
+                      "on-error": "#ffffff",
+                      "primary": "#002b5a",
+                      "tertiary": "#4e1c00",
+                      "on-tertiary-container": "#f79564",
+                      "on-surface-variant": "#424750",
+                      "on-secondary-fixed": "#001e2f",
+                      "on-primary-fixed-variant": "#0c4687",
+                      "on-secondary-container": "#004668",
+                      "primary-fixed": "#d6e3ff",
+                      "secondary-fixed": "#cae6ff",
+                      "secondary": "#006493",
+                      "surface-container-lowest": "#ffffff",
+                      "outline-variant": "#c3c6d2",
+                      "on-secondary-fixed-variant": "#004b70",
+                      "surface": "#f8f9ff",
+                      "secondary-container": "#44b7fd",
+                      "primary-fixed-dim": "#a9c7ff",
+                      "on-primary": "#ffffff",
+                      "error-container": "#ffdad6",
+                      "tertiary-fixed": "#ffdbcb",
+                      "on-tertiary": "#ffffff",
+                      "primary-container": "#004182",
+                      "on-surface": "#0b1c30",
+                      "error": "#ba1a1a",
+                      "on-error-container": "#93000a",
+                      "outline": "#737781",
+                      "secondary-fixed-dim": "#8ccdff",
+                      "inverse-on-surface": "#eaf1ff",
+                      "surface-dim": "#cbdbf5",
+                      "background": "#f8f9ff",
+                      "surface-container-highest": "#d3e4fe",
+                      "on-background": "#0b1c30",
+                      "inverse-primary": "#a9c7ff"
+              },
+              "borderRadius": {
+                      "DEFAULT": "0.125rem",
+                      "lg": "0.25rem",
+                      "xl": "0.5rem",
+                      "full": "0.75rem"
+              },
+              "spacing": {
+                      "margin-mobile": "16px",
+                      "base": "4px",
+                      "margin-desktop": "32px",
+                      "xs": "4px",
+                      "sm": "8px",
+                      "lg": "24px",
+                      "gutter": "20px",
+                      "2xl": "48px",
+                      "md": "16px",
+                      "xl": "32px"
+              },
+              "fontFamily": {
+                      "headline-sm": ["Public Sans"],
+                      "data-tabular": ["Public Sans"],
+                      "headline-lg": ["Public Sans"],
+                      "headline-md": ["Public Sans"],
+                      "body-sm": ["Public Sans"],
+                      "body-md": ["Public Sans"],
+                      "headline-lg-mobile": ["Public Sans"],
+                      "body-lg": ["Public Sans"],
+                      "label-md": ["Public Sans"]
+              },
+              "fontSize": {
+                      "headline-sm": ["20px", {"lineHeight": "28px", "fontWeight": "600"}],
+                      "data-tabular": ["13px", {"lineHeight": "16px", "fontWeight": "400"}],
+                      "headline-lg": ["32px", {"lineHeight": "40px", "letterSpacing": "-0.02em", "fontWeight": "700"}],
+                      "headline-md": ["24px", {"lineHeight": "32px", "letterSpacing": "-0.01em", "fontWeight": "600"}],
+                      "body-sm": ["13px", {"lineHeight": "18px", "fontWeight": "400"}],
+                      "body-md": ["14px", {"lineHeight": "20px", "fontWeight": "400"}],
+                      "headline-lg-mobile": ["24px", {"lineHeight": "32px", "fontWeight": "700"}],
+                      "body-lg": ["16px", {"lineHeight": "24px", "fontWeight": "400"}],
+                      "label-md": ["12px", {"lineHeight": "16px", "letterSpacing": "0.05em", "fontWeight": "600"}]
+              }
+            }
+          }
+        }
+    </script>
+<style>
+        body { font-family: 'Public Sans', sans-serif; background-color: #F8FAFC; }
+        .material-symbols-outlined { font-variation-settings: 'FILL' 1, 'wght' 400, 'GRAD' 0, 'opsz' 24; }
+        .card-shadow { box-shadow: 0px 4px 6px -1px rgba(0,0,0,0.05); }
+    </style>
+</head>
+<body class="bg-background flex flex-col md:flex-row min-h-screen">
+<!-- Top Navigation (Mobile) -->
+<header class="md:hidden sticky top-0 z-50 flex justify-between items-center w-full h-16 px-margin-mobile bg-surface-container-lowest border-b border-outline-variant/30">
+<div class="flex items-center gap-3">
+<span class="material-symbols-outlined text-primary cursor-pointer">menu</span>
+<span class="text-headline-sm font-headline-sm font-bold text-primary">BPS Data Matching</span>
+</div>
+<div class="flex items-center gap-3">
+<span class="material-symbols-outlined text-on-surface-variant cursor-pointer">notifications</span>
+<img class="w-8 h-8 rounded-full object-cover" data-alt="A small circular avatar of a professional user in a light blue corporate setting, representing a profile image." src="https://lh3.googleusercontent.com/aida-public/AB6AXuCw3JmD0YVrc8yo2ddz3BfxV0qSy84PCD7Ah9M4Sy8m1IKak77I41dq584QBV43GLi77XKeGAQbDTU5pnawnVmueMtPpIUjyZgAESa6_nHZeyjq4uodXXfkvx3HQfMBsVvwWrZ3DBJi-dZ8nmOBmejeKQq24Lq4rXuXb5g9zHhIqscJXgeHehR5HS16SxhzqGbJUBdQ5SquViId_5MhAW-TUBbTdr32d8jj6q5hLP_nKGev-cGJZM3a">
+</div>
+</header>
+<!-- Side Navigation (Desktop) -->
+<nav class="hidden md:flex flex-col h-screen w-[260px] border-r border-outline-variant/20 bg-primary fixed left-0 top-0 z-40">
+<div class="p-6 flex items-center gap-4">
+<div class="w-10 h-10 rounded bg-white flex items-center justify-center">
+<span class="text-primary font-bold">BPS</span>
+</div>
+<div>
+<h1 class="text-on-primary text-headline-sm font-headline-sm font-bold">BPS Kota Malang</h1>
+<p class="text-on-primary-container text-label-md font-label-md">Data Matching System</p>
+</div>
+</div>
+<div class="px-4 mb-6">
+<button class="w-full bg-secondary text-on-secondary py-2 rounded font-label-md text-label-md flex items-center justify-center gap-2 hover:bg-secondary/90 transition-colors">
+<span class="material-symbols-outlined" style="font-size: 18px;">add</span> New Matching Task
+            </button>
+</div>
+<div class="flex-1 overflow-y-auto">
+<ul class="flex flex-col gap-1">
+<li class="">
+<a class="flex items-center gap-3 px-4 py-3 text-on-primary/70 hover:text-on-primary hover:bg-primary-container/10 transition-colors" href="#">
+<span class="material-symbols-outlined">dashboard</span>
+<span class="text-body-md font-body-md">Dashboard</span>
+</a>
+</li>
+<li class="">
+<a class="flex items-center gap-3 px-4 py-3 text-on-primary/70 hover:text-on-primary hover:bg-primary-container/10 transition-colors" href="#">
+<span class="material-symbols-outlined">dataset_linked</span>
+<span class="text-body-md font-body-md">Data Matching</span>
+</a>
+</li>
+<li class="">
+<a class="flex items-center gap-3 px-4 py-3 text-on-primary/70 hover:text-on-primary hover:bg-primary-container/10 transition-colors" href="#">
+<span class="material-symbols-outlined">fact_check</span>
+<span class="text-body-md font-body-md">Verification</span>
+</a>
+</li>
+<li class="">
+<a class="flex items-center gap-3 px-4 py-3 text-on-primary/70 hover:text-on-primary hover:bg-primary-container/10 transition-colors" href="#">
+<span class="material-symbols-outlined">storage</span>
+<span class="text-body-md font-body-md">Database</span>
+</a>
+</li>
+<li class="">
+<a class="flex items-center gap-3 px-4 py-3 border-l-4 border-secondary-container bg-primary-container/20 text-secondary-container font-semibold transition-all duration-150 opacity-90 scale-[0.98]" href="#">
+<span class="material-symbols-outlined">analytics</span>
+<span class="text-body-md font-body-md">Reporting</span>
+</a>
+</li>
+<li class="">
+<a class="flex items-center gap-3 px-4 py-3 text-on-primary/70 hover:text-on-primary hover:bg-primary-container/10 transition-colors font-semibold" href="#">
+<span class="material-symbols-outlined">manage_accounts</span>
+<span class="text-body-md font-body-md">User Management</span>
+</a>
+</li>
+</ul>
+</div>
+<div class="mt-auto p-4 border-t border-primary-container">
+<ul class="flex flex-col gap-1">
+<li class="">
+<a class="flex items-center gap-3 px-4 py-2 text-on-primary/70 hover:text-on-primary hover:bg-primary-container/10 transition-colors" href="#">
+<span class="material-symbols-outlined">settings</span>
+<span class="text-body-sm font-body-sm">Settings</span>
+</a>
+</li>
+<li class="">
+<a class="flex items-center gap-3 px-4 py-2 text-on-primary/70 hover:text-on-primary hover:bg-primary-container/10 transition-colors" href="#">
+<span class="material-symbols-outlined">help</span>
+<span class="text-body-sm font-body-sm">Support</span>
+</a>
+</li>
+</ul>
+</div>
+</nav>
+<!-- Main Content Canvas -->
+<main class="flex-1 md:ml-[260px] p-margin-mobile md:p-margin-desktop overflow-x-hidden">
+<header class="mb-lg flex flex-col md:flex-row md:items-end justify-between gap-4">
+<div>
+<a href="#" class="flex items-center gap-2 text-secondary font-label-md mb-2 hover:underline"><span class="material-symbols-outlined text-[18px]">arrow_back</span> Kembali ke Dashboard</a><h2 class="text-headline-lg font-headline-lg text-primary mb-1">Monitoring Progres Verifikasi</h2>
+<p class="text-body-md font-body-md text-on-surface-variant">Overview of current data matching and Verifikasi Manual tasks.</p><div class="mt-2"><span class="px-2 py-1 bg-primary-fixed text-on-primary-fixed-variant rounded text-xs font-bold uppercase tracking-wider">Role: Superadmin</span></div>
+</div>
+<div class="flex gap-2">
+<button class="bg-surface text-primary border border-outline-variant py-2 px-4 rounded text-label-md font-label-md hover:bg-surface-variant transition-colors flex items-center gap-2">
+<span class="material-symbols-outlined text-[18px]">download</span> Export Report
+                </button>
+</div>
+</header>
+<!-- KPI Cards -->
+<section class="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-gutter mb-lg">
+<div class="bg-surface-container-lowest border border-outline-variant/30 rounded-lg p-6 card-shadow flex flex-col justify-between">
+<div class="flex items-center justify-between mb-4">
+<span class="text-body-sm font-body-sm text-on-surface-variant uppercase tracking-wider">Total Kandidat</span>
+<span class="material-symbols-outlined text-primary bg-primary-fixed p-2 rounded">group</span>
+</div>
+<div class="text-headline-lg font-headline-lg text-primary">124,500</div>
+<div class="text-label-md font-label-md text-secondary mt-2 flex items-center gap-1">
+<span class="material-symbols-outlined text-[16px]">trending_up</span> +5.2% this week
+                </div>
+</div>
+<div class="bg-surface-container-lowest border border-outline-variant/30 rounded-lg p-6 card-shadow flex flex-col justify-between">
+<div class="flex items-center justify-between mb-4">
+<span class="text-body-sm font-body-sm text-on-surface-variant uppercase tracking-wider">Sudah Diverifikasi</span>
+<span class="material-symbols-outlined text-[#006493] bg-[#cae6ff] p-2 rounded">check_circle</span>
+</div>
+<div class="text-headline-lg font-headline-lg text-primary">89,142</div>
+<div class="text-label-md font-label-md text-outline mt-2">71.6% of total</div>
+</div>
+<div class="bg-surface-container-lowest border border-outline-variant/30 rounded-lg p-6 card-shadow flex flex-col justify-between">
+<div class="flex items-center justify-between mb-4">
+<span class="text-body-sm font-body-sm text-on-surface-variant uppercase tracking-wider">Belum Diverifikasi</span>
+<span class="material-symbols-outlined text-[#712d02] bg-[#ffdbcb] p-2 rounded">pending_actions</span>
+</div>
+<div class="text-headline-lg font-headline-lg text-primary">35,358</div>
+<div class="text-label-md font-label-md text-outline mt-2">28.4% remaining</div>
+</div>
+<div class="bg-surface-container-lowest border border-outline-variant/30 rounded-lg p-6 card-shadow flex flex-col justify-between">
+<div class="flex items-center justify-between mb-4">
+<span class="text-body-sm font-body-sm text-on-surface-variant uppercase tracking-wider">Overall Progress</span>
+<span class="material-symbols-outlined text-primary bg-primary-fixed p-2 rounded">speed</span>
+</div>
+<div class="text-headline-lg font-headline-lg text-primary">71.6%</div>
+<div class="w-full bg-surface-container h-2 rounded-full mt-3 overflow-hidden">
+<div class="bg-primary h-full rounded-full" style="width: 71.6%"></div>
+</div>
+</div>
+</section>
+<!-- Charts Section -->
+<section class="grid grid-cols-1 lg:grid-cols-3 gap-gutter mb-lg">
+<div class="lg:col-span-2 bg-surface-container-lowest border border-outline-variant/30 rounded-lg p-6 card-shadow">
+<h3 class="text-headline-sm font-headline-sm text-primary mb-4">Completion Timeline</h3>
+<div class="h-64 w-full relative">
+<canvas id="timelineChart" width="726" height="320" style="display: block; box-sizing: border-box; height: 256px; width: 581.1px;"></canvas>
+</div>
+</div>
+<div class="bg-surface-container-lowest border border-outline-variant/30 rounded-lg p-6 card-shadow flex flex-col">
+<h3 class="text-headline-sm font-headline-sm text-primary mb-4">Status Matching</h3>
+<div class="flex-1 flex items-center justify-center relative min-h-[200px]">
+<canvas id="statusChart" width="319" height="375" style="display: block; box-sizing: border-box; height: 300px; width: 255.7px;"></canvas>
+</div>
+<div class="flex justify-center gap-4 mt-4 text-label-md font-label-md">
+<div class="flex items-center gap-2"><div class="w-3 h-3 rounded-full bg-primary"></div>Match</div>
+<div class="flex items-center gap-2"><div class="w-3 h-3 rounded-full bg-outline-variant"></div>Non-Match</div>
+</div>
+</div>
+</section>
+<section class="mb-lg">
+<div class="bg-surface-container-lowest border border-outline-variant/30 rounded-lg card-shadow overflow-hidden">
+<div class="p-6 border-b border-outline-variant/30 flex justify-between items-center">
+<h3 class="text-headline-sm font-headline-sm text-primary">Progress per Petugas</h3>
+<button class="text-primary hover:text-primary-container">
+<span class="material-symbols-outlined">more_vert</span>
+</button>
+</div>
+<div class="p-6">
+<div class="h-64 w-full">
+<canvas id="officerChart" width="1133" height="320" style="display: block; box-sizing: border-box; height: 256px; width: 906.4px;"></canvas>
+</div>
+</div>
+</div>
+</section>
+<!-- Data Table -->
+<section class="bg-surface-container-lowest border border-outline-variant/30 rounded-lg card-shadow overflow-hidden">
+<div class="p-6 border-b border-outline-variant/30 flex justify-between items-center bg-surface-container-low">
+<h3 class="text-headline-sm font-headline-sm text-primary">Employee Verification Status</h3>
+<div class="relative">
+<span class="material-symbols-outlined absolute left-3 top-1/2 -translate-y-1/2 text-outline text-[18px]">search</span>
+<input class="pl-9 pr-4 py-2 border border-outline-variant rounded bg-white text-body-sm focus:border-secondary focus:ring-2 focus:ring-secondary/20 outline-none w-64" placeholder="Search employee..." type="text">
+</div>
+</div>
+<div class="overflow-x-auto">
+<table class="w-full text-left border-collapse">
+<thead>
+<tr class="bg-surface-container text-on-surface-variant text-label-md font-label-md border-b border-outline-variant/30">
+<th class="py-3 px-6 font-semibold sticky top-0">Nama Petugas</th>
+<th class="py-3 px-6 font-semibold sticky top-0">Assigned</th>
+<th class="py-3 px-6 font-semibold sticky top-0">Completed</th>
+<th class="py-3 px-6 font-semibold sticky top-0">Remaining</th>
+<th class="py-3 px-6 font-semibold sticky top-0 min-w-[200px]">Progress</th>
+<th class="py-3 px-6 font-semibold sticky top-0">Status</th>
+</tr>
+</thead>
+<tbody class="text-data-tabular font-data-tabular text-on-surface">
+<tr class="border-b border-outline-variant/20 hover:bg-surface-variant/50 transition-colors">
+<td class="py-3 px-6 flex items-center gap-3">
+<div class="w-8 h-8 rounded bg-primary-fixed text-primary flex items-center justify-center font-bold">AB</div>
+<span class="">Ahmad Budi</span>
+</td>
+<td class="py-3 px-6">5,000</td>
+<td class="py-3 px-6">4,500</td>
+<td class="py-3 px-6">500</td>
+<td class="py-3 px-6">
+<div class="flex items-center gap-2">
+<div class="w-full bg-surface-container h-1.5 rounded-full overflow-hidden">
+<div class="bg-secondary h-full rounded-full" style="width: 90%"></div>
+</div>
+<span class="text-label-md w-10 text-right">90%</span>
+</div>
+</td>
+<td class="py-3 px-6">
+<span class="px-2 py-1 bg-surface-container-high text-primary rounded text-xs font-semibold">Active</span>
+</td>
+</tr>
+<tr class="border-b border-outline-variant/20 hover:bg-surface-variant/50 transition-colors">
+<td class="py-3 px-6 flex items-center gap-3">
+<div class="w-8 h-8 rounded bg-primary-fixed text-primary flex items-center justify-center font-bold">CS</div>
+<span class="">Citra Sari</span>
+</td>
+<td class="py-3 px-6">4,200</td>
+<td class="py-3 px-6">2,100</td>
+<td class="py-3 px-6">2,100</td>
+<td class="py-3 px-6">
+<div class="flex items-center gap-2">
+<div class="w-full bg-surface-container h-1.5 rounded-full overflow-hidden">
+<div class="bg-tertiary-container h-full rounded-full" style="width: 50%"></div>
+</div>
+<span class="text-label-md w-10 text-right">50%</span>
+</div>
+</td>
+<td class="py-3 px-6">
+<span class="px-2 py-1 bg-surface-container-high text-primary rounded text-xs font-semibold">Active</span>
+</td>
+</tr>
+<tr class="border-b border-outline-variant/20 hover:bg-surface-variant/50 transition-colors">
+<td class="py-3 px-6 flex items-center gap-3">
+<div class="w-8 h-8 rounded bg-primary-fixed text-primary flex items-center justify-center font-bold">DW</div>
+<span class="">Dian Wira</span>
+</td>
+<td class="py-3 px-6">6,000</td>
+<td class="py-3 px-6">5,800</td>
+<td class="py-3 px-6">200</td>
+<td class="py-3 px-6">
+<div class="flex items-center gap-2">
+<div class="w-full bg-surface-container h-1.5 rounded-full overflow-hidden">
+<div class="bg-primary h-full rounded-full" style="width: 96%"></div>
+</div>
+<span class="text-label-md w-10 text-right">96%</span>
+</div>
+</td>
+<td class="py-3 px-6">
+<span class="px-2 py-1 bg-[#cae6ff] text-[#006493] rounded text-xs font-semibold">Near Done</span>
+</td>
+</tr>
+<tr class="hover:bg-surface-variant/50 transition-colors">
+<td class="py-3 px-6 flex items-center gap-3">
+<div class="w-8 h-8 rounded bg-primary-fixed text-primary flex items-center justify-center font-bold">EF</div>
+<span class="">Eko Fahmi</span>
+</td>
+<td class="py-3 px-6">3,500</td>
+<td class="py-3 px-6">500</td>
+<td class="py-3 px-6">3,000</td>
+<td class="py-3 px-6">
+<div class="flex items-center gap-2">
+<div class="w-full bg-surface-container h-1.5 rounded-full overflow-hidden">
+<div class="bg-error h-full rounded-full" style="width: 14%"></div>
+</div>
+<span class="text-label-md w-10 text-right">14%</span>
+</div>
+</td>
+<td class="py-3 px-6">
+<span class="px-2 py-1 bg-error-container text-on-error-container rounded text-xs font-semibold">Behind</span>
+</td>
+</tr>
+</tbody>
+</table>
+</div>
+<div class="p-4 border-t border-outline-variant/30 flex items-center justify-between text-body-sm text-on-surface-variant">
+<span class="">Showing 1 to 4 of 24 entries</span>
+<div class="flex gap-1">
+<button class="px-3 py-1 border border-outline-variant rounded hover:bg-surface-variant disabled:opacity-50" disabled="">Prev</button>
+<button class="px-3 py-1 border border-primary bg-primary text-white rounded">1</button>
+<button class="px-3 py-1 border border-outline-variant rounded hover:bg-surface-variant">2</button>
+<button class="px-3 py-1 border border-outline-variant rounded hover:bg-surface-variant">3</button>
+<button class="px-3 py-1 border border-outline-variant rounded hover:bg-surface-variant">Next</button>
+</div>
+</div>
+</section>
+</main>
+<script>
+        // Chart.js global config
+        Chart.defaults.font.family = "'Public Sans', sans-serif";
+        Chart.defaults.color = '#424750';
+        
+        // Timeline Chart (Line)
+        const ctxTimeline = document.getElementById('timelineChart').getContext('2d');
+        new Chart(ctxTimeline, {
+            type: 'line',
+            data: {
+                labels: ['Week 1', 'Week 2', 'Week 3', 'Week 4', 'Week 5', 'Week 6'],
+                datasets: [{
+                    label: 'Cumulative Progress',
+                    data: [10000, 25000, 42000, 60000, 75000, 89142],
+                    borderColor: '#002b5a',
+                    backgroundColor: 'rgba(0, 43, 90, 0.1)',
+                    borderWidth: 2,
+                    tension: 0.4,
+                    fill: true,
+                    pointBackgroundColor: '#ffffff',
+                    pointBorderColor: '#002b5a'
+                }]
+            },
+            options: {
+                responsive: true,
+                maintainAspectRatio: false,
+                plugins: { legend: { display: false } },
+                scales: {
+                    y: { beginAtZero: true, grid: { color: '#e5eeff' } },
+                    x: { grid: { display: false } }
+                }
+            }
+        });
+
+        // Status Chart (Doughnut/Pie)
+        const ctxStatus = document.getElementById('statusChart').getContext('2d');
+        new Chart(ctxStatus, {
+            type: 'doughnut',
+            data: {
+                labels: ['Match', 'Non-Match'],
+                datasets: [{
+                    data: [82, 18],
+                    backgroundColor: ['#002b5a', '#c3c6d2'],
+                    borderWidth: 0,
+                    cutout: '75%'
+                }]
+            },
+            options: {
+                responsive: true,
+                maintainAspectRatio: false,
+                plugins: { legend: { display: false } }
+            }
+        });
+
+        // Officer Progress Chart (Bar)
+        const ctxOfficer = document.getElementById('officerChart').getContext('2d');
+        new Chart(ctxOfficer, {
+            type: 'bar',
+            data: {
+                labels: ['Ahmad', 'Budi', 'Citra', 'Dian', 'Eko', 'Fahmi', 'Gita', 'Hadi'],
+                datasets: [
+                    {
+                        label: 'Completed',
+                        data: [4500, 3200, 2100, 5800, 500, 4100, 3800, 2900],
+                        backgroundColor: '#006493',
+                        borderRadius: 4
+                    },
+                    {
+                        label: 'Remaining',
+                        data: [500, 1800, 2100, 200, 3000, 900, 1200, 2100],
+                        backgroundColor: '#dce9ff',
+                        borderRadius: 4
+                    }
+                ]
+            },
+            options: {
+                responsive: true,
+                maintainAspectRatio: false,
+                scales: {
+                    x: { stacked: true, grid: { display: false } },
+                    y: { stacked: true, grid: { color: '#e5eeff' } }
+                },
+                plugins: {
+                    legend: { position: 'top', align: 'end' }
+                }
+            }
+        });
+    </script>
+
+
+</body></html>

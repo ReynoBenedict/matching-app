@@ -1,0 +1,416 @@
+<!DOCTYPE html>
+
+<html lang="en"><head>
+<meta charset="utf-8"/>
+<meta content="width=device-width, initial-scale=1.0" name="viewport"/>
+<title>Employee Dashboard - Sistem Pencocokan Data</title>
+<script src="https://cdn.tailwindcss.com?plugins=forms,container-queries"></script>
+<link href="https://fonts.googleapis.com/css2?family=Material+Symbols+Outlined:wght,FILL@100..700,0..1&amp;display=swap" rel="stylesheet"/>
+<link href="https://fonts.googleapis.com/css2?family=Public+Sans:wght@400;600;700&amp;display=swap" rel="stylesheet"/>
+<link href="https://fonts.googleapis.com/css2?family=Material+Symbols+Outlined:wght,FILL@100..700,0..1&amp;display=swap" rel="stylesheet"/>
+<script id="tailwind-config">
+        tailwind.config = {
+          darkMode: "class",
+          theme: {
+            extend: {
+              "colors": {
+                      "primary": "#002b5a",
+                      "on-error-container": "#93000a",
+                      "on-tertiary-container": "#f79564",
+                      "on-tertiary-fixed": "#351000",
+                      "on-secondary-container": "#004668",
+                      "surface-bright": "#f8f9ff",
+                      "on-primary-container": "#84aff7",
+                      "surface-container-highest": "#d3e4fe",
+                      "secondary": "#006493",
+                      "on-secondary-fixed-variant": "#004b70",
+                      "outline": "#737781",
+                      "surface-variant": "#d3e4fe",
+                      "tertiary-container": "#712d02",
+                      "secondary-fixed-dim": "#8ccdff",
+                      "tertiary-fixed": "#ffdbcb",
+                      "surface": "#f8f9ff",
+                      "primary-fixed": "#d6e3ff",
+                      "on-surface-variant": "#424750",
+                      "surface-container-high": "#dce9ff",
+                      "surface-container-low": "#eff4ff",
+                      "surface-tint": "#2f5ea1",
+                      "inverse-surface": "#213145",
+                      "secondary-container": "#44b7fd",
+                      "on-secondary-fixed": "#001e2f",
+                      "outline-variant": "#c3c6d2",
+                      "on-tertiary": "#ffffff",
+                      "on-primary-fixed": "#001b3d",
+                      "surface-container-lowest": "#ffffff",
+                      "tertiary": "#4e1c00",
+                      "surface-dim": "#cbdbf5",
+                      "on-error": "#ffffff",
+                      "on-surface": "#0b1c30",
+                      "on-background": "#0b1c30",
+                      "on-secondary": "#ffffff",
+                      "tertiary-fixed-dim": "#ffb693",
+                      "background": "#f8f9ff",
+                      "primary-fixed-dim": "#a9c7ff",
+                      "error": "#ba1a1a",
+                      "on-tertiary-fixed-variant": "#783206",
+                      "inverse-primary": "#a9c7ff",
+                      "surface-container": "#e5eeff",
+                      "inverse-on-surface": "#eaf1ff",
+                      "secondary-fixed": "#cae6ff",
+                      "on-primary-fixed-variant": "#0c4687",
+                      "on-primary": "#ffffff",
+                      "error-container": "#ffdad6",
+                      "primary-container": "#004182"
+              },
+              "borderRadius": {
+                      "DEFAULT": "0.125rem",
+                      "lg": "0.25rem",
+                      "xl": "0.5rem",
+                      "full": "0.75rem"
+              },
+              "spacing": {
+                      "sm": "8px",
+                      "margin-desktop": "32px",
+                      "base": "4px",
+                      "margin-mobile": "16px",
+                      "xl": "32px",
+                      "md": "16px",
+                      "lg": "24px",
+                      "2xl": "48px",
+                      "gutter": "20px",
+                      "xs": "4px"
+              },
+              "fontFamily": {
+                      "headline-lg-mobile": [
+                              "Public Sans"
+                      ],
+                      "body-md": [
+                              "Public Sans"
+                      ],
+                      "label-md": [
+                              "Public Sans"
+                      ],
+                      "headline-sm": [
+                              "Public Sans"
+                      ],
+                      "body-sm": [
+                              "Public Sans"
+                      ],
+                      "data-tabular": [
+                              "Public Sans"
+                      ],
+                      "headline-lg": [
+                              "Public Sans"
+                      ],
+                      "body-lg": [
+                              "Public Sans"
+                      ],
+                      "headline-md": [
+                              "Public Sans"
+                      ]
+              },
+              "fontSize": {
+                      "headline-lg-mobile": [
+                              "24px",
+                              {
+                                      "lineHeight": "32px",
+                                      "fontWeight": "700"
+                              }
+                      ],
+                      "body-md": [
+                              "14px",
+                              {
+                                      "lineHeight": "20px",
+                                      "fontWeight": "400"
+                              }
+                      ],
+                      "label-md": [
+                              "12px",
+                              {
+                                      "lineHeight": "16px",
+                                      "letterSpacing": "0.05em",
+                                      "fontWeight": "600"
+                              }
+                      ],
+                      "headline-sm": [
+                              "20px",
+                              {
+                                      "lineHeight": "28px",
+                                      "fontWeight": "600"
+                              }
+                      ],
+                      "body-sm": [
+                              "13px",
+                              {
+                                      "lineHeight": "18px",
+                                      "fontWeight": "400"
+                              }
+                      ],
+                      "data-tabular": [
+                              "13px",
+                              {
+                                      "lineHeight": "16px",
+                                      "fontWeight": "400"
+                              }
+                      ],
+                      "headline-lg": [
+                              "32px",
+                              {
+                                      "lineHeight": "40px",
+                                      "letterSpacing": "-0.02em",
+                                      "fontWeight": "700"
+                              }
+                      ],
+                      "body-lg": [
+                              "16px",
+                              {
+                                      "lineHeight": "24px",
+                                      "fontWeight": "400"
+                              }
+                      ],
+                      "headline-md": [
+                              "24px",
+                              {
+                                      "lineHeight": "32px",
+                                      "letterSpacing": "-0.01em",
+                                      "fontWeight": "600"
+                              }
+                      ]
+              }
+      },
+          },
+        }
+      </script>
+</head>
+<body class="bg-background text-on-surface font-body-md h-screen flex overflow-hidden">
+<!-- SideNavBar -->
+<aside class="bg-primary dark:bg-primary w-[260px] h-screen fixed left-0 top-0 border-r border-outline-variant shadow-sm z-20 flex flex-col h-full py-xl transition-all duration-200 ease-in-out hidden md:flex">
+<div class="px-md mb-lg flex items-center gap-md">
+<span class="material-symbols-outlined text-on-primary text-3xl">data_exploration</span>
+<div>
+<h1 class="font-headline-sm text-headline-sm font-bold text-on-primary">Sistem Pencocokan Data</h1>
+<p class="font-body-sm text-body-sm text-secondary-fixed-dim">Kota Malang</p>
+</div>
+</div>
+<nav class="flex-1 flex flex-col gap-base mt-md">
+<a class="flex items-center gap-md px-md py-sm bg-primary-container text-on-primary-container border-l-4 border-secondary-container transition-all duration-200 ease-in-out" href="#">
+<span class="material-symbols-outlined" data-weight="fill" style="font-variation-settings: 'FILL' 1;">dashboard</span>
+<span class="font-body-md text-body-md font-bold">Dashboard</span>
+</a>
+<a class="flex items-center gap-md px-md py-sm text-on-primary hover:bg-on-primary-fixed-variant transition-colors transition-all duration-200 ease-in-out" href="#">
+<span class="material-symbols-outlined">assignment</span>
+<span class="font-body-md text-body-md">Assignment</span>
+</a>
+<a class="flex items-center gap-md px-md py-sm text-on-primary hover:bg-on-primary-fixed-variant transition-colors transition-all duration-200 ease-in-out" href="#">
+<span class="material-symbols-outlined">label</span>
+<span class="font-body-md text-body-md">Labeling Data</span>
+</a>
+<a class="flex items-center gap-md px-md py-sm text-on-primary hover:bg-on-primary-fixed-variant transition-colors transition-all duration-200 ease-in-out" href="#">
+<span class="material-symbols-outlined">history</span>
+<span class="font-body-md text-body-md">Riwayat Labeling</span>
+</a>
+</nav>
+<div class="px-md mt-auto">
+<button class="w-full bg-secondary hover:bg-on-secondary-fixed-variant text-on-secondary py-sm rounded-lg flex items-center justify-center gap-sm transition-colors mb-lg">
+<span class="material-symbols-outlined">add_task</span>
+<span class="font-label-md text-label-md">Mulai Labeling Baru</span>
+</button>
+<div class="flex flex-col gap-base border-t border-outline-variant/30 pt-md">
+<a class="flex items-center gap-md px-md py-sm text-on-primary hover:bg-on-primary-fixed-variant transition-colors" href="#">
+<span class="material-symbols-outlined">help</span>
+<span class="font-body-sm text-body-sm">Bantuan</span>
+</a>
+<a class="flex items-center gap-md px-md py-sm text-on-primary hover:bg-on-primary-fixed-variant transition-colors" href="#">
+<span class="material-symbols-outlined">logout</span>
+<span class="font-body-sm text-body-sm">Log Keluar</span>
+</a>
+</div>
+</div>
+</aside>
+<!-- Main Content Area -->
+<main class="flex-1 ml-0 md:ml-[260px] flex flex-col h-screen relative w-full max-w-full">
+<!-- TopNavBar -->
+<header class="bg-surface dark:bg-surface-container-low fixed top-0 left-0 md:left-[260px] right-0 h-16 border-b border-outline-variant flat no shadows z-10 flex justify-between items-center px-lg w-full max-w-full">
+<div class="flex items-center gap-md md:hidden">
+<button class="text-primary p-sm hover:bg-surface-variant rounded-full transition-colors">
+<span class="material-symbols-outlined">menu</span>
+</button>
+<span class="font-headline-sm text-headline-sm font-bold text-primary">BPS</span>
+</div>
+<div class="hidden md:flex items-center gap-xl">
+<span class="font-headline-sm text-headline-sm font-bold text-primary">Sistem Pencocokan Data BPS</span>
+<nav class="flex items-center gap-lg h-full">
+<a class="text-primary font-bold border-b-2 border-primary pb-1 h-full flex items-center font-label-md text-label-md" href="#">Beranda</a>
+</nav>
+</div>
+<div class="flex items-center gap-md">
+<div class="relative hidden sm:block">
+<span class="material-symbols-outlined absolute left-sm top-1/2 -translate-y-1/2 text-outline">search</span>
+<input class="pl-xl pr-sm py-1 border border-outline-variant rounded-full bg-surface-bright text-body-sm focus:border-secondary focus:ring-1 focus:ring-secondary focus:outline-none w-48 transition-all" placeholder="Cari data..." type="text"/>
+</div>
+<div class="flex items-center gap-sm text-primary">
+<button class="p-xs hover:bg-surface-variant rounded-full transition-colors cursor-pointer active:opacity-80"><span class="material-symbols-outlined">notifications</span></button>
+<button class="p-xs hover:bg-surface-variant rounded-full transition-colors cursor-pointer active:opacity-80"><span class="material-symbols-outlined">account_circle</span></button>
+</div>
+<div class="hidden sm:flex flex-col items-end border-l border-outline-variant pl-md ml-sm">
+<span class="font-label-md text-label-md text-primary">Budi Santoso</span>
+<span class="font-body-sm text-body-sm text-outline">Role: Employee</span>
+</div>
+</div>
+</header>
+<!-- Scrollable Content Canvas -->
+<div class="flex-1 overflow-y-auto mt-16 p-margin-mobile md:p-margin-desktop bg-surface-bright">
+<div class="max-w-[1280px] mx-auto">
+<div class="mb-lg">
+<h2 class="font-headline-lg text-headline-lg font-bold text-primary mb-sm">Selamat Datang, Budi</h2>
+<p class="font-body-lg text-body-lg text-on-surface-variant">Ringkasan tugas pelabelan data Anda hari ini.</p>
+</div>
+<!-- KPI Bento Grid -->
+<div class="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-md mb-xl">
+<!-- KPI 1 -->
+<div class="bg-surface rounded-xl p-md border border-outline-variant shadow-sm hover:shadow-md transition-shadow relative overflow-hidden group">
+<div class="absolute top-0 right-0 -mr-4 -mt-4 bg-primary-container/20 rounded-full w-24 h-24 blur-xl group-hover:bg-primary-container/30 transition-colors"></div>
+<div class="flex justify-between items-start mb-md relative z-10">
+<div>
+<p class="font-label-md text-label-md text-on-surface-variant uppercase tracking-wider mb-xs">Active Assignments</p>
+<h3 class="font-headline-lg text-headline-lg font-bold text-primary">3</h3>
+</div>
+<div class="p-sm bg-surface-container-high rounded-lg text-secondary">
+<span class="material-symbols-outlined">assignment_ind</span>
+</div>
+</div>
+<div class="relative z-10 flex items-center gap-xs text-secondary font-label-md text-label-md">
+<span class="material-symbols-outlined text-sm">schedule</span>
+<span>Tenggat waktu terdekat: Besok</span>
+</div>
+</div>
+<!-- KPI 2 -->
+<div class="bg-surface rounded-xl p-md border border-outline-variant shadow-sm hover:shadow-md transition-shadow relative overflow-hidden group">
+<div class="absolute top-0 right-0 -mr-4 -mt-4 bg-surface-container-highest rounded-full w-24 h-24 blur-xl group-hover:bg-surface-dim transition-colors"></div>
+<div class="flex justify-between items-start mb-md relative z-10">
+<div>
+<p class="font-label-md text-label-md text-on-surface-variant uppercase tracking-wider mb-xs">Total Records</p>
+<h3 class="font-headline-lg text-headline-lg font-bold text-primary">1,250</h3>
+</div>
+<div class="p-sm bg-surface-container-high rounded-lg text-primary">
+<span class="material-symbols-outlined">dataset</span>
+</div>
+</div>
+<div class="relative z-10 font-body-sm text-body-sm text-outline">
+                            Total baris data dalam tugas aktif
+                        </div>
+</div>
+<!-- KPI 3 -->
+<div class="bg-surface rounded-xl p-md border border-outline-variant shadow-sm hover:shadow-md transition-shadow relative overflow-hidden group">
+<div class="absolute top-0 right-0 -mr-4 -mt-4 bg-[#e6f4ea] rounded-full w-24 h-24 blur-xl"></div>
+<div class="flex justify-between items-start mb-md relative z-10">
+<div>
+<p class="font-label-md text-label-md text-on-surface-variant uppercase tracking-wider mb-xs">Completed</p>
+<h3 class="font-headline-lg text-headline-lg font-bold text-[#1e8e3e]">850</h3>
+</div>
+<div class="p-sm bg-[#fce8e6] bg-opacity-0 rounded-lg text-[#1e8e3e]">
+<span class="material-symbols-outlined">check_circle</span>
+</div>
+</div>
+<div class="w-full bg-surface-variant rounded-full h-1.5 mb-xs relative z-10">
+<div class="bg-[#1e8e3e] h-1.5 rounded-full" style="width: 68%"></div>
+</div>
+<div class="relative z-10 font-label-md text-label-md text-outline text-right">68% Selesai</div>
+</div>
+<!-- KPI 4 -->
+<div class="bg-surface rounded-xl p-md border border-outline-variant shadow-sm hover:shadow-md transition-shadow relative overflow-hidden group">
+<div class="absolute top-0 right-0 -mr-4 -mt-4 bg-error-container/40 rounded-full w-24 h-24 blur-xl"></div>
+<div class="flex justify-between items-start mb-md relative z-10">
+<div>
+<p class="font-label-md text-label-md text-on-surface-variant uppercase tracking-wider mb-xs">Remaining</p>
+<h3 class="font-headline-lg text-headline-lg font-bold text-on-error-container">400</h3>
+</div>
+<div class="p-sm bg-error-container/50 rounded-lg text-on-error-container">
+<span class="material-symbols-outlined">pending_actions</span>
+</div>
+</div>
+<div class="relative z-10 font-body-sm text-body-sm text-outline">
+                            Baris data yang perlu dilabeli
+                        </div>
+</div>
+</div>
+<!-- Recent Assignments Table -->
+<div class="bg-surface rounded-xl border border-outline-variant shadow-sm overflow-hidden mb-xl">
+<div class="px-lg py-md border-b border-outline-variant flex justify-between items-center bg-surface-container-lowest">
+<h3 class="font-headline-sm text-headline-sm font-bold text-primary">Tugas Aktif</h3>
+<button class="font-label-md text-label-md text-secondary hover:underline flex items-center gap-xs">
+                            Lihat Semua <span class="material-symbols-outlined text-sm">arrow_forward</span>
+</button>
+</div>
+<div class="overflow-x-auto">
+<table class="w-full text-left border-collapse">
+<thead>
+<tr class="bg-surface-container-low border-b border-outline-variant font-label-md text-label-md text-on-surface-variant">
+<th class="py-sm px-lg font-semibold">Nama Tugas</th>
+<th class="py-sm px-lg font-semibold">Tenggat Waktu</th>
+<th class="py-sm px-lg font-semibold">Progres</th>
+<th class="py-sm px-lg font-semibold text-right">Aksi</th>
+</tr>
+</thead>
+<tbody class="font-data-tabular text-data-tabular text-on-surface">
+<tr class="border-b border-outline-variant/50 hover:bg-surface-container-low/50 transition-colors">
+<td class="py-md px-lg">
+<div class="font-semibold text-primary mb-xs">Pencocokan Data UMKM Kec. Klojen</div>
+<div class="text-outline text-body-sm">Batch #2024-10-A</div>
+</td>
+<td class="py-md px-lg">
+<span class="inline-flex items-center gap-xs px-2 py-1 rounded-md bg-error-container text-on-error-container font-label-md">
+<span class="material-symbols-outlined text-sm">warning</span> Besok
+                                        </span>
+</td>
+<td class="py-md px-lg">
+<div class="flex items-center gap-sm">
+<div class="flex-1 bg-surface-variant rounded-full h-2 min-w-[100px]">
+<div class="bg-secondary h-2 rounded-full" style="width: 85%"></div>
+</div>
+<span class="font-label-md text-secondary">85%</span>
+</div>
+</td>
+<td class="py-md px-lg text-right">
+<button class="bg-primary hover:bg-on-primary-fixed-variant text-on-primary px-md py-sm rounded-lg font-label-md transition-colors shadow-sm hover:shadow">
+                                            Lanjutkan
+                                        </button>
+</td>
+</tr>
+<tr class="border-b border-outline-variant/50 hover:bg-surface-container-low/50 transition-colors">
+<td class="py-md px-lg">
+<div class="font-semibold text-primary mb-xs">Validasi Alamat Penduduk (Blimbing)</div>
+<div class="text-outline text-body-sm">Batch #2024-10-B</div>
+</td>
+<td class="py-md px-lg text-on-surface-variant">25 Okt 2024</td>
+<td class="py-md px-lg">
+<div class="flex items-center gap-sm">
+<div class="flex-1 bg-surface-variant rounded-full h-2 min-w-[100px]">
+<div class="bg-secondary h-2 rounded-full" style="width: 30%"></div>
+</div>
+<span class="font-label-md text-secondary">30%</span>
+</div>
+</td>
+<td class="py-md px-lg text-right">
+<button class="bg-primary hover:bg-on-primary-fixed-variant text-on-primary px-md py-sm rounded-lg font-label-md transition-colors shadow-sm hover:shadow">
+                                            Lanjutkan
+                                        </button>
+</td>
+</tr>
+</tbody>
+</table>
+</div>
+</div>
+</div>
+<!-- Footer -->
+<footer class="bg-surface-container-low dark:bg-surface-container-lowest border-t border-outline-variant mt-xl p-md flex justify-between items-center w-full max-w-full">
+<p class="font-body-sm text-body-sm text-primary">© 2024 Badan Pusat Statistik Kota Malang - Tim IT BPS</p>
+<div class="flex gap-md font-body-sm text-body-sm">
+<a class="text-on-surface-variant hover:underline transition-opacity" href="#">Kebijakan Privasi</a>
+<a class="text-on-surface-variant hover:underline transition-opacity" href="#">Syarat &amp; Ketentuan</a>
+<a class="text-on-surface-variant hover:underline transition-opacity" href="#">Hubungi Kami</a>
+</div>
+</footer>
+</div>
+</main>
+</body></html>

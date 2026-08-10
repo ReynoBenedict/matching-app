@@ -1,0 +1,458 @@
+<!DOCTYPE html><html lang="id"><head>
+<meta charset="utf-8">
+<meta content="width=device-width, initial-scale=1.0" name="viewport">
+<title>Konfigurasi Atribut - Sistem Pencocokan Data BPS</title>
+<link href="https://fonts.googleapis.com/css2?family=Public+Sans:wght@400;600;700&amp;display=swap" rel="stylesheet">
+<link href="https://fonts.googleapis.com/css2?family=Material+Symbols+Outlined:wght,FILL@100..700,0..1&amp;display=swap" rel="stylesheet">
+<link href="https://fonts.googleapis.com/css2?family=Material+Symbols+Outlined:wght,FILL@100..700,0..1&amp;display=swap" rel="stylesheet">
+<script src="https://cdn.tailwindcss.com?plugins=forms,container-queries"></script>
+<script id="tailwind-config">
+        tailwind.config = {
+          darkMode: "class",
+          theme: {
+            extend: {
+              "colors": {
+                      "primary": "#002b5a",
+                      "on-error-container": "#93000a",
+                      "on-tertiary-container": "#f79564",
+                      "on-tertiary-fixed": "#351000",
+                      "on-secondary-container": "#004668",
+                      "surface-bright": "#f8f9ff",
+                      "on-primary-container": "#84aff7",
+                      "surface-container-highest": "#d3e4fe",
+                      "secondary": "#006493",
+                      "on-secondary-fixed-variant": "#004b70",
+                      "outline": "#737781",
+                      "surface-variant": "#d3e4fe",
+                      "tertiary-container": "#712d02",
+                      "secondary-fixed-dim": "#8ccdff",
+                      "tertiary-fixed": "#ffdbcb",
+                      "surface": "#f8f9ff",
+                      "primary-fixed": "#d6e3ff",
+                      "on-surface-variant": "#424750",
+                      "surface-container-high": "#dce9ff",
+                      "surface-container-low": "#eff4ff",
+                      "surface-tint": "#2f5ea1",
+                      "inverse-surface": "#213145",
+                      "secondary-container": "#44b7fd",
+                      "on-secondary-fixed": "#001e2f",
+                      "outline-variant": "#c3c6d2",
+                      "on-tertiary": "#ffffff",
+                      "on-primary-fixed": "#001b3d",
+                      "surface-container-lowest": "#ffffff",
+                      "tertiary": "#4e1c00",
+                      "surface-dim": "#cbdbf5",
+                      "on-error": "#ffffff",
+                      "on-surface": "#0b1c30",
+                      "on-background": "#0b1c30",
+                      "on-secondary": "#ffffff",
+                      "tertiary-fixed-dim": "#ffb693",
+                      "background": "#f8f9ff",
+                      "primary-fixed-dim": "#a9c7ff",
+                      "error": "#ba1a1a",
+                      "on-tertiary-fixed-variant": "#783206",
+                      "inverse-primary": "#a9c7ff",
+                      "surface-container": "#e5eeff",
+                      "inverse-on-surface": "#eaf1ff",
+                      "secondary-fixed": "#cae6ff",
+                      "on-primary-fixed-variant": "#0c4687",
+                      "on-primary": "#ffffff",
+                      "error-container": "#ffdad6",
+                      "primary-container": "#004182"
+              },
+              "borderRadius": {
+                      "DEFAULT": "0.125rem",
+                      "lg": "0.25rem",
+                      "xl": "0.5rem",
+                      "full": "0.75rem"
+              },
+              "spacing": {
+                      "sm": "8px",
+                      "margin-desktop": "32px",
+                      "base": "4px",
+                      "margin-mobile": "16px",
+                      "xl": "32px",
+                      "md": "16px",
+                      "lg": "24px",
+                      "2xl": "48px",
+                      "gutter": "20px",
+                      "xs": "4px"
+              },
+              "fontFamily": {
+                      "headline-lg-mobile": [
+                              "Public Sans"
+                      ],
+                      "body-md": [
+                              "Public Sans"
+                      ],
+                      "label-md": [
+                              "Public Sans"
+                      ],
+                      "headline-sm": [
+                              "Public Sans"
+                      ],
+                      "body-sm": [
+                              "Public Sans"
+                      ],
+                      "data-tabular": [
+                              "Public Sans"
+                      ],
+                      "headline-lg": [
+                              "Public Sans"
+                      ],
+                      "body-lg": [
+                              "Public Sans"
+                      ],
+                      "headline-md": [
+                              "Public Sans"
+                      ]
+              },
+              "fontSize": {
+                      "headline-lg-mobile": [
+                              "24px",
+                              {
+                                      "lineHeight": "32px",
+                                      "fontWeight": "700"
+                              }
+                      ],
+                      "body-md": [
+                              "14px",
+                              {
+                                      "lineHeight": "20px",
+                                      "fontWeight": "400"
+                              }
+                      ],
+                      "label-md": [
+                              "12px",
+                              {
+                                      "lineHeight": "16px",
+                                      "letterSpacing": "0.05em",
+                                      "fontWeight": "600"
+                              }
+                      ],
+                      "headline-sm": [
+                              "20px",
+                              {
+                                      "lineHeight": "28px",
+                                      "fontWeight": "600"
+                              }
+                      ],
+                      "body-sm": [
+                              "13px",
+                              {
+                                      "lineHeight": "18px",
+                                      "fontWeight": "400"
+                              }
+                      ],
+                      "data-tabular": [
+                              "13px",
+                              {
+                                      "lineHeight": "16px",
+                                      "fontWeight": "400"
+                              }
+                      ],
+                      "headline-lg": [
+                              "32px",
+                              {
+                                      "lineHeight": "40px",
+                                      "letterSpacing": "-0.02em",
+                                      "fontWeight": "700"
+                              }
+                      ],
+                      "body-lg": [
+                              "16px",
+                              {
+                                      "lineHeight": "24px",
+                                      "fontWeight": "400"
+                              }
+                      ],
+                      "headline-md": [
+                              "24px",
+                              {
+                                      "lineHeight": "32px",
+                                      "letterSpacing": "-0.01em",
+                                      "fontWeight": "600"
+                              }
+                      ]
+              }
+      },
+          },
+        }
+      </script>
+</head>
+<body class="bg-background text-on-background font-body-md min-h-screen flex">
+<!-- SideNavBar -->
+<aside class="w-[260px] h-screen fixed left-0 top-0 bg-primary dark:bg-primary shadow-sm border-r border-outline-variant z-50">
+<div class="flex flex-col h-full py-xl">
+<div class="px-md mb-xl">
+<div class="flex items-center gap-sm">
+<img alt="BPS Logo" class="w-10 h-10 object-contain" data-alt="Official BPS Kota Malang logo in high resolution, white version suitable for dark backgrounds, modern corporate style, authoritative tone, professional aesthetic, crisp and clean edges, isolated on transparent background, no shadows." src="https://lh3.googleusercontent.com/aida-public/AB6AXuDFaLgWvZ-bOEXdw3oWWXxSicdjUWNnDqw80VP4TRLJ23mI1x1h4GOSCF9bNwbf8IaiOdCXpocERnSO4qLJwEQr1KAsgwwNYUzcpFfvKTXQtTCLOV91-p2kzJU85PrZy_adPg8EALBmWq2Sv25CfmU8B1db7i4N0ibAcCmy_32T3o5QB0fC1DA3OhdYT9oax6WyHouZh7rbSvuih0IQZNENOgNQX2UVVq6xALo-BRVr_53ZbOFMxhf4">
+<div>
+<h1 class="font-headline-sm text-headline-sm font-bold text-on-primary">Sistem Pencocokan Data</h1>
+<p class="font-label-md text-label-md text-secondary-fixed-dim mt-xs">Kota Malang</p>
+</div>
+</div>
+<button class="mt-lg w-full bg-secondary hover:bg-secondary-container hover:text-on-secondary-container text-on-secondary font-label-md text-label-md py-sm px-md rounded transition-colors flex items-center justify-center gap-sm">
+<span class="material-symbols-outlined" style="font-variation-settings: 'FILL' 1;">add</span>
+                    Mulai Pencocokan Baru
+                </button>
+</div>
+<nav class="flex-1 flex flex-col gap-xs px-sm">
+<a class="flex items-center gap-md px-md py-sm text-on-primary hover:bg-on-primary-fixed-variant transition-colors rounded" href="#">
+<span class="material-symbols-outlined">dashboard</span>
+<span class="font-label-md text-label-md">Dashboard</span>
+</a>
+<a class="flex items-center gap-md px-md py-sm text-on-primary hover:bg-on-primary-fixed-variant transition-colors rounded" href="#">
+<span class="material-symbols-outlined">group</span>
+<span class="font-label-md text-label-md">Manajemen Pengguna</span>
+</a>
+<a class="flex items-center gap-md px-md py-sm text-on-primary hover:bg-on-primary-fixed-variant transition-colors rounded" href="#">
+<span class="material-symbols-outlined">storage</span>
+<span class="font-label-md text-label-md">Manajemen Dataset</span>
+</a>
+<a class="flex items-center gap-md px-md py-sm bg-primary-container text-on-primary-container border-l-4 border-secondary-container rounded-r" href="#">
+<span class="material-symbols-outlined" style="font-variation-settings: 'FILL' 1;">dataset_linked</span>
+<span class="font-label-md text-label-md font-bold">Pencocokan Data</span>
+</a>
+<a class="flex items-center gap-md px-md py-sm text-on-primary hover:bg-on-primary-fixed-variant transition-colors rounded" href="#">
+<span class="material-symbols-outlined">assignment</span>
+<span class="font-label-md text-label-md">Assignment</span>
+</a>
+<a class="flex items-center gap-md px-md py-sm text-on-primary hover:bg-on-primary-fixed-variant transition-colors rounded" href="#">
+<span class="material-symbols-outlined">trending_up</span>
+<span class="font-label-md text-label-md">Monitoring Progres</span>
+</a>
+<a class="flex items-center gap-md px-md py-sm text-on-primary hover:bg-on-primary-fixed-variant transition-colors rounded" href="#">
+<span class="material-symbols-outlined">fact_check</span>
+<span class="font-label-md text-label-md">Hasil Matching</span>
+</a>
+<a class="flex items-center gap-md px-md py-sm text-on-primary hover:bg-on-primary-fixed-variant transition-colors rounded" href="#">
+<span class="material-symbols-outlined">history</span>
+<span class="font-label-md text-label-md">Riwayat Proses</span>
+</a>
+</nav>
+<div class="mt-auto px-sm flex flex-col gap-xs border-t border-on-primary-fixed-variant pt-sm">
+<a class="flex items-center gap-md px-md py-sm text-on-primary hover:bg-on-primary-fixed-variant transition-colors rounded" href="#">
+<span class="material-symbols-outlined">help</span>
+<span class="font-label-md text-label-md">Bantuan</span>
+</a>
+<a class="flex items-center gap-md px-md py-sm text-on-primary hover:bg-on-primary-fixed-variant transition-colors rounded" href="#">
+<span class="material-symbols-outlined">logout</span>
+<span class="font-label-md text-label-md">Log Keluar</span>
+</a>
+</div>
+</div>
+</aside>
+<!-- Main Content Area -->
+<div class="flex-1 ml-[260px] flex flex-col min-h-screen">
+<!-- TopNavBar -->
+<header class="fixed top-0 left-[260px] right-0 h-16 bg-surface dark:bg-surface-container-low border-b border-outline-variant z-40">
+<div class="flex justify-between items-center px-lg w-full max-w-full h-full">
+<div class="flex items-center gap-lg">
+<h2 class="font-headline-sm text-headline-sm font-bold text-primary hidden md:block">Sistem Pencocokan Data BPS</h2>
+<div class="relative flex items-center">
+<span class="material-symbols-outlined absolute left-sm text-on-surface-variant">search</span>
+<input class="pl-[36px] pr-sm py-xs border border-outline-variant rounded bg-surface-container-lowest focus:outline-none focus:border-secondary focus:ring-1 focus:ring-secondary text-body-sm font-body-sm w-64" placeholder="Cari..." type="text">
+</div>
+</div>
+<nav class="hidden lg:flex items-center gap-lg">
+<a class="font-label-md text-label-md text-primary font-bold border-b-2 border-primary pb-1 cursor-pointer active:opacity-80" href="#">Beranda</a>
+<a class="font-label-md text-label-md text-on-surface-variant hover:text-primary transition-colors cursor-pointer active:opacity-80" href="#">Data Master</a>
+<a class="font-label-md text-label-md text-on-surface-variant hover:text-primary transition-colors cursor-pointer active:opacity-80" href="#">Arsip</a>
+</nav>
+<div class="flex items-center gap-md">
+<span class="font-label-md text-label-md text-on-surface-variant bg-surface-container-high px-sm py-xs rounded">Role: Superadmin</span>
+<button class="text-on-surface-variant hover:text-primary transition-colors relative">
+<span class="material-symbols-outlined">notifications</span>
+<span class="absolute -top-1 -right-1 w-2 h-2 bg-error rounded-full"></span>
+</button>
+<button class="text-on-surface-variant hover:text-primary transition-colors">
+<span class="material-symbols-outlined">swap_horiz</span>
+</button>
+<button class="flex items-center gap-sm ml-sm">
+<img alt="User Profile" class="w-8 h-8 rounded-full object-cover border border-outline-variant" data-alt="Professional headshot of a civil servant, Asian descent, wearing neat formal attire, plain light background, soft studio lighting, authoritative yet approachable expression, high quality." src="https://lh3.googleusercontent.com/aida-public/AB6AXuCYPl5PdcOYz2vnjXwyp-Kd1nDgipcd8cgsH_LCUP9PwXD9SRv8vrHL7pAdeA6GuM9yLZKZKJsuczGVD2wIxGb4f_QnumaSmyZjBEhjeUAF22G9YOElI6jAyGQKEBMMVsbtRAwHEKjUtcTljvZlBnflB1Gz4SEnE5Ph4NrKMOL-h-IToCrfmreut8YkPT5wyDpIn-TRt7VoB89MZkvedHFsIdXP6qBnBhMyxjdB1foaNKKs_1ixJFYG">
+</button>
+</div>
+</div>
+</header>
+<!-- Main Workspace -->
+<main class="flex-1 mt-16 p-margin-desktop bg-surface-bright pb-24">
+<!-- Breadcrumb & Header -->
+<div class="mb-lg"><a href="#" class="inline-flex items-center gap-xs text-primary hover:underline font-label-md text-label-md mb-sm">
+    <span class="material-symbols-outlined text-[18px]">arrow_back</span>
+    Kembali ke Pencocokan Data
+</a>
+<div class="flex items-center gap-xs text-body-sm font-body-sm text-on-surface-variant mb-sm">
+<a class="hover:text-primary" href="#">Dashboard</a>
+<span class="material-symbols-outlined text-[16px]">chevron_right</span>
+<a class="hover:text-primary" href="#">Pencocokan Data</a>
+<span class="material-symbols-outlined text-[16px]">chevron_right</span>
+<span class="text-primary font-medium">Baru</span>
+</div>
+<h2 class="font-headline-lg text-headline-lg text-primary">Konfigurasi Pencocokan</h2>
+<p class="font-body-md text-body-md text-on-surface-variant mt-xs">Tahap 3 &amp; 4: Petakan atribut antar dataset dan tentukan parameter algoritma.</p>
+</div>
+<!-- Stepper -->
+<div class="flex items-center justify-between mb-xl max-w-3xl bg-surface-container-lowest p-md border border-outline-variant rounded shadow-sm"><div class="flex items-center gap-sm opacity-50">
+    <div class="w-8 h-8 rounded-full bg-surface-variant text-on-surface flex items-center justify-center font-label-md">1</div>
+    <span class="font-label-md text-label-md">Pilih Dataset</span>
+</div>
+<div class="h-px w-16 bg-outline-variant"></div>
+<div class="flex items-center gap-sm">
+    <div class="w-8 h-8 rounded-full bg-primary text-on-primary flex items-center justify-center font-label-md shadow-sm">2</div>
+    <span class="font-label-md text-label-md text-primary font-bold">Pemetaan Atribut</span>
+</div>
+<div class="h-px w-16 bg-outline-variant"></div>
+<div class="flex items-center gap-sm opacity-50">
+    <div class="w-8 h-8 rounded-full border-2 border-outline-variant text-on-surface flex items-center justify-center font-label-md">3</div>
+    <span class="font-label-md text-label-md">Konfigurasi Algoritma</span>
+</div>
+<div class="h-px w-16 bg-outline-variant"></div>
+<div class="flex items-center gap-sm opacity-50">
+    <div class="w-8 h-8 rounded-full border-2 border-outline-variant text-on-surface flex items-center justify-center font-label-md">4</div>
+    <span class="font-label-md text-label-md">Review &amp; Jalankan</span>
+</div></div>
+<!-- Configuration Bento Grid -->
+<div class="grid grid-cols-1 xl:grid-cols-3 gap-lg">
+<!-- Step 3: Attribute Mapping (Takes up 2 columns) -->
+<div class="xl:col-span-2 bg-surface-container-lowest border border-outline-variant rounded shadow-sm flex flex-col">
+<div class="p-md border-b border-outline-variant bg-surface-container-low flex justify-between items-center rounded-t">
+<div>
+<h3 class="font-headline-sm text-headline-sm text-primary">Pemetaan Atribut Kunci</h3>
+<p class="font-body-sm text-body-sm text-on-surface-variant">Tentukan kolom yang saling berkorespondensi antara Dataset A dan Dataset B.</p>
+</div>
+<button class="text-secondary hover:bg-surface-variant px-sm py-xs rounded font-label-md text-label-md transition-colors flex items-center gap-xs">
+<span class="material-symbols-outlined text-[18px]">auto_awesome</span> Auto-Map
+                        </button>
+</div><div class="px-md pt-md flex gap-lg">
+    <div class="flex-1">
+        <label class="block font-label-md text-label-md text-on-surface-variant mb-xs">Dataset A (Sumber)</label>
+        <div class="font-body-md text-body-md font-bold text-primary">Sensus Penduduk 2020 (Malang Kota)</div>
+    </div>
+    <div class="flex-1">
+        <label class="block font-label-md text-label-md text-on-surface-variant mb-xs">Dataset B (Target)</label>
+        <div class="font-body-md text-body-md font-bold text-primary">Data Dukcapil 2023 (Malang Kota)</div>
+    </div>
+</div>
+<div class="p-md flex-1">
+<!-- Table Header -->
+<div class="grid grid-cols-[1fr_auto_1fr_auto] gap-md items-center mb-sm px-sm py-xs bg-surface-variant rounded text-on-surface-variant font-label-md text-label-md">
+<div class="">Dataset A (Sensus 2020)</div>
+<div class="w-6 text-center"></div>
+<div class="">Dataset B (Dukcapil 2023)</div>
+<div class="w-10">Bobot</div>
+</div>
+<!-- Mapping Rows -->
+<div class="flex flex-col gap-sm">
+<!-- Row 1 -->
+<div class="grid grid-cols-[1fr_auto_1fr_auto] gap-md items-center group p-sm hover:bg-surface-container-low rounded transition-colors border border-transparent hover:border-outline-variant">
+<select class="w-full border-outline-variant rounded py-xs px-sm text-body-sm font-body-sm focus:border-secondary focus:ring-1 focus:ring-secondary bg-surface-container-lowest">
+<option>NIK_Sensus</option>
+<option>Nama</option>
+<option>Alamat</option>
+</select>
+<span class="material-symbols-outlined text-outline-variant">compare_arrows</span>
+<select class="w-full border-outline-variant rounded py-xs px-sm text-body-sm font-body-sm focus:border-secondary focus:ring-1 focus:ring-secondary bg-surface-container-lowest">
+<option>NIK_Dukcapil</option>
+<option>Nama_Lengkap</option>
+<option>Alamat_Domisili</option>
+</select>
+<div class="flex items-center gap-xs">
+<input class="w-16 border-outline-variant rounded py-xs px-xs text-center text-body-sm font-body-sm focus:border-secondary focus:ring-1 focus:ring-secondary" step="0.1" type="number" value="1.0">
+<button class="text-error opacity-0 group-hover:opacity-100 transition-opacity"><span class="material-symbols-outlined text-[18px]">delete</span></button>
+</div>
+</div>
+<!-- Row 2 -->
+<div class="grid grid-cols-[1fr_auto_1fr_auto] gap-md items-center group p-sm hover:bg-surface-container-low rounded transition-colors border border-transparent hover:border-outline-variant">
+<select class="w-full border-outline-variant rounded py-xs px-sm text-body-sm font-body-sm focus:border-secondary focus:ring-1 focus:ring-secondary bg-surface-container-lowest">
+<option>Nama</option>
+<option selected="">Nama_KRT</option>
+</select>
+<span class="material-symbols-outlined text-outline-variant">compare_arrows</span>
+<select class="w-full border-outline-variant rounded py-xs px-sm text-body-sm font-body-sm focus:border-secondary focus:ring-1 focus:ring-secondary bg-surface-container-lowest">
+<option selected="">Nama_Lengkap</option>
+<option>Nama_Ibu</option>
+</select>
+<div class="flex items-center gap-xs">
+<input class="w-16 border-outline-variant rounded py-xs px-xs text-center text-body-sm font-body-sm focus:border-secondary focus:ring-1 focus:ring-secondary" step="0.1" type="number" value="0.8">
+<button class="text-error opacity-0 group-hover:opacity-100 transition-opacity"><span class="material-symbols-outlined text-[18px]">delete</span></button>
+</div>
+</div>
+</div>
+<button class="mt-md w-full border border-dashed border-outline-variant text-on-surface-variant hover:bg-surface-container-low hover:text-primary py-sm rounded flex items-center justify-center gap-xs transition-colors text-label-md font-label-md">
+<span class="material-symbols-outlined text-[18px]">add</span> Tambah Pemetaan Atribut
+                        </button>
+</div>
+</div>
+<!-- Step 4: Algorithm Selection -->
+<div class="bg-surface-container-lowest border border-outline-variant rounded shadow-sm flex flex-col">
+<div class="p-md border-b border-outline-variant bg-surface-container-low rounded-t">
+<h3 class="font-headline-sm text-headline-sm text-primary">Konfigurasi Algoritma</h3>
+<p class="font-body-sm text-body-sm text-on-surface-variant">Pilih metode komputasi kesamaan.</p>
+</div>
+<div class="p-md flex flex-col gap-lg flex-1">
+<!-- Algoritma Pilihan -->
+<div>
+<label class="font-label-md text-label-md text-on-surface block mb-sm">Metode Evaluasi (String Metric)</label>
+<div class="flex flex-col gap-sm">
+<label class="flex items-start gap-sm p-sm border border-outline-variant rounded cursor-pointer hover:bg-surface-container-low bg-surface-container-highest border-primary transition-colors">
+<input checked="" class="mt-1 text-primary focus:ring-primary" name="algorithm" type="radio">
+<div>
+<div class="font-label-md text-label-md text-on-surface">Jaro-Winkler</div>
+<div class="font-body-sm text-body-sm text-on-surface-variant">Optimal untuk kesalahan ketik pada nama dan alamat.</div>
+</div>
+</label>
+<label class="flex items-start gap-sm p-sm border border-outline-variant rounded cursor-pointer hover:bg-surface-container-low transition-colors">
+<input class="mt-1 text-primary focus:ring-primary" name="algorithm" type="radio">
+<div>
+<div class="font-label-md text-label-md text-on-surface">Levenshtein Distance</div>
+<div class="font-body-sm text-body-sm text-on-surface-variant">Mengukur jumlah operasi minimum untuk mengubah string.</div>
+</div>
+</label>
+</div>
+</div>
+<!-- Threshold Slider -->
+<div>
+<div class="flex justify-between items-end mb-sm">
+<label class="font-label-md text-label-md text-on-surface block">Similarity Threshold</label>
+<span class="font-headline-sm text-headline-sm text-primary font-bold" id="threshold-val">0.80</span>
+</div>
+<input class="w-full accent-primary h-2 bg-surface-variant rounded-lg appearance-none cursor-pointer" max="1" min="0" oninput="document.getElementById('threshold-val').innerText = parseFloat(this.value).toFixed(2)" step="0.01" type="range" value="0.80">
+<div class="flex justify-between mt-xs font-body-sm text-body-sm text-on-surface-variant text-xs">
+<span class="">Longgar (0.0)</span>
+<span class="">Ketat (1.0)</span>
+</div>
+<p class="mt-sm font-body-sm text-body-sm text-on-surface-variant bg-surface-container-low p-sm rounded border border-outline-variant border-l-4 border-l-secondary-container">
+<span class="material-symbols-outlined text-[16px] inline-block align-middle mr-xs">info</span>
+                                Nilai 0.80 berarti rekaman harus memiliki minimal 80% kemiripan untuk dianggap cocok (Probable Match).
+                            </p>
+</div>
+</div>
+</div>
+</div>
+<!-- Action Buttons -->
+<div class="mt-xl flex justify-end gap-md">
+<button class="px-lg py-sm border border-outline-variant text-on-surface font-label-md text-label-md rounded hover:bg-surface-container-low transition-colors">
+                    Kembali
+                </button>
+<button class="px-lg py-sm bg-primary text-on-primary font-label-md text-label-md rounded hover:bg-primary-container hover:text-on-primary-container transition-colors shadow-md flex items-center gap-sm">
+    Mulai Proses Komputasi
+    <span class="material-symbols-outlined text-[18px]">rocket_launch</span>
+</button>
+</div>
+</main>
+<!-- Footer -->
+<footer class="bg-surface-container-low dark:bg-surface-container-lowest border-t border-outline-variant flex justify-between items-center p-md mt-auto relative bottom-0 w-full z-40">
+<div class="font-body-sm text-body-sm text-on-surface-variant">
+                © 2024 Badan Pusat Statistik Kota Malang - Tim IT BPS
+            </div>
+<div class="flex gap-md font-body-sm text-body-sm text-on-surface-variant">
+<a class="hover:underline text-primary" href="#">Kebijakan Privasi</a>
+<a class="hover:underline text-primary" href="#">Syarat &amp; Ketentuan</a>
+<a class="hover:underline text-primary" href="#">Hubungi Kami</a>
+</div>
+</footer>
+</div>
+
+
+</body></html>

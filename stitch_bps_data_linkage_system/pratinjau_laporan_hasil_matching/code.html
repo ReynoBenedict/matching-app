@@ -1,0 +1,241 @@
+<!DOCTYPE html>
+
+<html lang="id"><head>
+<meta charset="utf-8"/>
+<meta content="width=device-width, initial-scale=1.0" name="viewport"/>
+<title>Executive Report Preview - Sistem Pencocokan Data</title>
+<script src="https://cdn.tailwindcss.com?plugins=forms,container-queries"></script>
+<link href="https://fonts.googleapis.com/css2?family=Public+Sans:wght@400;600;700&amp;display=swap" rel="stylesheet"/>
+<link href="https://fonts.googleapis.com/css2?family=Material+Symbols+Outlined:wght,FILL@100..700,0..1&amp;display=swap" rel="stylesheet"/>
+<link href="https://fonts.googleapis.com/css2?family=Material+Symbols+Outlined:wght,FILL@100..700,0..1&amp;display=swap" rel="stylesheet"/>
+<script id="tailwind-config">
+        tailwind.config = {
+          darkMode: "class",
+          theme: {
+            extend: {
+              "colors": {
+                      "primary": "#002b5a",
+                      "on-error-container": "#93000a",
+                      "on-tertiary-container": "#f79564",
+                      "on-tertiary-fixed": "#351000",
+                      "on-secondary-container": "#004668",
+                      "surface-bright": "#f8f9ff",
+                      "on-primary-container": "#84aff7",
+                      "surface-container-highest": "#d3e4fe",
+                      "secondary": "#006493",
+                      "on-secondary-fixed-variant": "#004b70",
+                      "outline": "#737781",
+                      "surface-variant": "#d3e4fe",
+                      "tertiary-container": "#712d02",
+                      "secondary-fixed-dim": "#8ccdff",
+                      "tertiary-fixed": "#ffdbcb",
+                      "surface": "#f8f9ff",
+                      "primary-fixed": "#d6e3ff",
+                      "on-surface-variant": "#424750",
+                      "surface-container-high": "#dce9ff",
+                      "surface-container-low": "#eff4ff",
+                      "surface-tint": "#2f5ea1",
+                      "inverse-surface": "#213145",
+                      "secondary-container": "#44b7fd",
+                      "on-secondary-fixed": "#001e2f",
+                      "outline-variant": "#c3c6d2",
+                      "on-tertiary": "#ffffff",
+                      "on-primary-fixed": "#001b3d",
+                      "surface-container-lowest": "#ffffff",
+                      "tertiary": "#4e1c00",
+                      "surface-dim": "#cbdbf5",
+                      "on-error": "#ffffff",
+                      "on-surface": "#0b1c30",
+                      "on-background": "#0b1c30",
+                      "on-secondary": "#ffffff",
+                      "tertiary-fixed-dim": "#ffb693",
+                      "background": "#f8f9ff",
+                      "primary-fixed-dim": "#a9c7ff",
+                      "error": "#ba1a1a",
+                      "on-tertiary-fixed-variant": "#783206",
+                      "inverse-primary": "#a9c7ff",
+                      "surface-container": "#e5eeff",
+                      "inverse-on-surface": "#eaf1ff",
+                      "secondary-fixed": "#cae6ff",
+                      "on-primary-fixed-variant": "#0c4687",
+                      "on-primary": "#ffffff",
+                      "error-container": "#ffdad6",
+                      "primary-container": "#004182"
+              },
+              "borderRadius": {
+                      "DEFAULT": "0.125rem",
+                      "lg": "0.25rem",
+                      "xl": "0.5rem",
+                      "full": "0.75rem"
+              },
+              "spacing": {
+                      "sm": "8px",
+                      "margin-desktop": "32px",
+                      "base": "4px",
+                      "margin-mobile": "16px",
+                      "xl": "32px",
+                      "md": "16px",
+                      "lg": "24px",
+                      "2xl": "48px",
+                      "gutter": "20px",
+                      "xs": "4px"
+              },
+              "fontFamily": {
+                      "headline-lg-mobile": ["Public Sans"],
+                      "body-md": ["Public Sans"],
+                      "label-md": ["Public Sans"],
+                      "headline-sm": ["Public Sans"],
+                      "body-sm": ["Public Sans"],
+                      "data-tabular": ["Public Sans"],
+                      "headline-lg": ["Public Sans"],
+                      "body-lg": ["Public Sans"],
+                      "headline-md": ["Public Sans"]
+              },
+              "fontSize": {
+                      "headline-lg-mobile": ["24px", {"lineHeight": "32px", "fontWeight": "700"}],
+                      "body-md": ["14px", {"lineHeight": "20px", "fontWeight": "400"}],
+                      "label-md": ["12px", {"lineHeight": "16px", "letterSpacing": "0.05em", "fontWeight": "600"}],
+                      "headline-sm": ["20px", {"lineHeight": "28px", "fontWeight": "600"}],
+                      "body-sm": ["13px", {"lineHeight": "18px", "fontWeight": "400"}],
+                      "data-tabular": ["13px", {"lineHeight": "16px", "fontWeight": "400"}],
+                      "headline-lg": ["32px", {"lineHeight": "40px", "letterSpacing": "-0.02em", "fontWeight": "700"}],
+                      "body-lg": ["16px", {"lineHeight": "24px", "fontWeight": "400"}],
+                      "headline-md": ["24px", {"lineHeight": "32px", "letterSpacing": "-0.01em", "fontWeight": "600"}]
+              }
+      },
+          },
+        }
+      </script>
+</head>
+<body class="bg-background text-on-background font-body-md min-h-screen flex">
+<!-- Main Content Canvas (No Nav Shell as per instructions for transactional/focused view) -->
+<main class="flex-1 w-full max-w-[1280px] mx-auto p-margin-mobile md:p-margin-desktop flex flex-col gap-lg">
+<!-- Header Actions -->
+<header class="flex justify-between items-center pb-md border-b border-outline-variant">
+<div class="flex items-center gap-sm">
+<button aria-label="Kembali" class="p-2 hover:bg-surface-variant rounded-full transition-colors flex items-center justify-center text-primary">
+<span class="material-symbols-outlined">arrow_back</span>
+</button>
+<div>
+<h1 class="font-headline-md text-headline-md text-primary">Laporan Eksekutif Pencocokan Data</h1>
+<p class="font-body-sm text-body-sm text-on-surface-variant">ID Laporan: BPS-MLG-2024-10-A42</p>
+</div>
+</div>
+<div class="flex gap-md">
+<button class="px-md py-sm rounded border border-primary text-primary font-label-md text-label-md hover:bg-surface-variant transition-colors flex items-center gap-sm">
+<span class="material-symbols-outlined text-[18px]">share</span>
+                    Bagikan
+                </button>
+<button class="px-md py-sm rounded bg-primary text-on-primary font-label-md text-label-md hover:bg-primary-container hover:text-on-primary-container transition-colors shadow-sm hover:shadow-md flex items-center gap-sm">
+<span class="material-symbols-outlined text-[18px]">download</span>
+                    Unduh Laporan (PDF)
+                </button>
+</div>
+</header>
+<!-- Document Container -->
+<div class="bg-surface-container-lowest border border-outline-variant rounded-lg p-lg md:p-xl shadow-sm flex flex-col gap-xl">
+<!-- Document Header -->
+<div class="text-center border-b-2 border-primary pb-lg">
+<h2 class="font-headline-lg text-headline-lg text-primary uppercase mb-2">Laporan Hasil Pencocokan Data</h2>
+<h3 class="font-headline-sm text-headline-sm text-on-surface">Sensus Penduduk &amp; Data Registrasi Daerah</h3>
+<p class="font-body-md text-body-md text-on-surface-variant mt-sm">Periode Pelaksanaan: Oktober 2024 | Disiapkan Untuk: Kepala BPS Kota Malang</p>
+</div>
+<!-- Executive Summary -->
+<section class="flex flex-col gap-sm">
+<h4 class="font-label-md text-label-md text-primary uppercase tracking-wider">Ringkasan Eksekutif</h4>
+<div class="bg-surface-container-low p-md rounded border border-outline-variant">
+<p class="font-body-md text-body-md text-on-surface leading-relaxed">
+                        Proses pencocokan data antara basis data Sensus Penduduk BPS dengan Data Registrasi Administrasi Kependudukan Pemerintah Daerah telah selesai dilaksanakan. Proses ini bertujuan untuk mengidentifikasi tingkat kesesuaian data penduduk di wilayah Kota Malang guna mendukung kebijakan berbasis data yang presisi. Secara keseluruhan, tingkat pencocokan berhasil mencapai <strong>87.4%</strong>, yang menunjukkan tingkat integritas data yang cukup baik antar instansi. Langkah verifikasi manual lanjutan direkomendasikan untuk 12.6% data anomali yang belum terselesaikan secara algoritmik.
+                    </p>
+</div>
+</section>
+<!-- Grid Layout for Data Info & Config -->
+<div class="grid grid-cols-1 md:grid-cols-2 gap-lg">
+<!-- Dataset Info -->
+<section class="flex flex-col gap-sm">
+<h4 class="font-label-md text-label-md text-primary uppercase tracking-wider">Informasi Dataset</h4>
+<table class="w-full border-collapse border border-outline-variant text-left">
+<tbody>
+<tr class="border-b border-outline-variant hover:bg-surface-variant">
+<th class="font-label-md text-label-md p-sm bg-surface-container-low text-on-surface-variant w-1/3">Dataset Utama (A)</th>
+<td class="font-data-tabular text-data-tabular p-sm text-on-surface">SP2020_KotaMalang_Final.csv</td>
+</tr>
+<tr class="border-b border-outline-variant hover:bg-surface-variant">
+<th class="font-label-md text-label-md p-sm bg-surface-container-low text-on-surface-variant">Jumlah Record (A)</th>
+<td class="font-data-tabular text-data-tabular p-sm text-on-surface">843,210 Baris</td>
+</tr>
+<tr class="border-b border-outline-variant hover:bg-surface-variant">
+<th class="font-label-md text-label-md p-sm bg-surface-container-low text-on-surface-variant">Dataset Pembanding (B)</th>
+<td class="font-data-tabular text-data-tabular p-sm text-on-surface">Adminduk_Malang_Q3_2024.csv</td>
+</tr>
+<tr class="hover:bg-surface-variant">
+<th class="font-label-md text-label-md p-sm bg-surface-container-low text-on-surface-variant">Jumlah Record (B)</th>
+<td class="font-data-tabular text-data-tabular p-sm text-on-surface">851,045 Baris</td>
+</tr>
+</tbody>
+</table>
+</section>
+<!-- Matching Config -->
+<section class="flex flex-col gap-sm">
+<h4 class="font-label-md text-label-md text-primary uppercase tracking-wider">Konfigurasi Algoritma Pencocokan</h4>
+<div class="bg-surface-container-low p-md rounded border border-outline-variant h-full flex flex-col justify-center">
+<ul class="space-y-2 font-body-sm text-body-sm text-on-surface">
+<li class="flex items-center gap-2">
+<span class="material-symbols-outlined text-secondary text-[16px]">check_circle</span>
+<strong>Metode Utama:</strong> Exact Match &amp; Fuzzy String Matching (Levenshtein Distance)
+                            </li>
+<li class="flex items-center gap-2">
+<span class="material-symbols-outlined text-secondary text-[16px]">check_circle</span>
+<strong>Threshold Kemiripan:</strong> 0.85 (Fuzzy)
+                            </li>
+<li class="flex items-center gap-2">
+<span class="material-symbols-outlined text-secondary text-[16px]">check_circle</span>
+<strong>Key Attributes:</strong> NIK (Exact), Nama Lengkap (Fuzzy), Tanggal Lahir (Exact)
+                            </li>
+<li class="flex items-center gap-2">
+<span class="material-symbols-outlined text-secondary text-[16px]">check_circle</span>
+<strong>Durasi Proses:</strong> 02 Jam 14 Menit
+                            </li>
+</ul>
+</div>
+</section>
+</div>
+<!-- Statistics (Bento Grid Style) -->
+<section class="flex flex-col gap-sm">
+<h4 class="font-label-md text-label-md text-primary uppercase tracking-wider">Statistik Hasil Pencocokan</h4>
+<div class="grid grid-cols-1 md:grid-cols-4 gap-md">
+<div class="bg-primary-container p-md rounded border border-primary/20 text-center flex flex-col justify-center items-center">
+<span class="font-headline-lg text-headline-lg text-on-primary-container">87.4%</span>
+<span class="font-label-md text-label-md text-on-primary-container/80 mt-1">Total Matched</span>
+</div>
+<div class="bg-surface-container-highest p-md rounded border border-outline-variant text-center flex flex-col justify-center items-center">
+<span class="font-headline-md text-headline-md text-primary">736,965</span>
+<span class="font-label-md text-label-md text-on-surface-variant mt-1">Exact Match (NIK)</span>
+</div>
+<div class="bg-surface-container-highest p-md rounded border border-outline-variant text-center flex flex-col justify-center items-center">
+<span class="font-headline-md text-headline-md text-secondary">42,510</span>
+<span class="font-label-md text-label-md text-on-surface-variant mt-1">Fuzzy Match (Nama/TTL)</span>
+</div>
+<div class="bg-error-container p-md rounded border border-error/20 text-center flex flex-col justify-center items-center">
+<span class="font-headline-md text-headline-md text-on-error-container">63,735</span>
+<span class="font-label-md text-label-md text-on-error-container/80 mt-1">Non-Match (Anomali)</span>
+</div>
+</div>
+</section>
+<!-- Verification Progress -->
+<section class="flex flex-col gap-sm">
+<h4 class="font-label-md text-label-md text-primary uppercase tracking-wider">Progres Verifikasi Manual (Post-Match)</h4>
+<div class="bg-surface-container-low p-md rounded border border-outline-variant">
+<div class="flex justify-between items-center mb-2">
+<span class="font-body-md text-body-md text-on-surface font-semibold">Tindak Lanjut Data Anomali</span>
+<span class="font-label-md text-label-md text-secondary">35% Selesai (22,307 / 63,735)</span>
+</div>
+<div class="w-full bg-surface-variant rounded-full h-2 mb-4 overflow-hidden">
+<div class="bg-secondary h-2 rounded-full" style="width: 35%"></div>
+</div>
+<p class="font-body-sm text-body-sm text-on-surface-variant">Tim verifikator saat ini sedang memproses entri yang gagal dicocokkan. Kendala utama teridentifikasi pada perbedaan format penulisan alamat dan kesalahan ketik nama pada dataset B.</p>
+</div>
+</section>
+</div>
+</main>
+</body></html>

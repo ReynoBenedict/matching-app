@@ -1,0 +1,62 @@
+services:
+  # Next.js Application
+  app:
+    build:
+      context: .
+      dockerfile: Dockerfile
+    ports:
+      - "3000:3000"
+    environment:
+      - NODE_ENV=production
+      - DATABASE_URL=postgresql://bps_user:bps_password@postgres:5432/bps_data_matching
+      - MODEL_SERVICE_URL=http://model:8000
+    depends_on:
+      postgres:
+        condition: service_healthy
+    networks:
+      - bps-network
+    restart: unless-stopped
+
+  # PostgreSQL Database
+  postgres:
+    image: postgres:16-alpine
+    environment:
+      POSTGRES_DB: bps_data_matching
+      POSTGRES_USER: bps_user
+      POSTGRES_PASSWORD: bps_password
+    ports:
+      - "5432:5432"
+    volumes:
+      - postgres_data:/var/lib/postgresql/data
+    networks:
+      - bps-network
+    healthcheck:
+      test: ["CMD-SHELL", "pg_isready -U bps_user -d bps_data_matching"]
+      interval: 10s
+      timeout: 5s
+      retries: 5
+    restart: unless-stopped
+
+  # Model Service (Placeholder for Phase 2+)
+  # This service is commented out because the actual model implementation
+  # does not exist yet. It will be implemented in later phases.
+  # 
+  # model:
+  #   image: bps-matching-model:latest  # To be defined in later phases
+  #   ports:
+  #     - "8000:8000"
+  #   environment:
+  #     - MODEL_ENV=production
+  #   networks:
+  #     - bps-network
+  #   restart: unless-stopped
+  #   depends_on:
+  #     - postgres
+
+volumes:
+  postgres_data:
+    driver: local
+
+networks:
+  bps-network:
+    driver: bridge

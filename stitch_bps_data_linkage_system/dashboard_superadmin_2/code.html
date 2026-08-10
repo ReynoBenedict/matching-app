@@ -1,0 +1,434 @@
+<!DOCTYPE html>
+
+<html lang="id"><head>
+<meta charset="utf-8"/>
+<meta content="width=device-width, initial-scale=1.0" name="viewport"/>
+<title>Dashboard - Sistem Pencocokan Data BPS</title>
+<script src="https://cdn.tailwindcss.com?plugins=forms,container-queries"></script>
+<link href="https://fonts.googleapis.com/css2?family=Public+Sans:wght@400;600;700&amp;display=swap" rel="stylesheet"/>
+<link href="https://fonts.googleapis.com/css2?family=Material+Symbols+Outlined:wght,FILL@100..700,0..1&amp;display=swap" rel="stylesheet"/>
+<link href="https://fonts.googleapis.com/css2?family=Material+Symbols+Outlined:wght,FILL@100..700,0..1&amp;display=swap" rel="stylesheet"/>
+<script id="tailwind-config">
+        tailwind.config = {
+            darkMode: "class",
+            theme: {
+                extend: {
+                    "colors": {
+                        "on-tertiary-fixed-variant": "#783206",
+                        "primary-fixed": "#d6e3ff",
+                        "secondary-fixed-dim": "#8ccdff",
+                        "on-surface-variant": "#424750",
+                        "primary-fixed-dim": "#a9c7ff",
+                        "surface-container-highest": "#d3e4fe",
+                        "primary-container": "#004182",
+                        "surface-container-lowest": "#ffffff",
+                        "surface-container-low": "#eff4ff",
+                        "surface-container-high": "#dce9ff",
+                        "on-surface": "#0b1c30",
+                        "inverse-surface": "#213145",
+                        "on-primary-fixed-variant": "#0c4687",
+                        "error-container": "#ffdad6",
+                        "on-background": "#0b1c30",
+                        "secondary": "#006493",
+                        "on-primary": "#ffffff",
+                        "on-tertiary": "#ffffff",
+                        "surface-bright": "#f8f9ff",
+                        "tertiary-fixed-dim": "#ffb693",
+                        "tertiary-fixed": "#ffdbcb",
+                        "on-secondary-fixed-variant": "#004b70",
+                        "surface-dim": "#cbdbf5",
+                        "on-secondary": "#ffffff",
+                        "on-tertiary-fixed": "#351000",
+                        "on-secondary-container": "#004668",
+                        "outline-variant": "#c3c6d2",
+                        "secondary-fixed": "#cae6ff",
+                        "on-error-container": "#93000a",
+                        "on-primary-fixed": "#001b3d",
+                        "on-tertiary-container": "#f79564",
+                        "on-secondary-fixed": "#001e2f",
+                        "primary": "#002b5a",
+                        "tertiary": "#4e1c00",
+                        "tertiary-container": "#712d02",
+                        "surface-variant": "#d3e4fe",
+                        "surface": "#f8f9ff",
+                        "on-error": "#ffffff",
+                        "background": "#f8f9ff",
+                        "error": "#ba1a1a",
+                        "secondary-container": "#44b7fd",
+                        "inverse-on-surface": "#eaf1ff",
+                        "inverse-primary": "#a9c7ff",
+                        "surface-container": "#e5eeff",
+                        "on-primary-container": "#84aff7",
+                        "surface-tint": "#2f5ea1",
+                        "outline": "#737781"
+                    },
+                    "borderRadius": {
+                        "DEFAULT": "0.125rem",
+                        "lg": "0.25rem",
+                        "xl": "0.5rem",
+                        "full": "0.75rem"
+                    },
+                    "spacing": {
+                        "md": "16px",
+                        "xs": "4px",
+                        "gutter": "20px",
+                        "sm": "8px",
+                        "base": "4px",
+                        "margin-mobile": "16px",
+                        "lg": "24px",
+                        "xl": "32px",
+                        "2xl": "48px",
+                        "margin-desktop": "32px"
+                    },
+                    "fontFamily": {
+                        "body-lg": ["Public Sans"],
+                        "data-tabular": ["Public Sans"],
+                        "headline-lg": ["Public Sans"],
+                        "body-md": ["Public Sans"],
+                        "body-sm": ["Public Sans"],
+                        "headline-md": ["Public Sans"],
+                        "label-md": ["Public Sans"],
+                        "headline-sm": ["Public Sans"],
+                        "headline-lg-mobile": ["Public Sans"]
+                    },
+                    "fontSize": {
+                        "body-lg": ["16px", { "lineHeight": "24px", "fontWeight": "400" }],
+                        "data-tabular": ["13px", { "lineHeight": "16px", "fontWeight": "400" }],
+                        "headline-lg": ["32px", { "lineHeight": "40px", "letterSpacing": "-0.02em", "fontWeight": "700" }],
+                        "body-md": ["14px", { "lineHeight": "20px", "fontWeight": "400" }],
+                        "body-sm": ["13px", { "lineHeight": "18px", "fontWeight": "400" }],
+                        "headline-md": ["24px", { "lineHeight": "32px", "letterSpacing": "-0.01em", "fontWeight": "600" }],
+                        "label-md": ["12px", { "lineHeight": "16px", "letterSpacing": "0.05em", "fontWeight": "600" }],
+                        "headline-sm": ["20px", { "lineHeight": "28px", "fontWeight": "600" }],
+                        "headline-lg-mobile": ["24px", { "lineHeight": "32px", "fontWeight": "700" }]
+                    }
+                }
+            }
+        }
+    </script>
+<style>
+        body { font-family: 'Public Sans', sans-serif; }
+    </style>
+</head>
+<body class="bg-background text-on-background antialiased h-screen overflow-hidden flex">
+<!-- SideNavBar -->
+<nav class="hidden md:flex w-[260px] h-screen fixed left-0 top-0 bg-primary dark:bg-primary border-r border-outline-variant shadow-sm z-20 flex-col py-xl">
+<div class="px-md mb-xl flex items-center gap-sm">
+<span class="material-symbols-outlined text-on-primary text-4xl" data-weight="fill">stacked_bar_chart</span>
+<div>
+<h1 class="font-headline-sm text-headline-sm font-bold text-on-primary leading-tight">Sistem Pencocokan Data</h1>
+<p class="font-body-sm text-body-sm text-secondary-fixed-dim dark:text-primary-fixed-dim">Kota Malang</p>
+</div>
+</div>
+<div class="px-md mb-lg">
+<button class="w-full bg-secondary-container text-on-secondary-container font-label-md text-label-md py-sm px-md rounded-lg flex items-center justify-center gap-sm hover:bg-secondary-fixed transition-colors">
+<span class="material-symbols-outlined" data-weight="fill">add_circle</span>
+                Mulai Pencocokan Baru
+            </button>
+</div>
+<ul class="flex-1 flex flex-col gap-xs font-body-md text-body-md">
+<!-- Active Tab: Dashboard -->
+<li>
+<a class="flex items-center gap-md px-md py-sm bg-primary-container text-on-primary-container border-l-4 border-secondary-container transition-all duration-200 ease-in-out" href="#">
+<span class="material-symbols-outlined" data-weight="fill">dashboard</span>
+                    Dashboard
+                </a>
+</li>
+<li>
+<a class="flex items-center gap-md px-md py-sm text-on-primary hover:bg-on-primary-fixed-variant transition-colors transition-all duration-200 ease-in-out" href="#">
+<span class="material-symbols-outlined" data-weight="fill">group</span>
+                    Manajemen Pengguna
+                </a>
+</li>
+<li>
+<a class="flex items-center gap-md px-md py-sm text-on-primary hover:bg-on-primary-fixed-variant transition-colors transition-all duration-200 ease-in-out" href="#">
+<span class="material-symbols-outlined" data-weight="fill">database</span>
+                    Manajemen Dataset
+                </a>
+</li>
+<li>
+<a class="flex items-center gap-md px-md py-sm text-on-primary hover:bg-on-primary-fixed-variant transition-colors transition-all duration-200 ease-in-out" href="#">
+<span class="material-symbols-outlined" data-weight="fill">dataset_linked</span>
+                    Pencocokan Data
+                </a>
+</li>
+<li>
+<a class="flex items-center gap-md px-md py-sm text-on-primary hover:bg-on-primary-fixed-variant transition-colors transition-all duration-200 ease-in-out" href="#">
+<span class="material-symbols-outlined" data-weight="fill">assignment</span>
+                    Assignment
+                </a>
+</li>
+<li>
+<a class="flex items-center gap-md px-md py-sm text-on-primary hover:bg-on-primary-fixed-variant transition-colors transition-all duration-200 ease-in-out" href="#">
+<span class="material-symbols-outlined" data-weight="fill">monitoring</span>
+                    Monitoring Progres
+                </a>
+</li>
+<li>
+<a class="flex items-center gap-md px-md py-sm text-on-primary hover:bg-on-primary-fixed-variant transition-colors transition-all duration-200 ease-in-out" href="#">
+<span class="material-symbols-outlined" data-weight="fill">fact_check</span>
+                    Hasil Matching
+                </a>
+</li>
+<li>
+<a class="flex items-center gap-md px-md py-sm text-on-primary hover:bg-on-primary-fixed-variant transition-colors transition-all duration-200 ease-in-out" href="#">
+<span class="material-symbols-outlined" data-weight="fill">history</span>
+                    Riwayat Proses
+                </a>
+</li>
+</ul>
+<ul class="mt-auto flex flex-col gap-xs font-body-md text-body-md">
+<li>
+<a class="flex items-center gap-md px-md py-sm text-on-primary hover:bg-on-primary-fixed-variant transition-colors transition-all duration-200 ease-in-out" href="#">
+<span class="material-symbols-outlined" data-weight="fill">help</span>
+                    Bantuan
+                </a>
+</li>
+<li>
+<a class="flex items-center gap-md px-md py-sm text-on-primary hover:bg-on-primary-fixed-variant transition-colors transition-all duration-200 ease-in-out" href="#">
+<span class="material-symbols-outlined" data-weight="fill">logout</span>
+                    Log Keluar
+                </a>
+</li>
+</ul>
+</nav>
+<!-- Main Content Area -->
+<div class="flex-1 flex flex-col md:ml-[260px] h-screen overflow-hidden">
+<!-- TopNavBar -->
+<header class="fixed top-0 left-0 md:left-[260px] right-0 h-16 bg-surface dark:bg-surface-container-low border-b border-outline-variant z-10 flex justify-between items-center px-lg w-full max-w-full font-label-md text-label-md">
+<div class="flex items-center gap-md">
+<!-- Mobile Menu Button -->
+<button class="md:hidden text-primary p-sm">
+<span class="material-symbols-outlined">menu</span>
+</button>
+<span class="hidden lg:block font-headline-sm text-headline-sm font-bold text-primary">Sistem Pencocokan Data BPS</span>
+</div>
+<div class="flex items-center gap-md text-primary dark:text-primary-fixed-dim">
+<span class="hidden sm:block px-sm py-xs bg-surface-container rounded font-label-md text-on-surface-variant">Role: Superadmin</span>
+<div class="flex items-center gap-sm">
+<button aria-label="Notifikasi" class="p-sm hover:bg-surface-container-high rounded-full transition-colors relative">
+<span class="material-symbols-outlined">notifications</span>
+<span class="absolute top-1 right-1 w-2 h-2 bg-error rounded-full"></span>
+</button>
+<button aria-label="account_circle" class="p-sm hover:bg-surface-container-high rounded-full transition-colors">
+<span class="material-symbols-outlined">account_circle</span>
+</button>
+<button aria-label="swap_horiz" class="p-sm hover:bg-surface-container-high rounded-full transition-colors">
+<span class="material-symbols-outlined">swap_horiz</span>
+</button>
+</div>
+</div>
+</header>
+<!-- Dashboard Canvas -->
+<main class="flex-1 overflow-y-auto mt-16 p-margin-mobile md:p-margin-desktop bg-surface-bright">
+<div class="max-w-[1280px] mx-auto">
+<!-- Page Header -->
+<div class="mb-lg">
+<div class="font-label-md text-on-surface-variant mb-xs">Beranda / Dashboard</div>
+<h2 class="font-headline-lg-mobile md:font-headline-lg text-on-surface">Dashboard Superadmin</h2>
+<p class="font-body-md text-on-surface-variant mt-sm">Ringkasan status operasional pencocokan data nasional.</p>
+</div>
+<!-- KPI Bento Grid -->
+<div class="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-5 gap-md mb-xl">
+<!-- KPI 1 -->
+<div class="bg-surface-container-lowest border border-outline-variant rounded-xl p-md shadow-sm hover:shadow-md transition-shadow relative overflow-hidden group">
+<div class="absolute top-0 right-0 p-sm opacity-20 group-hover:opacity-40 transition-opacity">
+<span class="material-symbols-outlined text-4xl text-primary">database</span>
+</div>
+<h3 class="font-label-md text-on-surface-variant mb-xs">Total Dataset</h3>
+<p class="font-headline-md text-on-surface">142</p>
+<p class="font-body-sm text-secondary mt-sm flex items-center gap-xs">
+<span class="material-symbols-outlined text-[16px]">arrow_upward</span>
+                            +3 bulan ini
+                        </p>
+</div>
+<!-- KPI 2 -->
+<div class="bg-surface-container-lowest border border-outline-variant rounded-xl p-md shadow-sm hover:shadow-md transition-shadow relative overflow-hidden group">
+<div class="absolute top-0 right-0 p-sm opacity-20 group-hover:opacity-40 transition-opacity">
+<span class="material-symbols-outlined text-4xl text-primary">sync_alt</span>
+</div>
+<h3 class="font-label-md text-on-surface-variant mb-xs">Total Proses Matching</h3>
+<p class="font-headline-md text-on-surface">1,204</p>
+<p class="font-body-sm text-secondary mt-sm flex items-center gap-xs">
+<span class="material-symbols-outlined text-[16px]">arrow_upward</span>
+                            +12% vs bulan lalu
+                        </p>
+</div>
+<!-- KPI 3 -->
+<div class="bg-surface-container-lowest border border-outline-variant rounded-xl p-md shadow-sm hover:shadow-md transition-shadow relative overflow-hidden group">
+<div class="absolute top-0 right-0 p-sm opacity-20 group-hover:opacity-40 transition-opacity">
+<span class="material-symbols-outlined text-4xl text-primary">group</span>
+</div>
+<h3 class="font-label-md text-on-surface-variant mb-xs">Total Kandidat</h3>
+<p class="font-headline-md text-on-surface">8.4M</p>
+<p class="font-body-sm text-on-surface-variant mt-sm">Data record unik</p>
+</div>
+<!-- KPI 4 -->
+<div class="bg-surface-container-lowest border border-outline-variant rounded-xl p-md shadow-sm hover:shadow-md transition-shadow relative overflow-hidden group border-l-4 border-l-error">
+<div class="absolute top-0 right-0 p-sm opacity-20 group-hover:opacity-40 transition-opacity">
+<span class="material-symbols-outlined text-4xl text-error">warning</span>
+</div>
+<h3 class="font-label-md text-on-surface-variant mb-xs">Belum Terverifikasi</h3>
+<p class="font-headline-md text-on-surface">45,210</p>
+<p class="font-body-sm text-error mt-sm flex items-center gap-xs">
+<span class="material-symbols-outlined text-[16px]">priority_high</span>
+                            Perlu tindakan
+                        </p>
+</div>
+<!-- KPI 5 -->
+<div class="bg-surface-container-lowest border border-outline-variant rounded-xl p-md shadow-sm hover:shadow-md transition-shadow relative overflow-hidden group">
+<div class="absolute top-0 right-0 p-sm opacity-20 group-hover:opacity-40 transition-opacity">
+<span class="material-symbols-outlined text-4xl text-primary">task_alt</span>
+</div>
+<h3 class="font-label-md text-on-surface-variant mb-xs">Progress Labeling</h3>
+<p class="font-headline-md text-on-surface">78%</p>
+<div class="w-full bg-surface-container-high rounded-full h-2 mt-sm overflow-hidden">
+<div class="bg-primary h-2 rounded-full" style="width: 78%"></div>
+</div>
+</div>
+</div>
+<!-- Charts Layout -->
+<div class="grid grid-cols-1 lg:grid-cols-3 gap-md mb-xl">
+<!-- Chart 1: Progress Labeling (Bar - Placeholder) -->
+<div class="bg-surface-container-lowest border border-outline-variant rounded-xl p-md shadow-sm lg:col-span-2 flex flex-col">
+<h3 class="font-headline-sm text-on-surface mb-sm">Aktivitas Matching Harian</h3>
+<div class="flex-1 min-h-[240px] bg-surface-container-low rounded-lg border border-outline-variant border-dashed flex items-center justify-center relative overflow-hidden">
+<!-- Simulated Chart Grid -->
+<div class="absolute inset-0 flex flex-col justify-between py-md px-lg opacity-10">
+<div class="w-full h-px bg-on-surface"></div>
+<div class="w-full h-px bg-on-surface"></div>
+<div class="w-full h-px bg-on-surface"></div>
+<div class="w-full h-px bg-on-surface"></div>
+</div>
+<div class="z-10 flex items-end gap-sm h-3/4 px-lg w-full">
+<div class="w-full bg-primary-fixed-dim hover:bg-primary transition-colors rounded-t-sm h-[40%]" title="Senin"></div>
+<div class="w-full bg-primary-fixed-dim hover:bg-primary transition-colors rounded-t-sm h-[60%]" title="Selasa"></div>
+<div class="w-full bg-primary hover:bg-primary-container transition-colors rounded-t-sm h-[85%]" title="Rabu (Hari ini)"></div>
+<div class="w-full bg-primary-fixed-dim hover:bg-primary transition-colors rounded-t-sm h-[30%]" title="Kamis"></div>
+<div class="w-full bg-primary-fixed-dim hover:bg-primary transition-colors rounded-t-sm h-[50%]" title="Jumat"></div>
+</div>
+</div>
+</div>
+<!-- Chart 2: Match vs Non-Match (Pie - Placeholder) -->
+<div class="bg-surface-container-lowest border border-outline-variant rounded-xl p-md shadow-sm flex flex-col">
+<h3 class="font-headline-sm text-on-surface mb-sm">Distribusi Status</h3>
+<div class="flex-1 min-h-[240px] bg-surface-container-low rounded-lg border border-outline-variant border-dashed flex flex-col items-center justify-center gap-md p-md">
+<div class="w-32 h-32 rounded-full border-8 border-primary-container relative">
+<div class="absolute inset-0 rounded-full border-8 border-secondary-container" style="clip-path: polygon(50% 50%, 100% 0, 100% 100%, 0 100%, 0 50%)"></div>
+</div>
+<div class="w-full font-body-sm text-on-surface-variant flex flex-col gap-xs">
+<div class="flex justify-between items-center"><span class="flex items-center gap-xs"><span class="w-3 h-3 rounded-full bg-secondary-container"></span> Match (65%)</span> <span>5.4M</span></div>
+<div class="flex justify-between items-center"><span class="flex items-center gap-xs"><span class="w-3 h-3 rounded-full bg-primary-container"></span> Non-Match (20%)</span> <span>1.6M</span></div>
+<div class="flex justify-between items-center"><span class="flex items-center gap-xs"><span class="w-3 h-3 rounded-full bg-outline"></span> Ragu-ragu (15%)</span> <span>1.4M</span></div>
+</div>
+</div>
+</div>
+</div>
+<!-- Recent Activity Table -->
+<div class="bg-surface-container-lowest border border-outline-variant rounded-xl shadow-sm overflow-hidden mb-xl">
+<div class="p-md border-b border-outline-variant flex justify-between items-center bg-surface">
+<h3 class="font-headline-sm text-on-surface">Aktivitas Terbaru</h3>
+<button class="font-label-md text-primary hover:underline">Lihat Semua</button>
+</div>
+<div class="overflow-x-auto">
+<table class="w-full text-left font-data-tabular">
+<thead class="bg-surface-container-low font-label-md text-on-surface-variant">
+<tr>
+<th class="py-sm px-md border-b border-outline-variant font-semibold sticky top-0 bg-surface-container-low">ID Proses</th>
+<th class="py-sm px-md border-b border-outline-variant font-semibold sticky top-0 bg-surface-container-low">Dataset Asal</th>
+<th class="py-sm px-md border-b border-outline-variant font-semibold sticky top-0 bg-surface-container-low">Tanggal Mulai</th>
+<th class="py-sm px-md border-b border-outline-variant font-semibold sticky top-0 bg-surface-container-low">Petugas</th>
+<th class="py-sm px-md border-b border-outline-variant font-semibold sticky top-0 bg-surface-container-low">Status</th>
+<th class="py-sm px-md border-b border-outline-variant font-semibold sticky top-0 bg-surface-container-low text-right">Aksi</th>
+</tr>
+</thead>
+<tbody class="divide-y divide-outline-variant">
+<tr class="hover:bg-surface-container-lowest transition-colors group">
+<td class="py-sm px-md text-on-surface">PRC-24-001</td>
+<td class="py-sm px-md text-on-surface">Sensus Penduduk 2020 vs Dukcapil 2023</td>
+<td class="py-sm px-md text-on-surface-variant">24 Okt 2024, 08:30</td>
+<td class="py-sm px-md text-on-surface">Ahmad B.</td>
+<td class="py-sm px-md">
+<span class="inline-flex items-center px-2 py-0.5 rounded-full text-[11px] font-medium bg-[#e6f4ea] text-[#1e8e3e]">Selesai</span>
+</td>
+<td class="py-sm px-md text-right">
+<button class="text-secondary hover:text-primary transition-colors p-1" title="Lihat Detail">
+<span class="material-symbols-outlined text-[18px]">visibility</span>
+</button>
+</td>
+</tr>
+<tr class="hover:bg-surface-container-lowest transition-colors group">
+<td class="py-sm px-md text-on-surface">PRC-24-002</td>
+<td class="py-sm px-md text-on-surface">Data DTKS vs Regsosek 2022</td>
+<td class="py-sm px-md text-on-surface-variant">24 Okt 2024, 09:15</td>
+<td class="py-sm px-md text-on-surface">Siti N.</td>
+<td class="py-sm px-md">
+<span class="inline-flex items-center px-2 py-0.5 rounded-full text-[11px] font-medium bg-[#e8f0fe] text-[#1967d2] animate-pulse">Berlangsung</span>
+</td>
+<td class="py-sm px-md text-right">
+<button class="text-secondary hover:text-primary transition-colors p-1" title="Lihat Detail">
+<span class="material-symbols-outlined text-[18px]">visibility</span>
+</button>
+</td>
+</tr>
+<tr class="hover:bg-surface-container-lowest transition-colors group">
+<td class="py-sm px-md text-on-surface">PRC-24-003</td>
+<td class="py-sm px-md text-on-surface">Survei Angkatan Kerja vs BPJS Naker</td>
+<td class="py-sm px-md text-on-surface-variant">23 Okt 2024, 14:00</td>
+<td class="py-sm px-md text-on-surface">Budi S.</td>
+<td class="py-sm px-md">
+<span class="inline-flex items-center px-2 py-0.5 rounded-full text-[11px] font-medium bg-[#fff8e1] text-[#f57f17]">Menunggu Verifikasi Manual</span>
+</td>
+<td class="py-sm px-md text-right">
+<button class="text-secondary hover:text-primary transition-colors p-1" title="Lihat Detail">
+<span class="material-symbols-outlined text-[18px]">visibility</span>
+</button>
+</td>
+</tr>
+<tr class="hover:bg-surface-container-lowest transition-colors group">
+<td class="py-sm px-md text-on-surface">PRC-24-004</td>
+<td class="py-sm px-md text-on-surface">Data UMKM Kemenkop vs Sensus Ekonomi</td>
+<td class="py-sm px-md text-on-surface-variant">22 Okt 2024, 10:20</td>
+<td class="py-sm px-md text-on-surface">Sistem (Auto)</td>
+<td class="py-sm px-md">
+<span class="inline-flex items-center px-2 py-0.5 rounded-full text-[11px] font-medium bg-[#fce8e6] text-[#d93025]">Gagal</span>
+</td>
+<td class="py-sm px-md text-right">
+<button class="text-secondary hover:text-primary transition-colors p-1" title="Lihat Detail">
+<span class="material-symbols-outlined text-[18px]">visibility</span>
+</button>
+</td>
+</tr>
+<tr class="hover:bg-surface-container-lowest transition-colors group">
+<td class="py-sm px-md text-on-surface">PRC-24-005</td>
+<td class="py-sm px-md text-on-surface">Pendataan Keluarga BKKBN vs Dukcapil</td>
+<td class="py-sm px-md text-on-surface-variant">20 Okt 2024, 11:45</td>
+<td class="py-sm px-md text-on-surface">Ahmad B.</td>
+<td class="py-sm px-md">
+<span class="inline-flex items-center px-2 py-0.5 rounded-full text-[11px] font-medium bg-[#e6f4ea] text-[#1e8e3e]">Selesai</span>
+</td>
+<td class="py-sm px-md text-right">
+<button class="text-secondary hover:text-primary transition-colors p-1" title="Lihat Detail">
+<span class="material-symbols-outlined text-[18px]">visibility</span>
+</button>
+</td>
+</tr>
+</tbody>
+</table>
+</div>
+</div>
+</div>
+<!-- Footer -->
+<footer class="mt-auto py-md border-t border-outline-variant bg-surface-container-lowest dark:bg-surface-container-lowest flex flex-col md:flex-row justify-between items-center px-md w-full relative bottom-0">
+<div class="font-body-sm text-body-sm text-primary mb-sm md:mb-0">
+                    © 2024 Badan Pusat Statistik Kota Malang - Tim IT BPS
+                </div>
+<div class="flex gap-md font-body-sm text-body-sm text-on-surface-variant">
+<a class="hover:underline hover:text-primary transition-opacity" href="#">Kebijakan Privasi</a>
+<a class="hover:underline hover:text-primary transition-opacity" href="#">Syarat &amp; Ketentuan</a>
+<a class="hover:underline hover:text-primary transition-opacity" href="#">Hubungi Kami</a>
+</div>
+</footer>
+</main>
+</div>
+</body></html>

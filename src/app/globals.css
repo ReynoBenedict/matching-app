@@ -1,0 +1,31 @@
+@import "tailwindcss";
+
+@layer utilities {
+  :root {
+    --background: #ffffff;
+    --foreground: #171717;
+    
+    /* BPS Color Scheme from Stitch Design */
+    --primary: #002b5a;
+    --secondary: #006493;
+    --tertiary: #4e1c00;
+    --surface: #f8f9ff;
+    --surface-bright: #f8f9ff;
+    --surface-container-high: #dce9ff;
+    --outline: #737781;
+    --on-primary: #ffffff;
+    --on-secondary: #ffffff;
+    --on-surface: #0b1c30;
+  }
+
+  @media (prefers-color-scheme: dark) {
+    :root {
+      --background: #0a0a0a;
+      --foreground: #ededed;
+    }
+  }
+}
+
+body {
+  @apply bg-[var(--background)] text-[var(--foreground)];
+}

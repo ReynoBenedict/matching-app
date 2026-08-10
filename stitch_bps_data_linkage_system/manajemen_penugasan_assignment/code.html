@@ -1,0 +1,381 @@
+<!DOCTYPE html><html lang="en"><head>
+<meta charset="utf-8">
+<meta content="width=device-width, initial-scale=1.0" name="viewport">
+<title>Manajemen Penugasan - Sistem Pencocokan Data BPS</title>
+<link href="https://fonts.googleapis.com/css2?family=Public+Sans:wght@400;600;700&amp;display=swap" rel="stylesheet">
+<link href="https://fonts.googleapis.com/css2?family=Material+Symbols+Outlined:wght,FILL@100..700,0..1&amp;display=swap" rel="stylesheet">
+<link href="https://fonts.googleapis.com/css2?family=Material+Symbols+Outlined:wght,FILL@100..700,0..1&amp;display=swap" rel="stylesheet">
+<script src="https://cdn.tailwindcss.com?plugins=forms,container-queries"></script>
+<script id="tailwind-config">
+        tailwind.config = {
+          darkMode: "class",
+          theme: {
+            extend: {
+              "colors": {
+                      "background": "#f8f9ff",
+                      "surface-container-high": "#dce9ff",
+                      "on-error-container": "#93000a",
+                      "on-background": "#0b1c30",
+                      "secondary": "#006493",
+                      "error": "#ba1a1a",
+                      "surface-container-highest": "#d3e4fe",
+                      "primary-container": "#004182",
+                      "surface-container-low": "#eff4ff",
+                      "secondary-fixed": "#cae6ff",
+                      "on-primary": "#ffffff",
+                      "outline": "#737781",
+                      "tertiary-fixed-dim": "#ffb693",
+                      "primary": "#002b5a",
+                      "primary-fixed": "#d6e3ff",
+                      "inverse-primary": "#a9c7ff",
+                      "inverse-on-surface": "#eaf1ff",
+                      "surface-tint": "#2f5ea1",
+                      "surface-bright": "#f8f9ff",
+                      "error-container": "#ffdad6",
+                      "surface-container": "#e5eeff",
+                      "secondary-fixed-dim": "#8ccdff",
+                      "primary-fixed-dim": "#a9c7ff",
+                      "on-secondary": "#ffffff",
+                      "surface-container-lowest": "#ffffff",
+                      "on-tertiary": "#ffffff",
+                      "surface-variant": "#d3e4fe",
+                      "tertiary": "#4e1c00",
+                      "on-tertiary-fixed-variant": "#783206",
+                      "on-secondary-fixed": "#001e2f",
+                      "on-secondary-fixed-variant": "#004b70",
+                      "on-tertiary-fixed": "#351000",
+                      "secondary-container": "#44b7fd",
+                      "on-error": "#ffffff",
+                      "outline-variant": "#c3c6d2",
+                      "surface-dim": "#cbdbf5",
+                      "inverse-surface": "#213145",
+                      "on-secondary-container": "#004668",
+                      "on-primary-container": "#84aff7",
+                      "tertiary-fixed": "#ffdbcb",
+                      "surface": "#f8f9ff",
+                      "on-surface": "#0b1c30",
+                      "on-primary-fixed": "#001b3d",
+                      "on-surface-variant": "#424750",
+                      "on-primary-fixed-variant": "#0c4687",
+                      "on-tertiary-container": "#f79564",
+                      "tertiary-container": "#712d02"
+              },
+              "borderRadius": {
+                      "DEFAULT": "0.125rem",
+                      "lg": "0.25rem",
+                      "xl": "0.5rem",
+                      "full": "0.75rem"
+              },
+              "spacing": {
+                      "xs": "4px",
+                      "lg": "24px",
+                      "margin-desktop": "32px",
+                      "gutter": "20px",
+                      "md": "16px",
+                      "sm": "8px",
+                      "margin-mobile": "16px",
+                      "2xl": "48px",
+                      "xl": "32px",
+                      "base": "4px"
+              },
+              "fontFamily": {
+                      "body-sm": ["Public Sans"],
+                      "body-md": ["Public Sans"],
+                      "label-md": ["Public Sans"],
+                      "body-lg": ["Public Sans"],
+                      "data-tabular": ["Public Sans"],
+                      "headline-sm": ["Public Sans"],
+                      "headline-lg-mobile": ["Public Sans"],
+                      "headline-lg": ["Public Sans"],
+                      "headline-md": ["Public Sans"]
+              },
+              "fontSize": {
+                      "body-sm": ["13px", {"lineHeight": "18px", "fontWeight": "400"}],
+                      "body-md": ["14px", {"lineHeight": "20px", "fontWeight": "400"}],
+                      "label-md": ["12px", {"lineHeight": "16px", "letterSpacing": "0.05em", "fontWeight": "600"}],
+                      "body-lg": ["16px", {"lineHeight": "24px", "fontWeight": "400"}],
+                      "data-tabular": ["13px", {"lineHeight": "16px", "fontWeight": "400"}],
+                      "headline-sm": ["20px", {"lineHeight": "28px", "fontWeight": "600"}],
+                      "headline-lg-mobile": ["24px", {"lineHeight": "32px", "fontWeight": "700"}],
+                      "headline-lg": ["32px", {"lineHeight": "40px", "letterSpacing": "-0.02em", "fontWeight": "700"}],
+                      "headline-md": ["24px", {"lineHeight": "32px", "letterSpacing": "-0.01em", "fontWeight": "600"}]
+              }
+            }
+          }
+        }
+    </script>
+</head>
+<body class="bg-background text-on-background font-body-md antialiased min-h-screen flex flex-col md:flex-row">
+<!-- SideNavBar -->
+<aside class="hidden md:block w-[260px] h-screen fixed left-0 top-0 bg-primary border-r border-outline-variant shadow-sm z-20 flex flex-col h-full py-xl transition-all duration-200 ease-in-out">
+<div class="px-md mb-xl flex items-center gap-md">
+<img alt="BPS Logo" class="w-10 h-10 object-contain bg-white rounded-full p-1" data-alt="Official logo of Badan Pusat Statistik, featuring the standard blue and yellow graphic elements, indicating a trusted government institution. Clean and simple vector style on a transparent background." src="https://lh3.googleusercontent.com/aida-public/AB6AXuAXuk-_7XCannBSt5jasM7ZmlbJjutDxJscB67mxcbogd7WbX6ds8XZoC0016EpysQJtVZIrZFo1C5tkxbweMMLeErnfemtyq5lr1eyeF-MRbXNZduKwZA3Qtbuh-ADgUPXuvXbky2bnyVUhr8RQb0vfWvJ34sZzcB9Q4r00mOXbToyR0NM2_QruPbqG5TCxho2O8PR7L07F5qfI1cQE09h08tzjSfvK1cQHMvExQ3zgdAfLBbPKrWE">
+<div>
+<h1 class="font-headline-sm text-headline-sm font-bold text-on-primary">Sistem Pencocokan Data</h1>
+<p class="font-body-sm text-body-sm text-secondary-fixed-dim">Kota Malang</p>
+</div>
+</div>
+<div class="px-md mb-lg">
+<button class="w-full bg-secondary text-on-secondary font-label-md text-label-md py-sm px-md rounded-lg flex items-center justify-center gap-sm hover:bg-secondary-fixed-dim transition-colors shadow-sm">
+<span class="material-symbols-outlined text-[18px]">add</span>
+                Mulai Pencocokan Baru
+            </button>
+</div>
+<nav class="flex-1 overflow-y-auto px-sm space-y-sm">
+<a class="flex items-center gap-md px-md py-sm text-on-primary hover:bg-on-primary-fixed-variant transition-colors rounded-lg font-body-md text-body-md" href="#">
+<span class="material-symbols-outlined">dashboard</span>
+                Dashboard
+            </a>
+<a class="flex items-center gap-md px-md py-sm text-on-primary hover:bg-on-primary-fixed-variant transition-colors rounded-lg font-body-md text-body-md" href="#">
+<span class="material-symbols-outlined">dataset_linked</span>
+                Pencocokan Data
+            </a>
+<a class="flex items-center gap-md px-md py-sm bg-primary-container text-on-primary-container border-l-4 border-secondary-container rounded-r-lg font-body-md text-body-md" href="#">
+<span class="material-symbols-outlined" style="font-variation-settings: 'FILL' 1;">assignment</span>
+                Penugasan
+            </a>
+<a class="flex items-center gap-md px-md py-sm text-on-primary hover:bg-on-primary-fixed-variant transition-colors rounded-lg font-body-md text-body-md" href="#">
+<span class="material-symbols-outlined">history</span>
+                Riwayat Proses
+            </a>
+<a class="flex items-center gap-md px-md py-sm text-on-primary hover:bg-on-primary-fixed-variant transition-colors rounded-lg font-body-md text-body-md" href="#">
+<span class="material-symbols-outlined">settings_input_component</span>
+                Konfigurasi Atribut
+            </a>
+<a class="flex items-center gap-md px-md py-sm text-on-primary hover:bg-on-primary-fixed-variant transition-colors rounded-lg font-body-md text-body-md" href="#">
+<span class="material-symbols-outlined">group</span>
+                Manajemen Pengguna
+            </a>
+<a class="flex items-center gap-md px-md py-sm text-on-primary hover:bg-on-primary-fixed-variant transition-colors rounded-lg font-body-md text-body-md" href="#">
+<span class="material-symbols-outlined">analytics</span>
+                Laporan Statistik
+            </a>
+</nav>
+<div class="px-sm mt-auto space-y-sm">
+<a class="flex items-center gap-md px-md py-sm text-on-primary hover:bg-on-primary-fixed-variant transition-colors rounded-lg font-body-md text-body-md" href="#">
+<span class="material-symbols-outlined">help</span>
+                Bantuan
+            </a>
+<a class="flex items-center gap-md px-md py-sm text-on-primary hover:bg-on-primary-fixed-variant transition-colors rounded-lg font-body-md text-body-md" href="#">
+<span class="material-symbols-outlined">logout</span>
+                Log Keluar
+            </a>
+</div>
+</aside>
+<!-- Main Content Area -->
+<div class="flex-1 flex flex-col md:ml-[260px] min-h-screen">
+<!-- TopNavBar -->
+<header class="hidden md:flex justify-between items-center px-lg w-full max-w-full fixed top-0 left-[260px] right-0 h-16 bg-surface border-b border-outline-variant z-10">
+<div class="flex items-center gap-xl">
+<span class="font-headline-sm text-headline-sm font-bold text-primary">Sistem Pencocokan Data BPS</span>
+<nav class="flex gap-lg">
+<a class="font-label-md text-label-md text-on-surface-variant hover:text-primary transition-colors cursor-pointer active:opacity-80" href="#">Beranda</a>
+<a class="font-label-md text-label-md text-on-surface-variant hover:text-primary transition-colors cursor-pointer active:opacity-80" href="#">Data Master</a>
+<a class="font-label-md text-label-md text-on-surface-variant hover:text-primary transition-colors cursor-pointer active:opacity-80" href="#">Arsip</a>
+</nav>
+</div>
+<div class="flex items-center gap-md">
+<div class="relative">
+<span class="material-symbols-outlined absolute left-3 top-1/2 -translate-y-1/2 text-on-surface-variant">search</span>
+<input class="pl-10 pr-4 py-sm rounded-full bg-surface-container-low border border-outline-variant text-body-sm focus:outline-none focus:ring-2 focus:ring-secondary focus:border-secondary transition-all w-64" placeholder="Cari..." type="text">
+</div>
+<span class="font-label-md text-label-md text-primary">Role: Superadmin</span>
+<button class="text-on-surface-variant hover:text-primary transition-colors cursor-pointer active:opacity-80 relative p-sm rounded-full hover:bg-surface-container-high">
+<span class="material-symbols-outlined">notifications</span>
+<span class="absolute top-1 right-1 w-2 h-2 bg-error rounded-full"></span>
+</button>
+<button class="text-on-surface-variant hover:text-primary transition-colors cursor-pointer active:opacity-80 p-sm rounded-full hover:bg-surface-container-high">
+<span class="material-symbols-outlined">swap_horiz</span>
+</button>
+<button class="text-on-surface-variant hover:text-primary transition-colors cursor-pointer active:opacity-80">
+<span class="material-symbols-outlined text-[32px]">account_circle</span>
+</button>
+</div>
+</header>
+<!-- Main Canvas -->
+<main class="flex-1 p-margin-desktop mt-16 pb-24">
+<!-- Breadcrumbs -->
+<div class="flex items-center gap-sm font-body-sm text-body-sm text-on-surface-variant mb-lg"><a href="#" class="flex items-center gap-xs text-primary hover:underline mr-md font-semibold"><span class="material-symbols-outlined text-[18px]">arrow_back</span> Kembali ke Dashboard</a><div class="h-4 w-[1px] bg-outline-variant mr-md"></div>
+<a class="hover:text-primary transition-colors hover:underline" href="#">Dashboard</a>
+<span class="material-symbols-outlined text-[16px]">chevron_right</span>
+<span class="text-primary font-semibold">Penugasan</span>
+</div>
+<!-- Header Section -->
+<div class="flex flex-col md:flex-row justify-between items-start md:items-center gap-md mb-xl">
+<div>
+<h2 class="font-headline-lg text-headline-lg text-on-background mb-xs">Manajemen Penugasan</h2>
+<p class="font-body-md text-body-md text-on-surface-variant">Kelola dan distribusikan tugas pencocokan data kepada pegawai.</p>
+</div>
+<button class="bg-primary text-on-primary font-label-md text-label-md px-lg py-md rounded-lg shadow-sm hover:bg-on-primary-fixed-variant transition-colors flex items-center gap-sm" onclick="document.getElementById('distributionModal').classList.remove('hidden')">
+<span class="material-symbols-outlined">share_reviews</span>
+                    Distribusikan Assignment
+                </button>
+</div>
+<!-- Dashboard Cards -->
+<div class="grid grid-cols-1 md:grid-cols-2 gap-gutter mb-xl">
+<!-- Card 1 -->
+<div class="bg-surface rounded-xl border border-outline-variant p-lg shadow-sm hover:shadow-md transition-shadow relative overflow-hidden">
+<div class="absolute -right-4 -top-4 w-24 h-24 bg-error-container rounded-full opacity-50"></div>
+<div class="flex justify-between items-start relative z-10">
+<div>
+<p class="font-label-md text-label-md text-on-surface-variant mb-xs">Kandidat Menunggu (Pending)</p>
+<h3 class="font-headline-lg text-headline-lg text-on-background">1,245</h3>
+<p class="font-body-sm text-body-sm text-on-surface-variant mt-sm flex items-center gap-xs">
+<span class="material-symbols-outlined text-error text-[16px]">trending_up</span>
+                                +12% dari minggu lalu
+                            </p>
+</div>
+<div class="p-sm bg-surface-container-high rounded-lg">
+<span class="material-symbols-outlined text-primary text-[24px]">hourglass_empty</span>
+</div>
+</div>
+</div>
+<!-- Card 2 -->
+<div class="bg-surface rounded-xl border border-outline-variant p-lg shadow-sm hover:shadow-md transition-shadow relative overflow-hidden">
+<div class="absolute -right-4 -top-4 w-24 h-24 bg-surface-container-high rounded-full opacity-50"></div>
+<div class="flex justify-between items-start relative z-10">
+<div>
+<p class="font-label-md text-label-md text-on-surface-variant mb-xs">Pegawai Aktif Ditugaskan</p>
+<h3 class="font-headline-lg text-headline-lg text-on-background">48</h3>
+<p class="font-body-sm text-body-sm text-on-surface-variant mt-sm flex items-center gap-xs">
+<span class="material-symbols-outlined text-secondary text-[16px]">check_circle</span>
+                                Siap menerima tugas
+                            </p>
+</div>
+<div class="p-sm bg-surface-container-high rounded-lg">
+<span class="material-symbols-outlined text-primary text-[24px]">group</span>
+</div>
+</div>
+</div>
+</div>
+<!-- Data Table Section -->
+<div class="bg-surface rounded-xl border border-outline-variant shadow-sm overflow-hidden flex flex-col">
+<div class="px-md py-md border-b border-outline-variant bg-surface flex justify-between items-center">
+<h3 class="font-headline-sm text-headline-sm text-on-background">Daftar Penugasan</h3>
+<div class="flex gap-sm">
+<div class="relative">
+<span class="material-symbols-outlined absolute left-2 top-1/2 -translate-y-1/2 text-on-surface-variant text-[18px]">filter_list</span>
+<select class="pl-8 pr-8 py-sm rounded-lg bg-surface border border-outline-variant text-body-sm focus:outline-none focus:ring-2 focus:ring-secondary appearance-none">
+<option>Semua Status</option>
+<option>Belum Dimulai</option>
+<option>Sedang Proses</option>
+<option>Selesai</option>
+</select>
+</div>
+</div>
+</div>
+<div class="overflow-x-auto">
+<table class="w-full text-left border-collapse">
+<thead class="bg-surface-container-low font-label-md text-label-md text-on-surface-variant sticky top-0 z-10"><tr><th class="py-md px-md border-b border-outline-variant whitespace-nowrap">ID Penugasan</th><th class="py-md px-md border-b border-outline-variant">Match Batch</th><th class="py-md px-md border-b border-outline-variant">Dataset</th><th class="py-md px-md border-b border-outline-variant text-right">Records</th><th class="py-md px-md border-b border-outline-variant">Assigned To</th><th class="py-md px-md border-b border-outline-variant">Status</th><th class="py-md px-md border-b border-outline-variant text-center">Aksi</th></tr></thead>
+<tbody class="font-data-tabular text-data-tabular text-on-background"><tr class="hover:bg-surface-container-low transition-colors border-b border-outline-variant/50"><td class="py-md px-md font-semibold text-primary">ASN-2024-001</td><td class="py-md px-md">Batch 1 - Sensus Ekonomi</td><td class="py-md px-md">Data Pelaku Usaha 2024</td><td class="py-md px-md text-right">250</td><td class="py-md px-md flex items-center gap-sm"><div class="w-6 h-6 rounded-full bg-primary-container text-on-primary-container flex items-center justify-center font-bold text-[10px]">BS</div>Budi Santoso</td><td class="py-md px-md"><span class="inline-flex items-center gap-xs px-sm py-xs rounded-full bg-surface-container-high text-on-surface-variant font-label-md text-[10px]"><span class="w-1.5 h-1.5 rounded-full bg-outline"></span>Belum Dimulai</span></td><td class="py-md px-md text-center"><button class="text-on-surface-variant hover:text-primary p-xs rounded-lg hover:bg-surface-container-high transition-colors"><span class="material-symbols-outlined text-[18px]">visibility</span></button></td></tr><tr class="hover:bg-surface-container-low transition-colors border-b border-outline-variant/50"><td class="py-md px-md font-semibold text-primary">ASN-2024-002</td><td class="py-md px-md">Batch 1 - Sensus Ekonomi</td><td class="py-md px-md">Data Pelaku Usaha 2024</td><td class="py-md px-md text-right">250</td><td class="py-md px-md flex items-center gap-sm"><div class="w-6 h-6 rounded-full bg-secondary-container text-on-secondary-container flex items-center justify-center font-bold text-[10px]">SW</div>Siti Wahyuni</td><td class="py-md px-md"><span class="inline-flex items-center gap-xs px-sm py-xs rounded-full bg-inverse-primary/20 text-primary font-label-md text-[10px]"><span class="material-symbols-outlined text-[12px] spin-slow">sync</span>Sedang Proses</span></td><td class="py-md px-md text-center"><button class="text-on-surface-variant hover:text-primary p-xs rounded-lg hover:bg-surface-container-high transition-colors"><span class="material-symbols-outlined text-[18px]">visibility</span></button></td></tr></tbody>
+</table>
+</div>
+<!-- Pagination -->
+<div class="px-md py-sm border-t border-outline-variant bg-surface flex justify-between items-center font-body-sm text-body-sm text-on-surface-variant">
+<div class="">Menampilkan 1-3 dari 45 data</div>
+<div class="flex gap-xs">
+<button class="p-xs rounded hover:bg-surface-container-high disabled:opacity-50" disabled="">
+<span class="material-symbols-outlined text-[18px]">chevron_left</span>
+</button>
+<button class="w-6 h-6 rounded bg-primary text-on-primary flex items-center justify-center">1</button>
+<button class="w-6 h-6 rounded hover:bg-surface-container-high flex items-center justify-center">2</button>
+<button class="w-6 h-6 rounded hover:bg-surface-container-high flex items-center justify-center">3</button>
+<button class="p-xs rounded hover:bg-surface-container-high">
+<span class="material-symbols-outlined text-[18px]">chevron_right</span>
+</button>
+</div>
+</div>
+</div>
+</main>
+<!-- Footer -->
+<footer class="flex justify-between items-center p-md bg-surface-container-low border-t border-outline-variant relative bottom-0 w-full z-10 mt-auto">
+<span class="font-body-sm text-body-sm text-primary">© 2024 Badan Pusat Statistik Kota Malang - Tim IT BPS</span>
+<div class="flex gap-md font-body-sm text-body-sm">
+<a class="text-on-surface-variant hover:underline transition-opacity" href="#">Kebijakan Privasi</a>
+<a class="text-on-surface-variant hover:underline transition-opacity" href="#">Syarat &amp; Ketentuan</a>
+<a class="text-on-surface-variant hover:underline transition-opacity" href="#">Hubungi Kami</a>
+</div>
+</footer>
+</div>
+<!-- Modal: Distribusikan Assignment -->
+<div class="hidden fixed inset-0 z-50 flex items-center justify-center" id="distributionModal">
+<!-- Backdrop -->
+<div class="absolute inset-0 bg-inverse-surface/50 backdrop-blur-sm" onclick="document.getElementById('distributionModal').classList.add('hidden')"></div>
+<!-- Modal Content -->
+<div class="bg-surface rounded-xl shadow-lg w-full max-w-lg relative z-10 flex flex-col max-h-[90vh]">
+<div class="px-lg py-md border-b border-outline-variant flex justify-between items-center">
+<h3 class="font-headline-sm text-headline-sm font-semibold text-on-background">Distribusi Otomatis Penugasan</h3>
+<button class="text-on-surface-variant hover:bg-surface-container-high p-xs rounded-full transition-colors" onclick="document.getElementById('distributionModal').classList.add('hidden')">
+<span class="material-symbols-outlined">close</span>
+</button>
+</div>
+<div class="p-lg overflow-y-auto font-body-md text-body-md text-on-surface-variant space-y-md">
+<p class="">Sistem akan membagi sisa kandidat yang berstatus <strong>Pending (1,245)</strong> secara merata kepada seluruh pegawai aktif yang dipilih.</p>
+<div class="bg-surface-container-low p-md rounded-lg border border-outline-variant/50">
+<label class="font-label-md text-label-md text-on-background block mb-xs">Pilih Sumber Data (Proses Pencocokan)</label>
+<select class="w-full px-sm py-sm rounded border border-outline-variant focus:outline-none focus:border-secondary focus:ring-1 focus:ring-secondary bg-surface text-body-sm">
+<option>Sensus Ekonomi 2024 - Batch 2 (Sisa: 1,245)</option>
+<option>Survei Angkatan Kerja 2024 (Sisa: 450)</option>
+</select>
+</div>
+<div>
+<div class="flex justify-between items-center mb-sm">
+<label class="font-label-md text-label-md text-on-background">Pegawai Tujuan (48 Tersedia)</label>
+<button class="text-primary text-[12px] font-semibold hover:underline">Pilih Semua</button>
+</div>
+<div class="border border-outline-variant rounded-lg max-h-48 overflow-y-auto bg-surface">
+<!-- Employee List Item -->
+<label class="flex items-center gap-md p-sm border-b border-outline-variant/30 hover:bg-surface-container-low cursor-pointer">
+<input checked="" class="rounded border-outline-variant text-secondary focus:ring-secondary" type="checkbox">
+<div class="w-8 h-8 rounded-full bg-primary-container text-on-primary-container flex items-center justify-center font-bold text-[12px]">BS</div>
+<div class="flex-1">
+<div class="text-on-background font-semibold text-[13px]">Budi Santoso</div>
+<div class="text-[11px] text-on-surface-variant">Beban saat ini: 250</div>
+</div>
+</label>
+<!-- Employee List Item -->
+<label class="flex items-center gap-md p-sm border-b border-outline-variant/30 hover:bg-surface-container-low cursor-pointer">
+<input checked="" class="rounded border-outline-variant text-secondary focus:ring-secondary" type="checkbox">
+<div class="w-8 h-8 rounded-full bg-secondary-container text-on-secondary-container flex items-center justify-center font-bold text-[12px]">SW</div>
+<div class="flex-1">
+<div class="text-on-background font-semibold text-[13px]">Siti Wahyuni</div>
+<div class="text-[11px] text-on-surface-variant">Beban saat ini: 250</div>
+</div>
+</label>
+<!-- Employee List Item -->
+<label class="flex items-center gap-md p-sm border-b border-outline-variant/30 hover:bg-surface-container-low cursor-pointer">
+<input class="rounded border-outline-variant text-secondary focus:ring-secondary" type="checkbox">
+<div class="w-8 h-8 rounded-full bg-tertiary-container text-on-tertiary-container flex items-center justify-center font-bold text-[12px]">AP</div>
+<div class="flex-1">
+<div class="text-on-background font-semibold text-[13px]">Andi Pratama</div>
+<div class="text-[11px] text-on-surface-variant">Beban saat ini: 120</div>
+</div>
+</label>
+</div>
+</div>
+<div class="bg-surface-container p-sm rounded-lg flex items-start gap-sm">
+<span class="material-symbols-outlined text-primary text-[20px]">info</span>
+<p class="text-[12px]">Berdasarkan pilihan saat ini, 2 pegawai akan menerima masing-masing ~622 kandidat baru.</p>
+</div>
+</div>
+<div class="px-lg py-md border-t border-outline-variant flex justify-end gap-md bg-surface-container-low/50 rounded-b-xl">
+<button class="px-md py-sm rounded-lg font-label-md text-label-md border border-outline bg-surface text-on-surface hover:bg-surface-container-high transition-colors" onclick="document.getElementById('distributionModal').classList.add('hidden')">Batal</button>
+<button class="px-md py-sm rounded-lg font-label-md text-label-md bg-primary text-on-primary shadow-sm hover:bg-on-primary-fixed-variant transition-colors flex items-center gap-xs">
+<span class="material-symbols-outlined text-[18px]">play_arrow</span>
+                    Proses Distribusi
+                </button>
+</div>
+</div>
+</div>
+<style>
+        .spin-slow {
+            animation: spin 3s linear infinite;
+        }
+        @keyframes spin {
+            from { transform: rotate(0deg); }
+            to { transform: rotate(360deg); }
+        }
+    </style>
+
+
+</body></html>

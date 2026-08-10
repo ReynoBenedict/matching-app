@@ -1,0 +1,441 @@
+<!DOCTYPE html><html lang="id"><head>
+<meta charset="utf-8">
+<meta content="width=device-width, initial-scale=1.0" name="viewport">
+<title>Sistem Pencocokan Data BPS - Detail Dataset</title>
+<link href="https://fonts.googleapis.com/css2?family=Public+Sans:wght@400;600;700&amp;display=swap" rel="stylesheet">
+<link href="https://fonts.googleapis.com/css2?family=Material+Symbols+Outlined:wght,FILL@100..700,0..1&amp;display=swap" rel="stylesheet">
+<link href="https://fonts.googleapis.com/css2?family=Material+Symbols+Outlined:wght,FILL@100..700,0..1&amp;display=swap" rel="stylesheet">
+<script src="https://cdn.tailwindcss.com?plugins=forms,container-queries"></script>
+<script id="tailwind-config">
+        tailwind.config = {
+          darkMode: "class",
+          theme: {
+            extend: {
+              "colors": {
+                      "background": "#f8f9ff",
+                      "surface-container-high": "#dce9ff",
+                      "on-error-container": "#93000a",
+                      "on-background": "#0b1c30",
+                      "secondary": "#006493",
+                      "error": "#ba1a1a",
+                      "surface-container-highest": "#d3e4fe",
+                      "primary-container": "#004182",
+                      "surface-container-low": "#eff4ff",
+                      "secondary-fixed": "#cae6ff",
+                      "on-primary": "#ffffff",
+                      "outline": "#737781",
+                      "tertiary-fixed-dim": "#ffb693",
+                      "primary": "#002b5a",
+                      "primary-fixed": "#d6e3ff",
+                      "inverse-primary": "#a9c7ff",
+                      "inverse-on-surface": "#eaf1ff",
+                      "surface-tint": "#2f5ea1",
+                      "surface-bright": "#f8f9ff",
+                      "error-container": "#ffdad6",
+                      "surface-container": "#e5eeff",
+                      "secondary-fixed-dim": "#8ccdff",
+                      "primary-fixed-dim": "#a9c7ff",
+                      "on-secondary": "#ffffff",
+                      "surface-container-lowest": "#ffffff",
+                      "on-tertiary": "#ffffff",
+                      "surface-variant": "#d3e4fe",
+                      "tertiary": "#4e1c00",
+                      "on-tertiary-fixed-variant": "#783206",
+                      "on-secondary-fixed": "#001e2f",
+                      "on-secondary-fixed-variant": "#004b70",
+                      "on-tertiary-fixed": "#351000",
+                      "secondary-container": "#44b7fd",
+                      "on-error": "#ffffff",
+                      "outline-variant": "#c3c6d2",
+                      "surface-dim": "#cbdbf5",
+                      "inverse-surface": "#213145",
+                      "on-secondary-container": "#004668",
+                      "on-primary-container": "#84aff7",
+                      "tertiary-fixed": "#ffdbcb",
+                      "surface": "#f8f9ff",
+                      "on-surface": "#0b1c30",
+                      "on-primary-fixed": "#001b3d",
+                      "on-surface-variant": "#424750",
+                      "on-primary-fixed-variant": "#0c4687",
+                      "on-tertiary-container": "#f79564",
+                      "tertiary-container": "#712d02"
+              },
+              "borderRadius": {
+                      "DEFAULT": "0.125rem",
+                      "lg": "0.25rem",
+                      "xl": "0.5rem",
+                      "full": "0.75rem"
+              },
+              "spacing": {
+                      "xs": "4px",
+                      "lg": "24px",
+                      "margin-desktop": "32px",
+                      "gutter": "20px",
+                      "md": "16px",
+                      "sm": "8px",
+                      "margin-mobile": "16px",
+                      "2xl": "48px",
+                      "xl": "32px",
+                      "base": "4px"
+              },
+              "fontFamily": {
+                      "body-sm": [
+                              "Public Sans"
+                      ],
+                      "body-md": [
+                              "Public Sans"
+                      ],
+                      "label-md": [
+                              "Public Sans"
+                      ],
+                      "body-lg": [
+                              "Public Sans"
+                      ],
+                      "data-tabular": [
+                              "Public Sans"
+                      ],
+                      "headline-sm": [
+                              "Public Sans"
+                      ],
+                      "headline-lg-mobile": [
+                              "Public Sans"
+                      ],
+                      "headline-lg": [
+                              "Public Sans"
+                      ],
+                      "headline-md": [
+                              "Public Sans"
+                      ]
+              },
+              "fontSize": {
+                      "body-sm": [
+                              "13px",
+                              {
+                                      "lineHeight": "18px",
+                                      "fontWeight": "400"
+                              }
+                      ],
+                      "body-md": [
+                              "14px",
+                              {
+                                      "lineHeight": "20px",
+                                      "fontWeight": "400"
+                              }
+                      ],
+                      "label-md": [
+                              "12px",
+                              {
+                                      "lineHeight": "16px",
+                                      "letterSpacing": "0.05em",
+                                      "fontWeight": "600"
+                              }
+                      ],
+                      "body-lg": [
+                              "16px",
+                              {
+                                      "lineHeight": "24px",
+                                      "fontWeight": "400"
+                              }
+                      ],
+                      "data-tabular": [
+                              "13px",
+                              {
+                                      "lineHeight": "16px",
+                                      "fontWeight": "400"
+                              }
+                      ],
+                      "headline-sm": [
+                              "20px",
+                              {
+                                      "lineHeight": "28px",
+                                      "fontWeight": "600"
+                              }
+                      ],
+                      "headline-lg-mobile": [
+                              "24px",
+                              {
+                                      "lineHeight": "32px",
+                                      "fontWeight": "700"
+                              }
+                      ],
+                      "headline-lg": [
+                              "32px",
+                              {
+                                      "lineHeight": "40px",
+                                      "letterSpacing": "-0.02em",
+                                      "fontWeight": "700"
+                              }
+                      ],
+                      "headline-md": [
+                              "24px",
+                              {
+                                      "lineHeight": "32px",
+                                      "letterSpacing": "-0.01em",
+                                      "fontWeight": "600"
+                              }
+                      ]
+              }
+      },
+          },
+        }
+    </script>
+</head>
+<body class="bg-background text-on-background font-body-md min-h-screen">
+<!-- SideNavBar -->
+<aside class="bg-primary text-secondary-fixed-dim font-body-md text-body-md w-[260px] h-screen fixed left-0 top-0 border-r border-outline-variant shadow-sm transition-all duration-200 ease-in-out flex flex-col h-full py-xl z-50">
+<div class="px-md mb-xl">
+<h1 class="font-headline-sm text-headline-sm font-bold text-on-primary">Sistem Pencocokan Data</h1>
+<p class="text-sm opacity-80 mt-xs">Kota Malang</p>
+</div>
+<div class="px-md mb-lg">
+<button class="w-full bg-secondary-container text-on-secondary-container font-label-md py-sm px-md rounded-DEFAULT hover:bg-opacity-90 transition-colors">
+                Mulai Pencocokan Baru
+            </button>
+</div>
+<nav class="flex-1 overflow-y-auto">
+<a class="flex items-center gap-md px-md py-sm text-on-primary hover:bg-on-primary-fixed-variant transition-colors" href="#">
+<span class="material-symbols-outlined" data-icon="dashboard">dashboard</span>
+<span class="">Dashboard</span>
+</a>
+<a class="flex items-center gap-md px-md py-sm text-on-primary hover:bg-on-primary-fixed-variant transition-colors" href="#">
+<span class="material-symbols-outlined" data-icon="dataset_linked">dataset_linked</span>
+<span class="">Pencocokan Data</span>
+</a>
+<a class="flex items-center gap-md px-md py-sm text-on-primary hover:bg-on-primary-fixed-variant transition-colors" href="#">
+<span class="material-symbols-outlined" data-icon="history">history</span>
+<span class="">Riwayat Proses</span>
+</a>
+<a class="flex items-center gap-md px-md py-sm bg-primary-container text-on-primary-container border-l-4 border-secondary-container" href="#">
+<span class="material-symbols-outlined" data-icon="settings_input_component">settings_input_component</span>
+<span class="">Konfigurasi Atribut</span>
+</a>
+<a class="flex items-center gap-md px-md py-sm text-on-primary hover:bg-on-primary-fixed-variant transition-colors" href="#">
+<span class="material-symbols-outlined" data-icon="group">group</span>
+<span class="">Manajemen Pengguna</span>
+</a>
+<a class="flex items-center gap-md px-md py-sm text-on-primary hover:bg-on-primary-fixed-variant transition-colors" href="#">
+<span class="material-symbols-outlined" data-icon="analytics">analytics</span>
+<span class="">Laporan Statistik</span>
+</a>
+</nav>
+<div class="mt-auto border-t border-outline-variant pt-md">
+<a class="flex items-center gap-md px-md py-sm text-on-primary hover:bg-on-primary-fixed-variant transition-colors" href="#">
+<span class="material-symbols-outlined" data-icon="help">help</span>
+<span class="">Bantuan</span>
+</a>
+<a class="flex items-center gap-md px-md py-sm text-on-primary hover:bg-on-primary-fixed-variant transition-colors" href="#">
+<span class="material-symbols-outlined" data-icon="logout">logout</span>
+<span class="">Log Keluar</span>
+</a>
+</div>
+</aside>
+<!-- Main Content Area -->
+<div class="ml-[260px] flex flex-col min-h-screen">
+<!-- TopNavBar -->
+<header class="bg-surface text-primary font-label-md text-label-md fixed top-0 left-[260px] right-0 h-16 border-b border-outline-variant z-40 flex justify-between items-center px-lg w-full max-w-full">
+<div class="flex items-center gap-lg">
+<h2 class="font-headline-sm text-headline-sm font-bold text-primary hidden lg:block">Sistem Pencocokan Data BPS</h2>
+<nav class="hidden md:flex gap-md">
+<a class="text-on-surface-variant hover:text-primary transition-colors cursor-pointer active:opacity-80 py-1" href="#">Beranda</a>
+<a class="text-primary font-bold border-b-2 border-primary pb-1 py-1" href="#">Data Master</a>
+<a class="text-on-surface-variant hover:text-primary transition-colors cursor-pointer active:opacity-80 py-1" href="#">Arsip</a>
+</nav>
+</div>
+<div class="flex items-center gap-md">
+<span class="hidden md:inline-block text-on-surface-variant">Role: Superadmin</span>
+<span class="hidden lg:inline-block text-on-surface-variant">Notifikasi</span>
+<button aria-label="Notifications" class="text-on-surface-variant hover:text-primary transition-colors">
+<span class="material-symbols-outlined" data-icon="notifications">notifications</span>
+</button>
+<button aria-label="Account" class="text-on-surface-variant hover:text-primary transition-colors">
+<span class="material-symbols-outlined" data-icon="account_circle">account_circle</span>
+</button>
+<button aria-label="Swap" class="text-on-surface-variant hover:text-primary transition-colors">
+<span class="material-symbols-outlined" data-icon="swap_horiz">swap_horiz</span>
+</button>
+</div>
+</header>
+<!-- Page Canvas -->
+<main class="flex-1 mt-16 p-margin-desktop bg-background overflow-x-hidden">
+<!-- Breadcrumbs -->
+<a href="#" class="inline-flex items-center gap-xs text-primary hover:text-primary-container transition-colors font-label-md mb-md">
+    <span class="material-symbols-outlined text-[18px]">arrow_back</span>
+    Kembali ke Manajemen Dataset
+</a><div class="mb-lg flex items-center text-sm text-on-surface-variant font-label-md">
+<a class="hover:text-primary transition-colors" href="#">Manajemen Dataset</a>
+<span class="mx-xs material-symbols-outlined text-[16px]">chevron_right</span>
+<span class="text-primary font-bold">Data Penduduk Kota Malang 2023.csv</span>
+</div>
+<!-- Page Header -->
+<div class="mb-xl flex justify-between items-end border-b border-outline-variant pb-md">
+<div>
+<h1 class="font-headline-lg text-headline-lg font-bold text-on-background mb-xs">Detail Dataset</h1>
+<p class="text-on-surface-variant font-body-md text-body-md">Menampilkan informasi metadata dan sampel pratinjau data.</p>
+</div>
+<div class="flex gap-sm">
+<button class="bg-surface text-primary border border-primary px-md py-sm rounded-DEFAULT font-label-md hover:bg-surface-container-low transition-colors flex items-center gap-xs">
+<span class="material-symbols-outlined text-[18px]">download</span>
+                        Unduh Asli
+                    </button>
+</div>
+</div>
+<!-- Bento Grid Layout for Metadata -->
+<div class="grid grid-cols-1 lg:grid-cols-3 gap-gutter mb-xl">
+<!-- Primary Info Card -->
+<div class="lg:col-span-2 bg-surface border border-outline-variant rounded-xl p-lg shadow-sm hover:shadow-md transition-shadow">
+<div class="flex items-start gap-md mb-md">
+<div class="p-sm bg-primary-container text-on-primary-container rounded-lg">
+<span class="material-symbols-outlined text-[32px]">description</span>
+</div>
+<div>
+<h3 class="font-headline-sm text-headline-sm font-bold text-on-background">Data Penduduk Kota Malang 2023.csv</h3>
+<div class="flex gap-sm mt-xs">
+<span class="inline-flex items-center px-2 py-0.5 rounded text-xs font-medium bg-surface-container-high text-primary">
+                                    CSV
+                                </span>
+<span class="inline-flex items-center px-2 py-0.5 rounded text-xs font-medium bg-green-100 text-green-800">
+                                    Siap Digunakan
+                                </span>
+</div>
+</div>
+</div>
+<div class="grid grid-cols-2 md:grid-cols-4 gap-md mt-lg border-t border-outline-variant pt-md">
+<div>
+<p class="text-on-surface-variant font-label-md text-label-md mb-xs">Sumber</p>
+<p class="font-body-md text-body-md font-semibold">Dispendukcapil</p>
+</div>
+<div>
+<p class="text-on-surface-variant font-label-md text-label-md mb-xs">Jumlah Baris</p>
+<p class="font-body-md text-body-md font-semibold">1,452,039</p>
+</div>
+<div>
+<p class="text-on-surface-variant font-label-md text-label-md mb-xs">Jumlah Kolom</p>
+<p class="font-body-md text-body-md font-semibold">24</p>
+</div>
+<div>
+<p class="text-on-surface-variant font-label-md text-label-md mb-xs">Tanggal Unggah</p>
+<p class="font-body-md text-body-md font-semibold">12 Okt 2024</p>
+</div>
+</div>
+</div>
+<!-- Secondary Info Card -->
+<div class="bg-surface border border-outline-variant rounded-xl p-lg shadow-sm hover:shadow-md transition-shadow flex flex-col justify-between">
+<div>
+<h4 class="font-label-md text-label-md text-on-surface-variant uppercase tracking-wider mb-sm">Status Kualitas Data</h4>
+<div class="mb-md">
+<div class="flex justify-between items-center mb-xs">
+<span class="font-body-sm text-body-sm">Kelengkapan</span>
+<span class="font-label-md text-label-md text-primary">98%</span>
+</div>
+<div class="w-full bg-surface-container h-2 rounded-full overflow-hidden">
+<div class="bg-secondary h-full w-[98%]"></div>
+</div>
+</div>
+<div>
+<div class="flex justify-between items-center mb-xs">
+<span class="font-body-sm text-body-sm">Validitas Format</span>
+<span class="font-label-md text-label-md text-primary">95%</span>
+</div>
+<div class="w-full bg-surface-container h-2 rounded-full overflow-hidden">
+<div class="bg-secondary h-full w-[95%]"></div>
+</div>
+</div>
+</div>
+<div class="mt-md pt-md border-t border-outline-variant">
+<p class="font-body-sm text-body-sm text-on-surface-variant">Diunggah oleh: <span class="font-semibold text-on-background">Admin Dispenduk</span></p>
+</div>
+</div>
+</div>
+<!-- Data Grid Section -->
+<div class="bg-surface border border-outline-variant rounded-xl shadow-sm overflow-hidden flex flex-col">
+<div class="p-md border-b border-outline-variant flex justify-between items-center bg-surface-bright">
+<h3 class="font-headline-md text-headline-md font-semibold text-on-background">Pratinjau Data (Sampel)</h3>
+<div class="flex gap-sm items-center">
+<span class="font-body-sm text-body-sm text-on-surface-variant">Menampilkan 1-10 dari 100 sampel</span>
+<div class="flex border border-outline-variant rounded">
+<button class="p-xs hover:bg-surface-container-low transition-colors border-r border-outline-variant disabled:opacity-50" disabled="">
+<span class="material-symbols-outlined text-[20px]">chevron_left</span>
+</button>
+<button class="p-xs hover:bg-surface-container-low transition-colors">
+<span class="material-symbols-outlined text-[20px]">chevron_right</span>
+</button>
+</div>
+</div>
+</div>
+<div class="overflow-x-auto">
+<table class="w-full text-left font-data-tabular text-data-tabular">
+<thead class="bg-surface-container-low border-b border-outline-variant">
+<tr>
+<th class="p-md font-label-md text-label-md text-on-surface-variant whitespace-nowrap border-r border-outline-variant/30">ID_PENDUDUK</th>
+<th class="p-md font-label-md text-label-md text-on-surface-variant whitespace-nowrap border-r border-outline-variant/30">NAMA_LENGKAP</th>
+<th class="p-md font-label-md text-label-md text-on-surface-variant whitespace-nowrap border-r border-outline-variant/30">NIK</th>
+<th class="p-md font-label-md text-label-md text-on-surface-variant whitespace-nowrap border-r border-outline-variant/30">JENIS_KELAMIN</th>
+<th class="p-md font-label-md text-label-md text-on-surface-variant whitespace-nowrap border-r border-outline-variant/30">TEMPAT_LAHIR</th>
+<th class="p-md font-label-md text-label-md text-on-surface-variant whitespace-nowrap border-r border-outline-variant/30">TANGGAL_LAHIR</th>
+<th class="p-md font-label-md text-label-md text-on-surface-variant whitespace-nowrap">ALAMAT</th>
+</tr>
+</thead>
+<tbody class="divide-y divide-outline-variant/50"><tr class="hover:bg-surface-container-lowest transition-colors group">
+    <td class="p-md border-r border-outline-variant/30 text-on-surface-variant group-hover:text-on-background">DP-001</td>
+    <td class="p-md border-r border-outline-variant/30 font-medium">Budi Santoso</td>
+    <td class="p-md border-r border-outline-variant/30 text-on-surface-variant">3573011205800001</td>
+    <td class="p-md border-r border-outline-variant/30">L</td>
+    <td class="p-md border-r border-outline-variant/30">Malang</td>
+    <td class="p-md border-r border-outline-variant/30">1980-05-12</td>
+    <td class="p-md truncate max-w-[200px]" title="Jl. Veteran No. 12, Klojen">Jl. Veteran No. 12, Klojen</td>
+</tr>
+<tr class="hover:bg-surface-container-lowest transition-colors group">
+    <td class="p-md border-r border-outline-variant/30 text-on-surface-variant group-hover:text-on-background">DP-002</td>
+    <td class="p-md border-r border-outline-variant/30 font-medium">Siti Aminah</td>
+    <td class="p-md border-r border-outline-variant/30 text-on-surface-variant">3573026011920003</td>
+    <td class="p-md border-r border-outline-variant/30">P</td>
+    <td class="p-md border-r border-outline-variant/30">Surabaya</td>
+    <td class="p-md border-r border-outline-variant/30">1992-11-20</td>
+    <td class="p-md truncate max-w-[200px]" title="Perum Sawojajar, Kedungkandang">Perum Sawojajar, Kedungkandang</td>
+</tr>
+<tr class="hover:bg-surface-container-lowest transition-colors group">
+    <td class="p-md border-r border-outline-variant/30 text-on-surface-variant group-hover:text-on-background">DP-003</td>
+    <td class="p-md border-r border-outline-variant/30 font-medium">Agus Yulianto</td>
+    <td class="p-md border-r border-outline-variant/30 text-on-surface-variant">3573032802750002</td>
+    <td class="p-md border-r border-outline-variant/30">L</td>
+    <td class="p-md border-r border-outline-variant/30">Malang</td>
+    <td class="p-md border-r border-outline-variant/30">1975-02-28</td>
+    <td class="p-md truncate max-w-[200px]" title="Jl. Ijen Boulevard No. 45">Jl. Ijen Boulevard No. 45</td>
+</tr>
+<tr class="hover:bg-surface-container-lowest transition-colors group">
+    <td class="p-md border-r border-outline-variant/30 text-on-surface-variant group-hover:text-on-background">DP-004</td>
+    <td class="p-md border-r border-outline-variant/30 font-medium">Rina Wijaya</td>
+    <td class="p-md border-r border-outline-variant/30 text-on-surface-variant">3573045508880005</td>
+    <td class="p-md border-r border-outline-variant/30">P</td>
+    <td class="p-md border-r border-outline-variant/30">Blitar</td>
+    <td class="p-md border-r border-outline-variant/30">1988-08-15</td>
+    <td class="p-md truncate max-w-[200px]" title="Jl. Soekarno Hatta No. 8, Lowokwaru">Jl. Soekarno Hatta No. 8...</td>
+</tr>
+<tr class="hover:bg-surface-container-lowest transition-colors group">
+    <td class="p-md border-r border-outline-variant/30 text-on-surface-variant group-hover:text-on-background">DP-005</td>
+    <td class="p-md border-r border-outline-variant/30 font-medium">Joko Pratama</td>
+    <td class="p-md border-r border-outline-variant/30 text-on-surface-variant">3573050504010004</td>
+    <td class="p-md border-r border-outline-variant/30">L</td>
+    <td class="p-md border-r border-outline-variant/30">Malang</td>
+    <td class="p-md border-r border-outline-variant/30">2001-04-05</td>
+    <td class="p-md truncate max-w-[200px]" title="Komp. Tlogomas Permai">Komp. Tlogomas Permai</td>
+</tr></tbody>
+</table>
+</div>
+</div>
+</main>
+<!-- Footer -->
+<footer class="bg-surface-container-low text-primary font-body-sm text-body-sm relative bottom-0 w-auto border-t border-outline-variant flex justify-between items-center p-md mt-auto z-10">
+<div class="">
+                © 2024 Badan Pusat Statistik Kota Malang - Tim IT BPS
+            </div>
+<div class="flex gap-md">
+<a class="text-on-surface-variant hover:underline transition-opacity" href="#">Kebijakan Privasi</a>
+<a class="text-on-surface-variant hover:underline transition-opacity" href="#">Syarat &amp; Ketentuan</a>
+<a class="text-on-surface-variant hover:underline transition-opacity" href="#">Hubungi Kami</a>
+</div>
+</footer>
+</div>
+
+
+</body></html>

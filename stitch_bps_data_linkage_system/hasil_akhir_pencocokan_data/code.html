@@ -1,0 +1,366 @@
+<!DOCTYPE html><html lang="id"><head>
+<meta charset="utf-8">
+<meta content="width=device-width, initial-scale=1.0" name="viewport">
+<title>BPS Data Matching - Hasil Akhir</title>
+<script src="https://cdn.tailwindcss.com?plugins=forms,container-queries"></script>
+<link href="https://fonts.googleapis.com/css2?family=Public+Sans:wght@400;600;700&amp;display=swap" rel="stylesheet">
+<link href="https://fonts.googleapis.com/css2?family=Material+Symbols+Outlined:wght,FILL@100..700,0..1&amp;display=swap" rel="stylesheet">
+<link href="https://fonts.googleapis.com/css2?family=Material+Symbols+Outlined:wght,FILL@100..700,0..1&amp;display=swap" rel="stylesheet">
+<script id="tailwind-config">
+        tailwind.config = {
+            darkMode: "class",
+            theme: {
+                extend: {
+                    "colors": {
+                        "tertiary-fixed-dim": "#ffb693",
+                        "tertiary-container": "#712d02",
+                        "surface-tint": "#2f5ea1",
+                        "on-secondary": "#ffffff",
+                        "on-primary-fixed": "#001b3d",
+                        "surface-bright": "#f8f9ff",
+                        "surface-variant": "#d3e4fe",
+                        "on-primary-container": "#84aff7",
+                        "on-tertiary-fixed-variant": "#783206",
+                        "surface-container-low": "#eff4ff",
+                        "on-tertiary-fixed": "#351000",
+                        "surface-container-high": "#dce9ff",
+                        "surface-container": "#e5eeff",
+                        "inverse-surface": "#213145",
+                        "on-error": "#ffffff",
+                        "primary": "#002b5a",
+                        "tertiary": "#4e1c00",
+                        "on-tertiary-container": "#f79564",
+                        "on-surface-variant": "#424750",
+                        "on-secondary-fixed": "#001e2f",
+                        "on-primary-fixed-variant": "#0c4687",
+                        "on-secondary-container": "#004668",
+                        "primary-fixed": "#d6e3ff",
+                        "secondary-fixed": "#cae6ff",
+                        "secondary": "#006493",
+                        "surface-container-lowest": "#ffffff",
+                        "outline-variant": "#c3c6d2",
+                        "on-secondary-fixed-variant": "#004b70",
+                        "surface": "#f8f9ff",
+                        "secondary-container": "#44b7fd",
+                        "primary-fixed-dim": "#a9c7ff",
+                        "on-primary": "#ffffff",
+                        "error-container": "#ffdad6",
+                        "tertiary-fixed": "#ffdbcb",
+                        "on-tertiary": "#ffffff",
+                        "primary-container": "#004182",
+                        "on-surface": "#0b1c30",
+                        "error": "#ba1a1a",
+                        "on-error-container": "#93000a",
+                        "outline": "#737781",
+                        "secondary-fixed-dim": "#8ccdff",
+                        "inverse-on-surface": "#eaf1ff",
+                        "surface-dim": "#cbdbf5",
+                        "background": "#f8f9ff",
+                        "surface-container-highest": "#d3e4fe",
+                        "on-background": "#0b1c30",
+                        "inverse-primary": "#a9c7ff"
+                    },
+                    "borderRadius": {
+                        "DEFAULT": "0.125rem",
+                        "lg": "0.25rem",
+                        "xl": "0.5rem",
+                        "full": "0.75rem"
+                    },
+                    "spacing": {
+                        "margin-mobile": "16px",
+                        "base": "4px",
+                        "margin-desktop": "32px",
+                        "xs": "4px",
+                        "sm": "8px",
+                        "lg": "24px",
+                        "gutter": "20px",
+                        "2xl": "48px",
+                        "md": "16px",
+                        "xl": "32px"
+                    },
+                    "fontFamily": {
+                        "headline-sm": ["Public Sans"],
+                        "data-tabular": ["Public Sans"],
+                        "headline-lg": ["Public Sans"],
+                        "headline-md": ["Public Sans"],
+                        "body-sm": ["Public Sans"],
+                        "body-md": ["Public Sans"],
+                        "headline-lg-mobile": ["Public Sans"],
+                        "body-lg": ["Public Sans"],
+                        "label-md": ["Public Sans"]
+                    },
+                    "fontSize": {
+                        "headline-sm": ["20px", { "lineHeight": "28px", "fontWeight": "600" }],
+                        "data-tabular": ["13px", { "lineHeight": "16px", "fontWeight": "400" }],
+                        "headline-lg": ["32px", { "lineHeight": "40px", "letterSpacing": "-0.02em", "fontWeight": "700" }],
+                        "headline-md": ["24px", { "lineHeight": "32px", "letterSpacing": "-0.01em", "fontWeight": "600" }],
+                        "body-sm": ["13px", { "lineHeight": "18px", "fontWeight": "400" }],
+                        "body-md": ["14px", { "lineHeight": "20px", "fontWeight": "400" }],
+                        "headline-lg-mobile": ["24px", { "lineHeight": "32px", "fontWeight": "700" }],
+                        "body-lg": ["16px", { "lineHeight": "24px", "fontWeight": "400" }],
+                        "label-md": ["12px", { "lineHeight": "16px", "letterSpacing": "0.05em", "fontWeight": "600" }]
+                    }
+                }
+            }
+        }
+    </script>
+</head>
+<body class="bg-background text-on-background font-body-md flex h-screen overflow-hidden">
+<!-- TopNavBar for Mobile (Hidden on MD) -->
+<header class="md:hidden sticky top-0 z-50 flex justify-between items-center w-full h-16 px-margin-mobile bg-surface-container-lowest border-b border-outline-variant/30 flat no shadows text-primary dark:text-primary-fixed-dim">
+<div class="flex items-center gap-3">
+<span class="material-symbols-outlined text-[24px]">menu</span>
+<h1 class="text-headline-sm font-headline-sm font-bold text-primary dark:text-primary-fixed-dim">BPS Data Matching</h1>
+</div>
+<div class="flex gap-4">
+<span class="material-symbols-outlined hover:bg-surface-container-high dark:hover:bg-surface-container transition-colors cursor-pointer rounded-full p-1">notifications</span>
+</div>
+</header>
+<!-- SideNavBar (Hidden on Mobile) -->
+<aside class="hidden md:flex flex-col h-screen w-[260px] border-r border-outline-variant/20 bg-primary dark:bg-primary text-secondary-container dark:text-secondary-fixed-dim flat no shadows flex-shrink-0 z-40">
+<div class="p-6 flex flex-col gap-4 border-b border-outline-variant/20">
+<div class="flex items-center gap-3">
+<div class="w-10 h-10 rounded-full bg-surface-container-highest flex items-center justify-center overflow-hidden">
+<img alt="BPS Logo" class="object-cover w-full h-full" data-alt="Official blue logo of Badan Pusat Statistik Indonesia, featuring statistical bar charts. Clean white background. High resolution, sharp corporate identity." src="https://lh3.googleusercontent.com/aida-public/AB6AXuAFZz3BtpzvJTlQVwUA54VB02U1oyVp2HrHw9g4woW81QsfdGMmoe90KNhV8qk7EGcEObtZNHdcsJKljBRHY_MftQ04MYUwu2iHLR7T5r--EYBtzVxTC_gqI7ixKF8MyxzB94d3zlS8nrPoskOD5ZrtZxWClsnwp81mzeN0rIYLQOHUMkRTsBYG7brrmZChBshTk6pJJsGpi4lFiylyincRdlKYrNSLyxfQ21QeDXGI961rIq_K_7gF">
+</div>
+<div>
+<h2 class="text-headline-md font-headline-md font-bold text-on-primary">BPS Kota Malang</h2>
+<p class="text-label-md font-label-md text-on-primary/70">Data Matching System</p>
+</div>
+</div>
+<div class="mt-4 px-3 py-1.5 bg-primary-container/30 rounded-lg inline-flex items-center gap-2 border border-primary-fixed/20 self-start">
+<span class="material-symbols-outlined text-[16px] text-primary-fixed">admin_panel_settings</span>
+<span class="text-label-md font-label-md text-primary-fixed">Role: Kepala BPS</span>
+</div>
+</div>
+<nav class="flex-1 py-4 overflow-y-auto">
+<ul class="flex flex-col gap-1">
+<li class="">
+<a class="flex items-center gap-3 px-4 py-3 text-on-primary/70 hover:text-on-primary hover:bg-primary-container/10 transition-colors" href="#">
+<span class="material-symbols-outlined">dashboard</span>
+<span class="text-body-md font-body-md">Dashboard</span>
+</a>
+</li>
+<li class="">
+<a class="flex items-center gap-3 px-4 py-3 border-l-4 border-secondary-container bg-primary-container/20 text-secondary-container font-semibold Active: opacity-90 scale-[0.98] transition-all duration-150" href="#">
+<span class="material-symbols-outlined" style="font-variation-settings: 'FILL' 1;">dataset_linked</span>
+<span class="text-body-md font-body-md">Hasil Akhir</span>
+</a>
+</li>
+<li class="">
+<a class="flex items-center gap-3 px-4 py-3 text-on-primary/70 hover:text-on-primary hover:bg-primary-container/10 transition-colors" href="#">
+<span class="material-symbols-outlined">analytics</span>
+<span class="text-body-md font-body-md">Laporan</span>
+</a>
+</li>
+<li class="">
+<a class="flex items-center gap-3 px-4 py-3 text-on-primary/70 hover:text-on-primary hover:bg-primary-container/10 transition-colors" href="#">
+<span class="material-symbols-outlined">history</span>
+<span class="text-body-md font-body-md">Riwayat Proses</span>
+</a>
+</li>
+</ul>
+</nav>
+<div class="mt-auto p-4 border-t border-outline-variant/20">
+<ul class="flex flex-col gap-1">
+<li class="">
+<a class="flex items-center gap-3 px-4 py-3 text-on-primary/70 hover:text-on-primary hover:bg-primary-container/10 transition-colors" href="#">
+<span class="material-symbols-outlined">settings</span>
+<span class="text-body-md font-body-md">Settings</span>
+</a>
+</li>
+<li class="">
+<a class="flex items-center gap-3 px-4 py-3 text-on-primary/70 hover:text-on-primary hover:bg-primary-container/10 transition-colors" href="#">
+<span class="material-symbols-outlined">help</span>
+<span class="text-body-md font-body-md">Support</span>
+</a>
+</li>
+</ul>
+</div>
+</aside>
+<!-- Main Content Canvas -->
+<main class="flex-1 flex flex-col h-full overflow-hidden bg-background">
+<!-- Top App Bar (Desktop Context) -->
+<header class="hidden md:flex sticky top-0 z-30 justify-between items-center w-full h-16 px-margin-desktop bg-surface-container-lowest border-b border-outline-variant/30 flat no shadows"><a href="#" class="flex items-center gap-2 text-primary hover:text-secondary-container transition-colors font-semibold mr-4"><span class="material-symbols-outlined">arrow_back</span><span class="text-body-md">Kembali ke Dashboard</span></a>
+<div>
+<h1 class="text-headline-sm font-headline-sm font-bold text-primary dark:text-primary-fixed-dim">Hasil Akhir: Verifikasi Data Matching</h1>
+</div>
+<div class="flex items-center gap-4 text-on-surface-variant">
+<button class="hover:bg-surface-container-high dark:hover:bg-surface-container transition-colors p-2 rounded-full flex items-center justify-center">
+<span class="material-symbols-outlined">notifications</span>
+</button>
+<button class="hover:bg-surface-container-high dark:hover:bg-surface-container transition-colors p-2 rounded-full flex items-center justify-center">
+<span class="material-symbols-outlined">help_outline</span>
+</button>
+<div class="w-8 h-8 rounded-full bg-surface-container-highest overflow-hidden border border-outline-variant/50 ml-2">
+<img alt="User profile" class="object-cover w-full h-full" data-alt="Professional headshot of an Indonesian government official wearing a clean white shirt. Bright, neutral lighting. Simple gray background." src="https://lh3.googleusercontent.com/aida-public/AB6AXuA780X_zYm2KD3AcUnpudmkPLy0tCcVcuMsoxuYf4RtGPkjABlC-gMfc_vnqJIyJnItn8ILOUrAaEBqUOF9iMtSrkU2BnluAjQZv54aiwUYTH-QuGC25jDl5_98Ax6tnNnpfzMMBaNLACQKeIs45IKl2kW4FtjO8Buha2lAYcaez8VTOh9kdkp2i50vz4fNIND-qJPUR4K1XNQwVcBbxfgvCs9i71eDyhrIyPtrcbK4S5o5WG5G5uSk">
+</div>
+</div>
+</header>
+<!-- Scrollable Content -->
+<div class="flex-1 overflow-y-auto p-margin-mobile md:p-margin-desktop">
+<div class="max-w-[1280px] mx-auto flex flex-col gap-lg">
+<!-- Metadata Header -->
+<section class="bg-surface-container-lowest rounded-xl border border-outline-variant/30 p-6 flex flex-col gap-6">
+<div class="flex justify-between items-start border-b border-outline-variant/30 pb-4">
+<div>
+<h2 class="text-headline-md font-headline-md font-bold text-on-surface">Detail Proses Matching: #DM-2023-11-042</h2>
+<p class="text-body-md font-body-md text-on-surface-variant mt-1">Tanggal Selesai: 24 Nov 2023, 14:30 WIB | Status: <span class="text-primary font-semibold">Terkonfirmasi</span></p>
+</div>
+<button class="flex items-center gap-2 bg-surface hover:bg-surface-container px-4 py-2 rounded-lg border border-outline-variant/50 transition-colors text-primary font-semibold text-label-md font-label-md">
+<span class="material-symbols-outlined text-[18px]">download</span>
+                            Unduh Laporan PDF
+                        </button>
+</div>
+<div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-6">
+<div class="flex flex-col gap-1">
+<span class="text-label-md font-label-md text-on-surface-variant">Dataset A (Sumber)</span>
+<span class="text-body-lg font-body-lg font-semibold text-on-surface">Data Kependudukan (Dukcapil) 2023</span>
+</div>
+<div class="flex flex-col gap-1">
+<span class="text-label-md font-label-md text-on-surface-variant">Dataset B (Target)</span>
+<span class="text-body-lg font-body-lg font-semibold text-on-surface">Sensus Ekonomi Nasional 2023</span>
+</div>
+<div class="flex flex-col gap-1">
+<span class="text-label-md font-label-md text-on-surface-variant">Algoritma Matching</span>
+<span class="text-body-lg font-body-lg font-semibold text-on-surface">Jaro-Winkler + Exact Match</span>
+</div>
+<div class="flex flex-col gap-1">
+<span class="text-label-md font-label-md text-on-surface-variant">Similarity Threshold</span>
+<span class="text-body-lg font-body-lg font-semibold text-on-surface">&gt; 85.0%</span>
+</div>
+<div class="flex flex-col gap-1 lg:col-span-4">
+<span class="text-label-md font-label-md text-on-surface-variant">Atribut Digunakan</span>
+<div class="flex flex-wrap gap-2 mt-1">
+<span class="px-3 py-1 bg-surface-container text-on-surface text-label-md font-label-md rounded border border-outline-variant/30">NIK</span>
+<span class="px-3 py-1 bg-surface-container text-on-surface text-label-md font-label-md rounded border border-outline-variant/30">Nama Lengkap</span>
+<span class="px-3 py-1 bg-surface-container text-on-surface text-label-md font-label-md rounded border border-outline-variant/30">Tanggal Lahir</span>
+<span class="px-3 py-1 bg-surface-container text-on-surface text-label-md font-label-md rounded border border-outline-variant/30">Alamat (Prov, Kab, Kec)</span>
+</div>
+</div>
+</div>
+</section>
+<!-- Data Table Section -->
+<section class="bg-surface-container-lowest rounded-xl border border-outline-variant/30 flex flex-col overflow-hidden">
+<div class="p-6 border-b border-outline-variant/30 flex justify-between items-center bg-surface">
+<h3 class="text-headline-sm font-headline-sm font-semibold text-on-surface">Data Terverifikasi</h3>
+<div class="flex gap-4">
+<div class="flex items-center gap-2">
+<span class="w-3 h-3 rounded-full bg-[#166534]"></span>
+<span class="text-body-sm font-body-sm text-on-surface-variant">Match (2,451)</span>
+</div>
+<div class="flex items-center gap-2">
+<span class="w-3 h-3 rounded-full bg-[#991b1b]"></span>
+<span class="text-body-sm font-body-sm text-on-surface-variant">Non-Match (124)</span>
+</div>
+</div>
+</div><div class="px-6 py-4 bg-surface-container-low border-b border-outline-variant/30 flex flex-wrap gap-4 items-center"><div class="flex-1 min-w-[240px] relative"><span class="material-symbols-outlined absolute left-3 top-1/2 -translate-y-1/2 text-on-surface-variant">search</span><input type="text" placeholder="Cari berdasarkan Nama atau NIK..." class="w-full pl-10 pr-4 py-2 rounded-lg border border-outline-variant/50 bg-surface-container-lowest text-body-sm focus:outline-none focus:border-primary" readonly=""></div><div class="flex gap-2"><button class="flex items-center gap-2 px-4 py-2 rounded-lg border border-outline-variant/50 bg-surface-container-lowest text-label-md font-semibold text-on-surface-variant cursor-default"><span class="material-symbols-outlined text-[18px]">filter_list</span>Filter Status</button><button class="flex items-center gap-2 px-4 py-2 rounded-lg border border-outline-variant/50 bg-surface-container-lowest text-label-md font-semibold text-on-surface-variant cursor-default"><span class="material-symbols-outlined text-[18px]">sort</span>Urutkan</button></div></div>
+<div class="overflow-x-auto">
+<table class="w-full text-left border-collapse">
+<thead>
+<tr class="bg-surface-container-low border-b border-outline-variant/50 sticky top-0">
+<th class="p-4 text-label-md font-label-md text-on-surface-variant font-semibold">ID Ref</th>
+<th class="p-4 text-label-md font-label-md text-on-surface-variant font-semibold">Record A (Dukcapil)</th>
+<th class="p-4 text-label-md font-label-md text-on-surface-variant font-semibold">Record B (Sensus)</th>
+<th class="p-4 text-label-md font-label-md text-on-surface-variant font-semibold text-right">Similarity Score</th>
+<th class="p-4 text-label-md font-label-md text-on-surface-variant font-semibold text-center">Verification</th>
+</tr>
+</thead>
+<tbody class="text-data-tabular font-data-tabular text-on-surface divide-y divide-outline-variant/20">
+<tr class="hover:bg-surface-container-lowest transition-colors">
+<td class="p-4 text-on-surface-variant">#R-001</td>
+<td class="p-4">
+<div class="font-semibold">BUDI SANTOSO</div>
+<div class="text-on-surface-variant text-xs mt-1">357301...001 | 1980-05-12</div>
+</td>
+<td class="p-4">
+<div class="font-semibold">BUDI SANTOSA</div>
+<div class="text-on-surface-variant text-xs mt-1">357301...001 | 1980-05-12</div>
+</td>
+<td class="p-4 text-right font-semibold text-[#15803d]">98.5%</td>
+<td class="p-4 text-center">
+<span class="inline-flex items-center px-2 py-1 rounded bg-[#dcfce7] text-[#166534] border border-[#bbf7d0] text-label-md font-label-md">MATCH</span>
+</td>
+</tr>
+<tr class="hover:bg-surface-container-lowest transition-colors bg-surface-bright/50">
+<td class="p-4 text-on-surface-variant">#R-002</td>
+<td class="p-4">
+<div class="font-semibold">SITI AMINAH</div>
+<div class="text-on-surface-variant text-xs mt-1">357302...045 | 1992-11-20</div>
+</td>
+<td class="p-4">
+<div class="font-semibold">SITI AMINAH</div>
+<div class="text-on-surface-variant text-xs mt-1">357302...045 | 1992-11-20</div>
+</td>
+<td class="p-4 text-right font-semibold text-[#15803d]">100%</td>
+<td class="p-4 text-center">
+<span class="inline-flex items-center px-2 py-1 rounded bg-[#dcfce7] text-[#166534] border border-[#bbf7d0] text-label-md font-label-md">MATCH</span>
+</td>
+</tr>
+<tr class="hover:bg-surface-container-lowest transition-colors">
+<td class="p-4 text-on-surface-variant">#R-003</td>
+<td class="p-4">
+<div class="font-semibold">AGUS PRATAMA</div>
+<div class="text-on-surface-variant text-xs mt-1">357303...112 | 1975-02-08</div>
+</td>
+<td class="p-4">
+<div class="font-semibold text-error">AGUS P.</div>
+<div class="text-on-surface-variant text-xs mt-1">357303...112 | 1975-02-08</div>
+</td>
+<td class="p-4 text-right font-semibold text-secondary-container">82.1%</td>
+<td class="p-4 text-center">
+<span class="inline-flex items-center px-2 py-1 rounded bg-[#fee2e2] text-[#991b1b] border border-[#fecaca] text-label-md font-label-md">NON-MATCH</span>
+</td>
+</tr>
+<tr class="hover:bg-surface-container-lowest transition-colors bg-surface-bright/50">
+<td class="p-4 text-on-surface-variant">#R-004</td>
+<td class="p-4">
+<div class="font-semibold">DEWI LESTARI</div>
+<div class="text-on-surface-variant text-xs mt-1">357304...088 | 1988-08-17</div>
+</td>
+<td class="p-4">
+<div class="font-semibold">DEWI LESTARI</div>
+<div class="text-on-surface-variant text-xs mt-1">357304...088 | 1988-08-17</div>
+</td>
+<td class="p-4 text-right font-semibold text-[#15803d]">100%</td>
+<td class="p-4 text-center">
+<span class="inline-flex items-center px-2 py-1 rounded bg-[#dcfce7] text-[#166534] border border-[#bbf7d0] text-label-md font-label-md">MATCH</span>
+</td>
+</tr>
+<tr class="hover:bg-surface-container-lowest transition-colors">
+<td class="p-4 text-on-surface-variant">#R-005</td>
+<td class="p-4">
+<div class="font-semibold">BAMBANG S.</div>
+<div class="text-on-surface-variant text-xs mt-1">357305...221 | 1960-01-01</div>
+</td>
+<td class="p-4">
+<div class="font-semibold text-error">BAMBANG SUTOPO</div>
+<div class="text-on-surface-variant text-xs mt-1">357305...221 | 1960-01-10</div>
+</td>
+<td class="p-4 text-right font-semibold text-secondary-container">78.4%</td>
+<td class="p-4 text-center">
+<span class="inline-flex items-center px-2 py-1 rounded bg-[#fee2e2] text-[#991b1b] border border-[#fecaca] text-label-md font-label-md">NON-MATCH</span>
+</td>
+</tr>
+</tbody>
+</table>
+</div>
+<!-- Pagination (Static Read-Only) -->
+<div class="p-4 border-t border-outline-variant/30 flex justify-between items-center bg-surface-container-low text-body-sm font-body-sm text-on-surface-variant">
+<span class="">Menampilkan 1 - 5 dari 2,575 baris</span>
+<div class="flex gap-2">
+<button class="px-3 py-1 rounded border border-outline-variant/50 opacity-50 cursor-not-allowed">Sebelumnya</button>
+<button class="px-3 py-1 rounded border border-outline-variant/50 bg-primary text-on-primary">1</button>
+<button class="px-3 py-1 rounded border border-outline-variant/50 hover:bg-surface-container">2</button>
+<button class="px-3 py-1 rounded border border-outline-variant/50 hover:bg-surface-container">3</button>
+<span class="px-2 py-1">...</span>
+<button class="px-3 py-1 rounded border border-outline-variant/50 hover:bg-surface-container">Selanjutnya</button>
+</div>
+</div>
+</section>
+</div>
+</div>
+</main>
+
+
+</body></html>

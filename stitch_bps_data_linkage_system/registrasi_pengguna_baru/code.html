@@ -1,0 +1,294 @@
+<!DOCTYPE html><html lang="id"><head>
+<meta charset="utf-8">
+<meta content="width=device-width, initial-scale=1.0" name="viewport">
+<title>Registrasi - Sistem Pencocokan Data BPS</title>
+<script src="https://cdn.tailwindcss.com?plugins=forms,container-queries"></script>
+<link href="https://fonts.googleapis.com/css2?family=Public+Sans:wght@400;600;700&amp;display=swap" rel="stylesheet">
+<link href="https://fonts.googleapis.com/css2?family=Material+Symbols+Outlined:wght,FILL@100..700,0..1&amp;display=swap" rel="stylesheet">
+<link href="https://fonts.googleapis.com/css2?family=Material+Symbols+Outlined:wght,FILL@100..700,0..1&amp;display=swap" rel="stylesheet">
+<script id="tailwind-config">
+      tailwind.config = {
+        darkMode: "class",
+        theme: {
+          extend: {
+            "colors": {
+                    "primary": "#002b5a",
+                    "on-error-container": "#93000a",
+                    "on-tertiary-container": "#f79564",
+                    "on-tertiary-fixed": "#351000",
+                    "on-secondary-container": "#004668",
+                    "surface-bright": "#f8f9ff",
+                    "on-primary-container": "#84aff7",
+                    "surface-container-highest": "#d3e4fe",
+                    "secondary": "#006493",
+                    "on-secondary-fixed-variant": "#004b70",
+                    "outline": "#737781",
+                    "surface-variant": "#d3e4fe",
+                    "tertiary-container": "#712d02",
+                    "secondary-fixed-dim": "#8ccdff",
+                    "tertiary-fixed": "#ffdbcb",
+                    "surface": "#f8f9ff",
+                    "primary-fixed": "#d6e3ff",
+                    "on-surface-variant": "#424750",
+                    "surface-container-high": "#dce9ff",
+                    "surface-container-low": "#eff4ff",
+                    "surface-tint": "#2f5ea1",
+                    "inverse-surface": "#213145",
+                    "secondary-container": "#44b7fd",
+                    "on-secondary-fixed": "#001e2f",
+                    "outline-variant": "#c3c6d2",
+                    "on-tertiary": "#ffffff",
+                    "on-primary-fixed": "#001b3d",
+                    "surface-container-lowest": "#ffffff",
+                    "tertiary": "#4e1c00",
+                    "surface-dim": "#cbdbf5",
+                    "on-error": "#ffffff",
+                    "on-surface": "#0b1c30",
+                    "on-background": "#0b1c30",
+                    "on-secondary": "#ffffff",
+                    "tertiary-fixed-dim": "#ffb693",
+                    "background": "#f8f9ff",
+                    "primary-fixed-dim": "#a9c7ff",
+                    "error": "#ba1a1a",
+                    "on-tertiary-fixed-variant": "#783206",
+                    "inverse-primary": "#a9c7ff",
+                    "surface-container": "#e5eeff",
+                    "inverse-on-surface": "#eaf1ff",
+                    "secondary-fixed": "#cae6ff",
+                    "on-primary-fixed-variant": "#0c4687",
+                    "on-primary": "#ffffff",
+                    "error-container": "#ffdad6",
+                    "primary-container": "#004182"
+            },
+            "borderRadius": {
+                    "DEFAULT": "0.125rem",
+                    "lg": "0.25rem",
+                    "xl": "0.5rem",
+                    "full": "0.75rem"
+            },
+            "spacing": {
+                    "sm": "8px",
+                    "margin-desktop": "32px",
+                    "base": "4px",
+                    "margin-mobile": "16px",
+                    "xl": "32px",
+                    "md": "16px",
+                    "lg": "24px",
+                    "2xl": "48px",
+                    "gutter": "20px",
+                    "xs": "4px"
+            },
+            "fontFamily": {
+                    "headline-lg-mobile": [
+                            "Public Sans"
+                    ],
+                    "body-md": [
+                            "Public Sans"
+                    ],
+                    "label-md": [
+                            "Public Sans"
+                    ],
+                    "headline-sm": [
+                            "Public Sans"
+                    ],
+                    "body-sm": [
+                            "Public Sans"
+                    ],
+                    "data-tabular": [
+                            "Public Sans"
+                    ],
+                    "headline-lg": [
+                            "Public Sans"
+                    ],
+                    "body-lg": [
+                            "Public Sans"
+                    ],
+                    "headline-md": [
+                            "Public Sans"
+                    ]
+            },
+            "fontSize": {
+                    "headline-lg-mobile": [
+                            "24px",
+                            {
+                                    "lineHeight": "32px",
+                                    "fontWeight": "700"
+                            }
+                    ],
+                    "body-md": [
+                            "14px",
+                            {
+                                    "lineHeight": "20px",
+                                    "fontWeight": "400"
+                            }
+                    ],
+                    "label-md": [
+                            "12px",
+                            {
+                                    "lineHeight": "16px",
+                                    "letterSpacing": "0.05em",
+                                    "fontWeight": "600"
+                            }
+                    ],
+                    "headline-sm": [
+                            "20px",
+                            {
+                                    "lineHeight": "28px",
+                                    "fontWeight": "600"
+                            }
+                    ],
+                    "body-sm": [
+                            "13px",
+                            {
+                                    "lineHeight": "18px",
+                                    "fontWeight": "400"
+                            }
+                    ],
+                    "data-tabular": [
+                            "13px",
+                            {
+                                    "lineHeight": "16px",
+                                    "fontWeight": "400"
+                            }
+                    ],
+                    "headline-lg": [
+                            "32px",
+                            {
+                                    "lineHeight": "40px",
+                                    "letterSpacing": "-0.02em",
+                                    "fontWeight": "700"
+                            }
+                    ],
+                    "body-lg": [
+                            "16px",
+                            {
+                                    "lineHeight": "24px",
+                                    "fontWeight": "400"
+                            }
+                    ],
+                    "headline-md": [
+                            "24px",
+                            {
+                                    "lineHeight": "32px",
+                                    "letterSpacing": "-0.01em",
+                                    "fontWeight": "600"
+                            }
+                    ]
+            }
+    },
+        },
+      }
+    </script>
+<style>
+        body {
+            background-color: theme('colors.background');
+        }
+        .input-halo:focus {
+            box-shadow: 0 0 0 2px rgba(0, 153, 221, 0.2);
+            border-color: theme('colors.secondary');
+        }
+    </style>
+</head>
+<body class="font-body-md text-on-surface min-h-screen flex items-center justify-center p-margin-mobile md:p-margin-desktop bg-surface-container-low">
+<div class="w-full max-w-[1000px] bg-on-tertiary border border-outline-variant rounded-xl shadow-sm overflow-hidden flex flex-col md:flex-row">
+<!-- Branding / Info Section -->
+<div class="md:w-[40%] bg-primary p-xl text-on-primary flex flex-col justify-between hidden md:flex">
+<div>
+<div class="flex items-center gap-sm mb-2xl">
+<span class="material-symbols-outlined text-[32px]" style="font-variation-settings: 'FILL' 1;">dataset_linked</span>
+<div>
+<h1 class="font-headline-sm text-headline-sm font-bold leading-tight">Sistem Pencocokan Data</h1>
+<p class="font-label-md text-label-md text-secondary-fixed-dim">BPS Kota Malang</p>
+</div>
+</div>
+<h2 class="font-headline-md text-headline-md mb-md mt-2xl">Pengajuan Akses Sistem</h2>
+<p class="font-body-md text-body-md text-surface-container opacity-90 mb-lg">
+                    Pendaftaran akun ini bersifat pengajuan. Setelah Anda mengisi formulir ini, tim administrator akan memverifikasi data dan peran yang Anda ajukan sebelum akses diberikan.
+                </p>
+<ul class="space-y-sm font-body-sm text-body-sm text-surface-container opacity-80">
+<li class="flex items-start gap-sm">
+<span class="material-symbols-outlined text-[16px]">verified</span>
+                        Gunakan email resmi instansi jika memungkinkan.
+                    </li>
+<li class="flex items-start gap-sm">
+<span class="material-symbols-outlined text-[16px]">admin_panel_settings</span>
+                        Pemilihan peran harus sesuai dengan SK tugas.
+                    </li>
+<li class="flex items-start gap-sm">
+<span class="material-symbols-outlined text-[16px]">schedule</span>
+                        Proses verifikasi memakan waktu 1-2 hari kerja.
+                    </li>
+</ul>
+</div>
+<div class="font-label-md text-label-md text-secondary-fixed-dim mt-2xl">
+                © 2024 Badan Pusat Statistik Kota Malang
+            </div>
+</div>
+<!-- Form Section -->
+<div class="w-full md:w-[60%] p-xl md:p-2xl bg-surface-container-lowest">
+<div class="md:hidden mb-lg">
+<h1 class="font-headline-lg-mobile text-headline-lg-mobile text-primary mb-sm">Sistem Pencocokan Data</h1>
+<p class="font-body-sm text-body-sm text-on-surface-variant">Pendaftaran akun bersifat pengajuan dan membutuhkan verifikasi administrator.</p>
+</div>
+<h2 class="font-headline-sm text-headline-sm text-primary mb-lg border-b border-outline-variant pb-sm">Formulir Registrasi</h2>
+<form action="/register/pending" class="space-y-md" method="POST">
+<div class="grid grid-cols-1 md:grid-cols-2 gap-md">
+<!-- Nama Lengkap -->
+<div>
+<label class="block font-label-md text-label-md text-on-surface mb-xs" for="namaLengkap">Nama Lengkap</label>
+<input class="w-full border border-outline rounded text-body-md font-body-md px-md py-sm text-on-surface bg-surface-container-lowest focus:outline-none input-halo placeholder:text-outline-variant" id="namaLengkap" name="namaLengkap" placeholder="Sesuai KTP/SK" required="" type="text">
+</div>
+<!-- Email -->
+<div>
+<label class="block font-label-md text-label-md text-on-surface mb-xs" for="email">Email</label>
+<input class="w-full border border-outline rounded text-body-md font-body-md px-md py-sm text-on-surface bg-surface-container-lowest focus:outline-none input-halo placeholder:text-outline-variant" id="email" name="email" placeholder="nama@bps.go.id" required="" type="email">
+</div>
+</div>
+<div class="grid grid-cols-1 md:grid-cols-2 gap-md">
+<!-- Username -->
+<div>
+<label class="block font-label-md text-label-md text-on-surface mb-xs" for="username">Username / NIP</label>
+<input class="w-full border border-outline rounded text-body-md font-body-md px-md py-sm text-on-surface bg-surface-container-lowest focus:outline-none input-halo placeholder:text-outline-variant" id="username" name="username" placeholder="Username atau NIP" required="" type="text">
+</div>
+<!-- Peran yang Diajukan -->
+<div>
+<label class="block font-label-md text-label-md text-on-surface mb-xs" for="peran">Peran yang Diajukan</label>
+<div class="relative">
+<select class="w-full border border-outline rounded text-body-md font-body-md px-md py-sm text-on-surface bg-surface-container-lowest focus:outline-none input-halo appearance-none" id="peran" name="peran" required="">
+<option disabled="" selected="" value="">Pilih Peran...</option>
+<option value="superadmin">Superadmin</option>
+<option value="employee">Employee</option>
+<option value="kepala_bps">Kepala BPS</option>
+</select>
+<span class="material-symbols-outlined absolute right-md top-1/2 -translate-y-1/2 pointer-events-none text-outline">arrow_drop_down</span>
+</div>
+</div>
+</div>
+<div class="grid grid-cols-1 md:grid-cols-2 gap-md">
+<!-- Password -->
+<div>
+<label class="block font-label-md text-label-md text-on-surface mb-xs" for="password">Password</label>
+<input class="w-full border border-outline rounded text-body-md font-body-md px-md py-sm text-on-surface bg-surface-container-lowest focus:outline-none input-halo" id="password" name="password" placeholder="Minimal 8 karakter" required="" type="password">
+</div>
+<!-- Konfirmasi Password -->
+<div>
+<label class="block font-label-md text-label-md text-on-surface mb-xs" for="konfirmasiPassword">Konfirmasi Password</label>
+<input class="w-full border border-outline rounded text-body-md font-body-md px-md py-sm text-on-surface bg-surface-container-lowest focus:outline-none input-halo" id="konfirmasiPassword" name="konfirmasiPassword" placeholder="Ketik ulang password" required="" type="password">
+</div>
+</div>
+<div class="pt-lg flex items-center justify-between">
+<a class="font-label-md text-label-md text-secondary hover:underline flex items-center gap-xs" href="/login">
+<span class="material-symbols-outlined text-[16px]">arrow_back</span>
+                        Kembali ke Login
+                    </a>
+<button class="bg-primary hover:bg-on-primary-fixed-variant text-on-primary font-label-md text-label-md px-lg py-sm rounded transition-colors flex items-center gap-sm" type="submit">
+                        Kirim Pengajuan
+                        <span class="material-symbols-outlined text-[18px]">send</span>
+</button>
+</div>
+</form>
+</div>
+</div>
+
+
+</body></html>
