@@ -1,0 +1,23 @@
+import { NextResponse } from 'next/server';
+import { destroySession } from '@/lib/auth/session';
+
+export async function POST() {
+  try {
+    // Destroy the session
+    await destroySession();
+
+    return NextResponse.json(
+      { 
+        success: true,
+        message: 'Logout berhasil'
+      },
+      { status: 200 }
+    );
+  } catch (error) {
+    console.error('Logout error:', error);
+    return NextResponse.json(
+      { error: 'Terjadi kesalahan pada server' },
+      { status: 500 }
+    );
+  }
+}
