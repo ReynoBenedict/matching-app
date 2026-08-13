@@ -6,13 +6,19 @@ export async function POST() {
     // Destroy the session
     await destroySession();
 
-    return NextResponse.json(
+    // Create response with explicit cookie deletion
+    const response = NextResponse.json(
       { 
         success: true,
         message: 'Logout berhasil'
       },
       { status: 200 }
     );
+
+    // Ensure cookie is cleared in response headers
+    response.cookies.delete('auth-session');
+
+    return response;
   } catch (error) {
     console.error('Logout error:', error);
     return NextResponse.json(

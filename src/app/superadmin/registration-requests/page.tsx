@@ -3,6 +3,7 @@
 import { useEffect, useState } from 'react';
 import { useRouter } from 'next/navigation';
 import Link from 'next/link';
+import { AuthenticatedLayout } from '@/components/layouts/AuthenticatedLayout';
 
 interface RegistrationRequest {
   id: number;
@@ -22,11 +23,6 @@ export default function RegistrationRequestsPage() {
   const [searchTerm, setSearchTerm] = useState('');
   const [activeTab, setActiveTab] = useState('persetujuan'); // 'daftar' or 'persetujuan'
   const [requestStatus, setRequestStatus] = useState('PENDING'); // PENDING, APPROVED, REJECTED
-
-  const handleLogout = async () => {
-    await fetch('/api/auth/logout', { method: 'POST' });
-    router.push('/login');
-  };
 
   useEffect(() => {
     const fetchRequests = async () => {
@@ -86,155 +82,8 @@ export default function RegistrationRequestsPage() {
   };
 
   return (
-    <div style={{ minHeight: '100vh', backgroundColor: '#f8f9ff', fontFamily: "'Public Sans', sans-serif", color: '#0b1c30', display: 'flex' }}>
-      <style>{`
-        @import url('https://fonts.googleapis.com/css2?family=Material+Symbols+Outlined:wght,FILL@100..700,0..1&display=swap');
-        @import url('https://fonts.googleapis.com/css2?family=Public+Sans:wght@400;600;700&display=swap');
-        .material-symbols-outlined { font-variation-settings: 'FILL' 0, 'wght' 400, 'GRAD' 0, 'opsz' 24; font-size: inherit; }
-        @keyframes spin { from { transform: rotate(0deg); } to { transform: rotate(360deg); } }
-        @media (max-width: 768px) {
-          .sidebar { display: none !important; }
-          .main-content { margin-left: 0 !important; }
-          .header { left: 0 !important; }
-        }
-      `}</style>
-
-      {/* Sidebar */}
-      <aside style={{
-        display: 'flex',
-        width: '260px',
-        height: '100vh',
-        backgroundColor: '#002b5a',
-        color: '#ffffff',
-        padding: '32px 16px',
-        position: 'fixed',
-        left: 0,
-        top: 0,
-        borderRight: '1px solid #c3c6d2',
-        boxShadow: '0 2px 4px rgba(0,0,0,0.1)',
-        zIndex: 20,
-        flexDirection: 'column',
-        overflowY: 'auto'
-      }} className="sidebar">
-        <div style={{ display: 'flex', alignItems: 'center', gap: '16px', marginBottom: '32px' }}>
-          <div style={{ width: '40px', height: '40px', borderRadius: '4px', backgroundColor: '#ffffff', display: 'flex', alignItems: 'center', justifyContent: 'center', fontSize: '18px', fontWeight: 'bold', color: '#002b5a' }}>
-            BPS
-          </div>
-          <div>
-            <h1 style={{ fontSize: '14px', fontWeight: '600', lineHeight: '1.4', margin: '0' }}>
-              Sistem Pencocokan Data
-            </h1>
-            <p style={{ fontSize: '12px', margin: '4px 0 0 0', opacity: 0.8, color: '#b3d9ff' }}>
-              Kota Malang
-            </p>
-          </div>
-        </div>
-
-        <nav style={{ flex: 1, display: 'flex', flexDirection: 'column', gap: '8px' }}>
-          <a
-            href="#"
-            style={{
-              display: 'flex',
-              alignItems: 'center',
-              gap: '16px',
-              padding: '12px 16px',
-              borderRadius: '4px',
-              color: '#ffffff',
-              textDecoration: 'none',
-              fontSize: '14px',
-              cursor: 'pointer',
-              transition: 'background-color 0.2s'
-            }}
-            onMouseEnter={(e) => (e.currentTarget.style.backgroundColor = '#0c4687')}
-            onMouseLeave={(e) => (e.currentTarget.style.backgroundColor = 'transparent')}
-          >
-            <span className="material-symbols-outlined">dashboard</span>
-            Dashboard
-          </a>
-          <Link
-            href="/superadmin/registration-requests"
-            style={{
-              display: 'flex',
-              alignItems: 'center',
-              gap: '16px',
-              padding: '12px 16px',
-              borderRadius: '4px',
-              color: '#ffffff',
-              backgroundColor: '#0c4687',
-              textDecoration: 'none',
-              fontSize: '14px',
-              fontWeight: '600'
-            }}
-          >
-            <span className="material-symbols-outlined">group</span>
-            Manajemen Pengguna
-          </Link>
-        </nav>
-
-        <div style={{ borderTop: '1px solid #0c4687', paddingTop: '16px', display: 'flex', flexDirection: 'column', gap: '8px' }}>
-          <button
-            onClick={handleLogout}
-            style={{
-              display: 'flex',
-              alignItems: 'center',
-              gap: '16px',
-              padding: '12px 16px',
-              borderRadius: '4px',
-              color: '#ffffff',
-              textDecoration: 'none',
-              fontSize: '13px',
-              cursor: 'pointer',
-              transition: 'background-color 0.2s',
-              background: 'none',
-              border: 'none'
-            }}
-            onMouseEnter={(e) => (e.currentTarget.style.backgroundColor = '#0c4687')}
-            onMouseLeave={(e) => (e.currentTarget.style.backgroundColor = 'transparent')}
-          >
-            <span className="material-symbols-outlined">logout</span>
-            Log Keluar
-          </button>
-        </div>
-      </aside>
-
-      {/* Header */}
-      <header style={{
-        position: 'fixed',
-        top: 0,
-        left: '260px',
-        right: 0,
-        height: '64px',
-        backgroundColor: '#ffffff',
-        borderBottom: '1px solid #c3c6d2',
-        display: 'flex',
-        justifyContent: 'space-between',
-        alignItems: 'center',
-        paddingLeft: '24px',
-        paddingRight: '24px',
-        zIndex: 10
-      }}>
-        <h2 style={{ fontSize: '18px', fontWeight: '600', color: '#002b5a', margin: '0' }}>
-          Persetujuan Registrasi Pengguna
-        </h2>
-        <div style={{ display: 'flex', alignItems: 'center', gap: '16px' }}>
-          <button style={{ background: 'none', border: 'none', color: '#002b5a', cursor: 'pointer', padding: '8px' }}>
-            <span className="material-symbols-outlined">notifications</span>
-          </button>
-          <button style={{ background: 'none', border: 'none', color: '#002b5a', cursor: 'pointer', padding: '8px' }}>
-            <span className="material-symbols-outlined">account_circle</span>
-          </button>
-        </div>
-      </header>
-
-      {/* Main Content */}
-      <main style={{
-        flex: 1,
-        marginTop: '64px',
-        marginLeft: '260px',
-        padding: '32px 24px',
-        width: 'calc(100% - 260px)'
-      }} className="main-content">
-        <div style={{ maxWidth: '1280px', margin: '0 auto' }}>
+    <AuthenticatedLayout pageTitle="Persetujuan Registrasi Pengguna">
+      <div style={{ maxWidth: '1280px', margin: '0 auto' }}>
           {/* Breadcrumbs */}
           <nav style={{ display: 'flex', alignItems: 'center', gap: '8px', fontSize: '12px', color: '#424750', marginBottom: '24px' }}>
             <a href="#" style={{ color: 'inherit', textDecoration: 'none', cursor: 'pointer' }}>
@@ -536,12 +385,11 @@ export default function RegistrationRequestsPage() {
             </>
           )}
         </div>
-      </main>
-    </div>
-  );
-}
-
-function DaftarPenggunaTab() {
+      </AuthenticatedLayout>
+    );
+  }
+  
+  function DaftarPenggunaTab() {
   const [users, setUsers] = useState<Array<{ id: number; fullName: string; email: string; username: string; role: string; status: string; createdAt: string }>>([]);
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState('');

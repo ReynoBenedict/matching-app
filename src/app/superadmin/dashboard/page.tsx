@@ -2,7 +2,7 @@
 
 import { useEffect, useState } from 'react';
 import { useRouter } from 'next/navigation';
-import Link from 'next/link';
+import { AuthenticatedLayout } from '@/components/layouts/AuthenticatedLayout';
 
 interface User {
   id: number;
@@ -46,17 +46,12 @@ export default function SuperadminDashboardPage() {
     fetchUser();
   }, [router]);
 
-  const handleLogout = async () => {
-    await fetch('/api/auth/logout', { method: 'POST' });
-    router.push('/login');
-  };
-
   if (loading) {
     return (
-      <div style={{ minHeight: '100vh', backgroundColor: '#f8f9ff', display: 'flex', alignItems: 'center', justifyContent: 'center' }}>
-        <div style={{ textAlign: 'center' }}>
-          <span style={{ fontSize: '40px', animation: 'spin 2s linear infinite', display: 'inline-block' }}>⏳</span>
-          <p style={{ marginTop: '16px', color: '#424750' }}>Memuat...</p>
+      <div className="flex min-h-screen items-center justify-center bg-background">
+        <div className="text-center">
+          <span className="material-symbols-outlined text-[40px] animate-spin inline-block">hourglass_empty</span>
+          <p className="mt-md text-on-surface-variant">Memuat...</p>
         </div>
       </div>
     );
@@ -64,225 +59,155 @@ export default function SuperadminDashboardPage() {
 
   if (error || !user) {
     return (
-      <div style={{ minHeight: '100vh', backgroundColor: '#f8f9ff', display: 'flex', alignItems: 'center', justifyContent: 'center', padding: '24px' }}>
-        <div style={{ textAlign: 'center', backgroundColor: '#ffffff', border: '1px solid #c3c6d2', borderRadius: '4px', padding: '32px', maxWidth: '400px' }}>
-          <p style={{ color: '#93000a', fontSize: '14px' }}>{error || 'Akses ditolak'}</p>
+      <div className="flex min-h-screen items-center justify-center bg-background p-lg">
+        <div className="text-center bg-surface border border-outline-variant rounded p-xl max-w-[400px]">
+          <p className="text-on-error-container text-body-md">{error || 'Akses ditolak'}</p>
         </div>
       </div>
     );
   }
 
   return (
-    <div style={{ minHeight: '100vh', backgroundColor: '#f8f9ff', fontFamily: "'Public Sans', sans-serif", color: '#0b1c30', display: 'flex' }}>
-      <style>{`
-        @import url('https://fonts.googleapis.com/css2?family=Material+Symbols+Outlined:wght,FILL@100..700,0..1&display=swap');
-        @import url('https://fonts.googleapis.com/css2?family=Public+Sans:wght@400;600;700&display=swap');
-        .material-symbols-outlined { font-variation-settings: 'FILL' 0, 'wght' 400, 'GRAD' 0, 'opsz' 24; font-size: inherit; }
-        @media (max-width: 768px) {
-          .sidebar { display: none !important; }
-          .main-content { margin-left: 0 !important; }
-          .header { left: 0 !important; }
-        }
-      `}</style>
+    <AuthenticatedLayout pageTitle="Dashboard Superadmin">
+      {/* Breadcrumb */}
+      <div className="mb-sm">
+        <span className="text-on-surface-variant font-label-md text-sm">
+          Sistem Pencocokan Data / <span className="text-primary font-semibold">Dashboard</span>
+        </span>
+      </div>
 
-      {/* Sidebar */}
-      <aside style={{
-        display: 'flex',
-        width: '260px',
-        height: '100vh',
-        backgroundColor: '#002b5a',
-        color: '#ffffff',
-        padding: '32px 16px',
-        position: 'fixed',
-        left: 0,
-        top: 0,
-        borderRight: '1px solid #c3c6d2',
-        boxShadow: '0 2px 4px rgba(0,0,0,0.1)',
-        zIndex: 20,
-        flexDirection: 'column',
-        overflowY: 'auto'
-      }} className="sidebar">
-        <div style={{ display: 'flex', alignItems: 'center', gap: '16px', marginBottom: '32px' }}>
-          <div style={{ width: '40px', height: '40px', borderRadius: '4px', backgroundColor: '#ffffff', display: 'flex', alignItems: 'center', justifyContent: 'center', fontSize: '18px', fontWeight: 'bold', color: '#002b5a' }}>
-            BPS
+      {/* Page Header */}
+      <div className="mb-xl flex justify-between items-end">
+        <div>
+          <h2 className="font-headline-lg text-headline-lg text-primary mb-1">Dashboard Superadmin</h2>
+          <p className="font-body-md text-on-surface-variant">Overview aktivitas pencocokan data dan metrik sistem.</p>
+        </div>
+        <div className="flex gap-sm">
+          <button className="px-md py-sm bg-surface border border-outline-variant text-primary rounded-md font-label-md hover:bg-surface-container-low transition-colors shadow-sm flex items-center gap-1">
+            <span className="material-symbols-outlined text-[18px]">download</span> Export Laporan
+          </button>
+        </div>
+      </div>
+
+      {/* KPI Bento Grid */}
+      <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-5 gap-md mb-xl">
+        <div className="bg-surface p-md rounded-xl border border-outline-variant shadow-sm hover:shadow-md transition-shadow">
+          <div className="flex items-center justify-between mb-sm text-on-surface-variant">
+            <span className="font-label-md">Total Dataset</span>
+            <span className="material-symbols-outlined text-secondary">database</span>
+          </div>
+          <div className="font-headline-lg text-primary">1,428</div>
+          <div className="font-label-md text-on-surface-variant mt-1 flex items-center gap-1">
+            <span className="material-symbols-outlined text-[14px] text-success">arrow_upward</span>
+            <span>+8.4% bln ini</span>
+          </div>
+        </div>
+
+        <div className="bg-surface p-md rounded-xl border border-outline-variant shadow-sm hover:shadow-md transition-shadow">
+          <div className="flex items-center justify-between mb-sm text-on-surface-variant">
+            <span className="font-label-md">Proses Berjalan</span>
+            <span className="material-symbols-outlined text-secondary">sync</span>
+          </div>
+          <div className="font-headline-lg text-primary">12</div>
+          <div className="font-label-md text-on-surface-variant mt-1">Aktif saat ini</div>
+        </div>
+
+        <div className="bg-surface p-md rounded-xl border border-outline-variant shadow-sm hover:shadow-md transition-shadow">
+          <div className="flex items-center justify-between mb-sm text-on-surface-variant">
+            <span className="font-label-md">Kandidat Matching</span>
+            <span className="material-symbols-outlined text-primary-container">fact_check</span>
+          </div>
+          <div className="font-headline-lg text-primary">24.8k</div>
+          <div className="font-label-md text-on-surface-variant mt-1">Menunggu validasi</div>
+        </div>
+
+        <div className="bg-surface p-md rounded-xl border border-outline-variant shadow-sm hover:shadow-md transition-shadow">
+          <div className="flex items-center justify-between mb-sm text-on-surface-variant">
+            <span className="font-label-md">Anomali Data</span>
+            <span className="material-symbols-outlined text-error">warning</span>
+          </div>
+          <div className="font-headline-lg text-error">156</div>
+          <div className="font-label-md text-on-surface-variant mt-1">Perlu penanganan</div>
+        </div>
+
+        <div className="bg-primary text-on-primary p-md rounded-xl shadow-sm flex flex-col justify-between">
+          <div className="flex items-center justify-between mb-sm">
+            <span className="font-label-md">Target Bulanan</span>
+            <span className="material-symbols-outlined">trending_up</span>
           </div>
           <div>
-            <h1 style={{ fontSize: '14px', fontWeight: '600', lineHeight: '1.4', margin: '0' }}>
-              Sistem Pencocokan Data
-            </h1>
-            <p style={{ fontSize: '12px', margin: '4px 0 0 0', opacity: 0.8, color: '#b3d9ff' }}>
-              Kota Malang
-            </p>
+            <div className="font-headline-lg mb-1">82%</div>
+            <div className="w-full bg-primary-fixed-dim/30 rounded-full h-1.5 mb-1">
+              <div className="bg-secondary-fixed h-1.5 rounded-full" style={{ width: '82%' }}></div>
+            </div>
+            <div className="font-label-md opacity-80">1.2M baris diproses</div>
           </div>
         </div>
+      </div>
 
-        <nav style={{ flex: 1, display: 'flex', flexDirection: 'column', gap: '8px' }}>
-          <a
-            href="#"
-            style={{
-              display: 'flex',
-              alignItems: 'center',
-              gap: '16px',
-              padding: '12px 16px',
-              borderRadius: '4px',
-              color: '#ffffff',
-              textDecoration: 'none',
-              fontSize: '14px',
-              cursor: 'pointer',
-              transition: 'background-color 0.2s'
-            }}
-            onMouseEnter={(e) => (e.currentTarget.style.backgroundColor = '#0c4687')}
-            onMouseLeave={(e) => (e.currentTarget.style.backgroundColor = 'transparent')}
-          >
-            <span className="material-symbols-outlined">dashboard</span>
-            Dashboard
-          </a>
-          <Link
-            href="/superadmin/registration-requests"
-            style={{
-              display: 'flex',
-              alignItems: 'center',
-              gap: '16px',
-              padding: '12px 16px',
-              borderRadius: '4px',
-              color: '#ffffff',
-              backgroundColor: '#0c4687',
-              textDecoration: 'none',
-              fontSize: '14px',
-              fontWeight: '600'
-            }}
-          >
-            <span className="material-symbols-outlined">group</span>
-            Manajemen Pengguna
-          </Link>
-        </nav>
-
-        <div style={{ borderTop: '1px solid #0c4687', paddingTop: '16px', display: 'flex', flexDirection: 'column', gap: '8px' }}>
-          <button
-            onClick={handleLogout}
-            style={{
-              display: 'flex',
-              alignItems: 'center',
-              gap: '16px',
-              padding: '12px 16px',
-              borderRadius: '4px',
-              color: '#ffffff',
-              textDecoration: 'none',
-              fontSize: '13px',
-              cursor: 'pointer',
-              transition: 'background-color 0.2s',
-              background: 'none',
-              border: 'none'
-            }}
-            onMouseEnter={(e) => (e.currentTarget.style.backgroundColor = '#0c4687')}
-            onMouseLeave={(e) => (e.currentTarget.style.backgroundColor = 'transparent')}
-          >
-            <span className="material-symbols-outlined">logout</span>
-            Log Keluar
-          </button>
-        </div>
-      </aside>
-
-      {/* Header */}
-      <header style={{
-        position: 'fixed',
-        top: 0,
-        left: '260px',
-        right: 0,
-        height: '64px',
-        backgroundColor: '#ffffff',
-        borderBottom: '1px solid #c3c6d2',
-        display: 'flex',
-        justifyContent: 'space-between',
-        alignItems: 'center',
-        paddingLeft: '24px',
-        paddingRight: '24px',
-        zIndex: 10
-      }} className="header">
-        <h2 style={{ fontSize: '18px', fontWeight: '600', color: '#002b5a', margin: '0' }}>
-          Dashboard Superadmin
-        </h2>
-        <div style={{ display: 'flex', alignItems: 'center', gap: '16px' }}>
-          <button style={{ background: 'none', border: 'none', color: '#002b5a', cursor: 'pointer', padding: '8px' }}>
-            <span className="material-symbols-outlined">notifications</span>
-          </button>
-          <button style={{ background: 'none', border: 'none', color: '#002b5a', cursor: 'pointer', padding: '8px' }}>
-            <span className="material-symbols-outlined">account_circle</span>
-          </button>
-        </div>
-      </header>
-
-      {/* Main Content */}
-      <main style={{
-        flex: 1,
-        marginTop: '64px',
-        marginLeft: '260px',
-        padding: '32px 24px',
-        width: 'calc(100% - 260px)'
-      }} className="main-content">
-        <div style={{ maxWidth: '1280px', margin: '0 auto' }}>
-          {/* Welcome Section */}
-          <div style={{ marginBottom: '32px' }}>
-            <h1 style={{ fontSize: '28px', fontWeight: '700', color: '#002b5a', margin: '0 0 8px 0' }}>
-              Selamat Datang, {user.fullName}
-            </h1>
-            <p style={{ fontSize: '14px', color: '#424750', margin: '0', maxWidth: '600px' }}>
-              Kelola sistem pencocokan data dan administrasi pengguna.
-            </p>
-          </div>
-
-          {/* Dashboard Cards */}
-          <div style={{ display: 'grid', gridTemplateColumns: 'repeat(auto-fit, minmax(300px, 1fr))', gap: '24px' }}>
-            {/* Manajemen Pengguna Card */}
-            <Link
-              href="/superadmin/registration-requests"
-              style={{
-                backgroundColor: '#ffffff',
-                border: '1px solid #c3c6d2',
-                borderRadius: '4px',
-                padding: '24px',
-                textDecoration: 'none',
-                color: 'inherit',
-                transition: 'all 0.2s',
-                cursor: 'pointer',
-                display: 'block'
-              }}
-              onMouseEnter={(e) => {
-                e.currentTarget.style.boxShadow = '0 4px 12px rgba(0,0,0,0.1)';
-                e.currentTarget.style.borderColor = '#002b5a';
-              }}
-              onMouseLeave={(e) => {
-                e.currentTarget.style.boxShadow = 'none';
-                e.currentTarget.style.borderColor = '#c3c6d2';
-              }}
-            >
-              <div style={{ display: 'flex', alignItems: 'flex-start', gap: '16px' }}>
-                <div style={{ 
-                  width: '48px',
-                  height: '48px',
-                  borderRadius: '4px',
-                  backgroundColor: '#eff4ff',
-                  display: 'flex',
-                  alignItems: 'center',
-                  justifyContent: 'center',
-                  color: '#002b5a',
-                  fontSize: '24px'
-                }}>
-                  <span className="material-symbols-outlined">group</span>
-                </div>
-                <div style={{ flex: 1 }}>
-                  <h3 style={{ fontSize: '16px', fontWeight: '600', color: '#002b5a', margin: '0 0 8px 0' }}>
-                    Manajemen Pengguna
-                  </h3>
-                  <p style={{ fontSize: '13px', color: '#424750', margin: '0' }}>
-                    Kelola registrasi pengguna, persetujuan, dan daftar pengguna aktif.
-                  </p>
-                </div>
+      {/* Charts Area */}
+      <div className="grid grid-cols-1 lg:grid-cols-3 gap-lg mb-xl">
+        {/* Activity Chart */}
+        <div className="bg-surface border border-outline-variant rounded-xl shadow-sm p-lg lg:col-span-2">
+          <h3 className="font-headline-sm text-primary mb-md">Aktivitas Matching (30 Hari)</h3>
+          <div className="h-64 w-full flex items-end justify-between gap-2 pb-4 px-4">
+            {[40, 60, 85, 45, 30, 70, 55, 90].map((height, idx) => (
+              <div key={idx} className="flex-1 flex flex-col items-center gap-1">
+                <div 
+                  className="w-full bg-secondary rounded-t-md transition-all hover:bg-primary"
+                  style={{ height: `${height}%` }}
+                ></div>
               </div>
-            </Link>
+            ))}
           </div>
         </div>
-      </main>
-    </div>
+
+        {/* Status Distribution */}
+        <div className="bg-surface border border-outline-variant rounded-xl shadow-sm p-lg">
+          <h3 className="font-headline-sm text-primary mb-md">Status Hasil (Overall)</h3>
+          <div className="h-64 w-full flex flex-col items-center justify-center gap-md">
+            <div className="relative w-40 h-40">
+              <svg viewBox="0 0 100 100" className="transform -rotate-90">
+                <circle cx="50" cy="50" r="40" fill="none" stroke="#e0e0e0" strokeWidth="20" />
+                <circle cx="50" cy="50" r="40" fill="none" stroke="#4CAF50" strokeWidth="20" strokeDasharray="163 251" strokeLinecap="round" />
+                <circle cx="50" cy="50" r="40" fill="none" stroke="#FFC107" strokeWidth="20" strokeDasharray="63 251" strokeDashoffset="-163" strokeLinecap="round" />
+                <circle cx="50" cy="50" r="40" fill="none" stroke="#F44336" strokeWidth="20" strokeDasharray="25 251" strokeDashoffset="-226" strokeLinecap="round" />
+              </svg>
+              <div className="absolute inset-0 flex flex-col items-center justify-center">
+                <div className="font-headline-sm text-primary">85k</div>
+                <div className="font-label-sm text-on-surface-variant text-[10px]">Total Data</div>
+              </div>
+            </div>
+            <div className="flex flex-col gap-xs text-body-sm">
+              <div className="flex items-center gap-sm">
+                <div className="w-3 h-3 rounded-full bg-[#4CAF50]"></div>
+                <span className="text-on-surface-variant">Match (65%)</span>
+              </div>
+              <div className="flex items-center gap-sm">
+                <div className="w-3 h-3 rounded-full bg-[#FFC107]"></div>
+                <span className="text-on-surface-variant">Non-Match (25%)</span>
+              </div>
+              <div className="flex items-center gap-sm">
+                <div className="w-3 h-3 rounded-full bg-[#F44336]"></div>
+                <span className="text-on-surface-variant">Anomali (10%)</span>
+              </div>
+            </div>
+          </div>
+        </div>
+      </div>
+
+      {/* Recent Activity Section */}
+      <div className="bg-surface border border-outline-variant rounded-xl shadow-sm overflow-hidden mb-xl">
+        <div className="px-lg py-md border-b border-outline-variant flex justify-between items-center bg-surface-container-lowest">
+          <h3 className="font-headline-sm text-primary">Proses Terbaru</h3>
+          <button className="text-secondary font-label-md hover:underline">Lihat Semua</button>
+        </div>
+        <div className="p-xl text-center text-on-surface-variant">
+          <span className="material-symbols-outlined text-[48px] opacity-30">inbox</span>
+          <p className="text-body-md mt-sm">Belum ada proses pencocokan yang berjalan</p>
+          <p className="text-body-sm mt-xs">Mulai dengan mengunggah dataset terlebih dahulu</p>
+        </div>
+      </div>
+    </AuthenticatedLayout>
   );
 }
