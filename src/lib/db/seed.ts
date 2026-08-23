@@ -1,3 +1,6 @@
+import { loadEnvConfig } from '@next/env';
+loadEnvConfig(process.cwd());
+
 import { getDatabase } from '@/lib/db';
 import { users } from '@/lib/db/schema';
 import { hashPassword } from '@/lib/auth/password';
@@ -51,10 +54,13 @@ export async function seedTestUsers() {
 
       console.log(`✅ Created user: ${testUser.username}`);
     } catch (error) {
-      if (
-        error instanceof Error &&
-        error.message.includes('unique constraint')
-      ) {
+      // Check both the top-level message and the nested cause (postgres driver wraps the PG error)
+      const isUniqueViolation =
+        (error instanceof Error && error.message.includes('unique constraint')) ||
+        (error instanceof Error &&
+          (error as Error & { cause?: { code?: string } }).cause?.code === '23505');
+
+      if (isUniqueViolation) {
         console.log(`⏭️  User ${testUser.username} already exists, skipping`);
       } else {
         console.error(`❌ Error creating user ${testUser.username}:`, error);
@@ -65,3 +71,6 @@ export async function seedTestUsers() {
 
   console.log('✅ Seeding complete!');
 }
+
+// Note: This module is imported by the API seed route.
+// Do not add top-level auto-execution here — it would fire during Next.js build.

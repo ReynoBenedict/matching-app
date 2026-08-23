@@ -345,14 +345,25 @@ function DatasetsPageContent() {
 
 export default function DatasetsPage() {
   return (
-    <Suspense
-      fallback={
-        <div className="flex min-h-screen items-center justify-center bg-background">
-          <span className="material-symbols-outlined text-[40px] animate-spin">hourglass_empty</span>
+    <AuthenticatedLayout pageTitle="Manajemen Dataset">
+      {/* 
+        Container utama ini menggunakan token Tailwind kita.
+        Nantinya, tabel dataset (Stitch) akan diletakkan di dalam sini. 
+      */}
+      <div className="bg-surface-container-lowest border border-outline-variant rounded-lg p-lg shadow-sm">
+        <div className="text-center py-xl">
+          <span className="material-symbols-outlined text-[48px] text-outline mb-4">
+            source
+          </span>
+          <h2 className="text-headline-sm font-headline-sm text-on-surface mb-2">
+            Manajemen Dataset
+          </h2>
+          <p className="text-body-md font-body-md text-on-surface-variant">
+            Halaman ini sekarang telah terintegrasi dengan Superadmin Shell. 
+            Modul tabel dataset akan diimplementasikan pada tahap selanjutnya.
+          </p>
         </div>
-      }
-    >
-      <DatasetsPageContent />
-    </Suspense>
+      </div>
+    </AuthenticatedLayout>
   );
 }

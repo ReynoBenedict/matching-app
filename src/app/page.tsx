@@ -1,7 +1,7 @@
 export default function Home() {
   return (
     <div className="min-h-screen bg-gradient-to-br from-primary to-secondary flex items-center justify-center p-8">
-      <div className="bg-white rounded-lg shadow-xl p-8 max-w-md w-full text-center">
+        <div className="bg-white rounded-lg shadow-xl p-8 max-w-[28rem] w-full text-center">
         <div className="mb-6">
           <div className="w-16 h-16 bg-primary rounded-full flex items-center justify-center mx-auto mb-4">
             <span className="text-white text-2xl font-bold">BPS</span>
