@@ -59,3 +59,6 @@ Thumbs.db
 
 # logs
 *.log
+
+# working/build directories (nested project copies)
+bps-data-matching-system/
