@@ -4,6 +4,8 @@ import { useEffect, useState, Suspense } from 'react';
 import { useRouter, useSearchParams } from 'next/navigation';
 import Link from 'next/link';
 import { AuthenticatedLayout } from '@/components/layouts/AuthenticatedLayout';
+import { DatasetSchemaInfo } from '@/components/datasets/DatasetSchemaInfo';
+import { DATASET_SOURCES } from '@/lib/constants/dataset-schema';
 
 interface Dataset {
   id: number;
@@ -26,7 +28,7 @@ interface DatasetsResponse {
   };
 }
 
-function DatasetsPageContent() {
+function DatasetsContent() {
   const router = useRouter();
   const searchParams = useSearchParams();
 
@@ -36,6 +38,7 @@ function DatasetsPageContent() {
   const [page, setPage] = useState(1);
   const [statusFilter, setStatusFilter] = useState(searchParams.get('status') || '');
   const [searchQuery, setSearchQuery] = useState('');
+  const [schemaInfoOpen, setSchemaInfoOpen] = useState(false);
 
   useEffect(() => {
     const fetchDatasets = async () => {
@@ -105,6 +108,11 @@ function DatasetsPageContent() {
     return badges[status as keyof typeof badges] || badges.READY;
   };
 
+  const getDatasetTypeLabel = (datasetType: string) => {
+    const source = DATASET_SOURCES.find((s) => s.id === datasetType);
+    return source ? source.label : datasetType;
+  };
+
   const formatDate = (dateString: string) => {
     const date = new Date(dateString);
     const day = date.getDate().toString().padStart(2, '0');
@@ -132,13 +140,23 @@ function DatasetsPageContent() {
             Kelola data master (penduduk, dtks, p3ke) untuk keperluan pencocokan.
           </p>
         </div>
-        <Link
-          href="/datasets/upload"
-          className="bg-primary text-on-primary px-lg py-sm rounded-xl font-label-md text-label-md hidden md:flex items-center gap-sm hover:bg-primary-container hover:text-on-primary-container transition-colors shadow-sm"
-        >
-          <span className="material-symbols-outlined text-[18px]">upload_file</span>
-          Tambah Dataset
-        </Link>
+        <div className="flex gap-sm md:flex-col items-stretch">
+          <button
+            onClick={() => setSchemaInfoOpen(true)}
+            className="bg-surface-container text-on-surface border border-outline-variant px-lg py-sm rounded-xl font-label-md text-label-md flex items-center gap-sm hover:bg-surface-container-highest transition-colors shadow-sm"
+            title="View required dataset schema fields"
+          >
+            <span className="material-symbols-outlined text-[18px]">info</span>
+            <span className="hidden sm:inline">Schema</span>
+          </button>
+          <Link
+            href="/datasets/upload"
+            className="bg-primary text-on-primary px-lg py-sm rounded-xl font-label-md text-label-md hidden md:flex items-center gap-sm hover:bg-primary-container hover:text-on-primary-container transition-colors shadow-sm"
+          >
+            <span className="material-symbols-outlined text-[18px]">upload_file</span>
+            Tambah Dataset
+          </Link>
+        </div>
       </div>
 
       {/* Bento-style Statistics Cards */}
@@ -267,7 +285,9 @@ function DatasetsPageContent() {
                       <span className="material-symbols-outlined text-secondary">database</span>
                       {dataset.name}
                     </td>
-                    <td className="p-md text-on-surface-variant">{dataset.source}</td>
+                    <td className="p-md text-on-surface-variant">
+                      <span title={`Dataset type: ${dataset.datasetType}`}>{getDatasetTypeLabel(dataset.datasetType)}</span>
+                    </td>
                     <td className="p-md text-on-surface-variant">
                       <span className="bg-surface-variant px-sm py-[2px] rounded text-on-surface-variant text-[11px] font-bold">
                         {dataset.originalFileName?.split('.').pop()?.toUpperCase() || 'CSV'}
@@ -276,7 +296,7 @@ function DatasetsPageContent() {
                     <td className="p-md text-on-surface-variant text-right">
                       {dataset.totalRecords?.toLocaleString() || '—'}
                     </td>
-                    <td className="p-md text-on-surface-variant text-center">—</td>
+                    <td className="p-md text-on-surface-variant text-center">35</td>
                     <td className="p-md text-on-surface-variant">{formatDate(dataset.createdAt)}</td>
                     <td className="p-md text-center">{getStatusBadge(dataset.status)}</td>
                     <td className="p-md text-right whitespace-nowrap">
@@ -290,15 +310,19 @@ function DatasetsPageContent() {
                         </Link>
                         {dataset.status === 'READY' && (
                           <button
+                            disabled
+                            title="Feature coming soon"
                             aria-label="Use for Matching"
-                            className="text-secondary hover:text-primary transition-colors"
+                            className="text-secondary/50 cursor-not-allowed disabled:opacity-50"
                           >
                             <span className="material-symbols-outlined text-[20px]">play_circle</span>
                           </button>
                         )}
                         <button
+                          disabled
+                          title="Feature coming soon"
                           aria-label="Delete"
-                          className="text-error hover:text-on-error-container transition-colors"
+                          className="text-error/50 cursor-not-allowed disabled:opacity-50"
                         >
                           <span className="material-symbols-outlined text-[20px]">delete</span>
                         </button>
@@ -339,31 +363,17 @@ function DatasetsPageContent() {
           </div>
         )}
       </div>
+
+      {/* Schema Information Modal */}
+      <DatasetSchemaInfo isOpen={schemaInfoOpen} onClose={() => setSchemaInfoOpen(false)} />
     </AuthenticatedLayout>
   );
 }
 
-export default function DatasetsPage() {
+export default function DatasetsPageContent() {
   return (
-    <AuthenticatedLayout pageTitle="Manajemen Dataset">
-      {/* 
-        Container utama ini menggunakan token Tailwind kita.
-        Nantinya, tabel dataset (Stitch) akan diletakkan di dalam sini. 
-      */}
-      <div className="bg-surface-container-lowest border border-outline-variant rounded-lg p-lg shadow-sm">
-        <div className="text-center py-xl">
-          <span className="material-symbols-outlined text-[48px] text-outline mb-4">
-            source
-          </span>
-          <h2 className="text-headline-sm font-headline-sm text-on-surface mb-2">
-            Manajemen Dataset
-          </h2>
-          <p className="text-body-md font-body-md text-on-surface-variant">
-            Halaman ini sekarang telah terintegrasi dengan Superadmin Shell. 
-            Modul tabel dataset akan diimplementasikan pada tahap selanjutnya.
-          </p>
-        </div>
-      </div>
-    </AuthenticatedLayout>
+    <Suspense fallback={<div className="p-lg text-center">Loading...</div>}>
+      <DatasetsContent />
+    </Suspense>
   );
 }
