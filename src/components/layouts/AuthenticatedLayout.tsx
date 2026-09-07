@@ -13,11 +13,11 @@ const LIVE_NAV_ITEMS = [
   { href: '/superadmin/dashboard', icon: 'dashboard', label: 'Dashboard' },
   { href: '/superadmin/registration-requests', icon: 'group', label: 'Manajemen Pengguna' },
   { href: '/datasets', icon: 'source', label: 'Manajemen Dataset' },
+  { href: '/matching', icon: 'dataset_linked', label: 'Pencocokan Data' },
 ];
 
 // Nav items present in Stitch but belonging to future phases — rendered visually but non-interactive
 const FUTURE_NAV_ITEMS = [
-  { icon: 'dataset_linked', label: 'Pencocokan Data' },
   { icon: 'assignment', label: 'Assignment' },
   { icon: 'monitoring', label: 'Monitoring Progres' },
   { icon: 'check_circle', label: 'Hasil Matching' },
@@ -43,6 +43,9 @@ export function AuthenticatedLayout({ children, pageTitle }: AuthenticatedLayout
     }
     if (href === '/datasets') {
       return pathname?.startsWith('/datasets') ?? false;
+    }
+    if (href === '/matching') {
+      return pathname?.startsWith('/matching') ?? false;
     }
     return false;
   };
