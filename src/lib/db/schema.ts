@@ -262,3 +262,87 @@ export const datasetRecords = pgTable(
     ),
   ]
 );
+
+/**
+ * Assignment status enum
+ * Represents the lifecycle of an assignment to an employee
+ */
+export const assignmentStatusEnum = pgEnum('assignment_status', [
+  'PENDING',
+  'IN_PROGRESS',
+  'COMPLETED',
+]);
+
+/**
+ * Verification result enum
+ * Represents the employee's verification decision (MATCH or NON-MATCH)
+ * Phase 5C: Added for employee labeling workflow
+ */
+export const verificationResultEnum = pgEnum('verification_result', [
+  'MATCH',
+  'NON_MATCH',
+]);
+
+/**
+ * Assignments table
+ * Represents assignments of matching candidates to employees for verification
+ * Each assignment links a matching candidate pair to an employee
+ */
+export const assignments = pgTable(
+  'assignments',
+  {
+    id: integer().primaryKey().generatedAlwaysAsIdentity(),
+    recordAId: integer('record_a_id').notNull(),
+    recordBId: integer('record_b_id').notNull(),
+    employeeId: integer('employee_id').notNull(),
+    similarityScore: numeric('similarity_score', { precision: 5, scale: 4 }).notNull(),
+    status: assignmentStatusEnum('status').notNull().default('PENDING'),
+    createdBy: integer('created_by').notNull(),
+    // Phase 5C: Employee verification fields
+    verificationResult: verificationResultEnum('verification_result'),
+    verifiedAt: timestamp('verified_at', { withTimezone: true }),
+    verifiedBy: integer('verified_by'),
+    createdAt: timestamp('created_at', { withTimezone: true })
+      .notNull()
+      .defaultNow(),
+    updatedAt: timestamp('updated_at', { withTimezone: true })
+      .notNull()
+      .defaultNow(),
+  },
+  (table) => [
+    foreignKey({
+      columns: [table.recordAId],
+      foreignColumns: [datasetRecords.id],
+      name: 'assignments_record_a_id_fk',
+    }).onDelete('cascade'),
+    foreignKey({
+      columns: [table.recordBId],
+      foreignColumns: [datasetRecords.id],
+      name: 'assignments_record_b_id_fk',
+    }).onDelete('cascade'),
+    foreignKey({
+      columns: [table.employeeId],
+      foreignColumns: [users.id],
+      name: 'assignments_employee_id_fk',
+    }).onDelete('cascade'),
+    foreignKey({
+      columns: [table.createdBy],
+      foreignColumns: [users.id],
+      name: 'assignments_created_by_fk',
+    }).onDelete('set null'),
+    // Phase 5C: Verified by foreign key
+    foreignKey({
+      columns: [table.verifiedBy],
+      foreignColumns: [users.id],
+      name: 'assignments_verified_by_fk',
+    }).onDelete('set null'),
+    index('assignments_employee_id_idx').on(table.employeeId),
+    index('assignments_status_idx').on(table.status),
+    index('assignments_created_at_idx').on(table.createdAt),
+    index('assignments_verification_result_idx').on(table.verificationResult),
+    unique('assignments_record_pair_unique').on(
+      table.recordAId,
+      table.recordBId
+    ),
+  ]
+);

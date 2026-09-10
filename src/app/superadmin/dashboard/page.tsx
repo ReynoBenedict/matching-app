@@ -2,7 +2,7 @@
 
 import { useEffect, useState } from 'react';
 import { useRouter } from 'next/navigation';
-import { AuthenticatedLayout } from '@/components/layouts/AuthenticatedLayout';
+import { SuperadminLayout } from '@/components/layouts/SuperadminLayout';
 
 interface User {
   id: number;
@@ -135,7 +135,7 @@ export default function SuperadminDashboardPage() {
   }
 
   return (
-    <AuthenticatedLayout pageTitle="Dashboard Superadmin">
+    <SuperadminLayout pageTitle="Dashboard Superadmin">
 
       {/* Breadcrumb */}
       <div className="mb-2">
@@ -341,6 +341,6 @@ export default function SuperadminDashboardPage() {
         </div>
       </div>
 
-    </AuthenticatedLayout>
+    </SuperadminLayout>
   );
 }

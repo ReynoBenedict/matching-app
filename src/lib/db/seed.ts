@@ -35,6 +35,13 @@ export async function seedTestUsers() {
       password: 'kepala123456',
       role: 'HEAD',
     },
+    {
+      fullName: 'Employee Test',
+      email: 'employee@bps.go.id',
+      username: 'employee_test',
+      password: 'employee123456',
+      role: 'EMPLOYEE',
+    },
   ];
 
   console.log('🌱 Seeding test users...');

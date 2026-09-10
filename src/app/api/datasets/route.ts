@@ -7,8 +7,8 @@
 import { NextRequest, NextResponse } from 'next/server';
 import { requireAuth } from '@/lib/auth/authorization';
 import { getDatabase } from '@/lib/db';
-import { datasets } from '@/lib/db/schema';
-import { eq, desc, sql } from 'drizzle-orm';
+import { datasets, datasetColumns } from '@/lib/db/schema';
+import { eq, desc, sql, count, inArray } from 'drizzle-orm';
 
 export async function GET(request: NextRequest) {
   try {
@@ -72,14 +72,32 @@ export async function GET(request: NextRequest) {
         .offset(offset);
     }
 
+    // Attach the real column count for each dataset (no hardcoded column count).
+    const datasetIds = results.map((d) => d.id);
+    const columnCounts = new Map<number, number>();
+    if (datasetIds.length > 0) {
+      const grouped = await db
+        .select({ datasetId: datasetColumns.datasetId, value: count() })
+        .from(datasetColumns)
+        .where(inArray(datasetColumns.datasetId, datasetIds))
+        .groupBy(datasetColumns.datasetId);
+      for (const row of grouped) {
+        columnCounts.set(row.datasetId, Number(row.value));
+      }
+    }
+    const resultsWithCounts = results.map((d) => ({
+      ...d,
+      columnCount: columnCounts.get(d.id) ?? 0,
+    }));
+
     return NextResponse.json(
       {
         success: true,
-        data: results,
+        data: resultsWithCounts,
         pagination: {
           page: validPage,
           limit: validLimit,
-          total: results.length,
+          total: resultsWithCounts.length,
         },
       },
       { status: 200 }

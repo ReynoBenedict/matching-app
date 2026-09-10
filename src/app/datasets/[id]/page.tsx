@@ -3,7 +3,7 @@
 import { useEffect, useState } from 'react';
 import { useRouter, useParams } from 'next/navigation';
 import Link from 'next/link';
-import { AuthenticatedLayout } from '@/components/layouts/AuthenticatedLayout';
+import { SuperadminLayout } from '@/components/layouts/SuperadminLayout';
 
 interface DatasetDetail {
   id: number;
@@ -117,7 +117,7 @@ export default function DatasetDetailPage() {
   };
 
   return (
-    <AuthenticatedLayout pageTitle="Detail Dataset">
+    <SuperadminLayout pageTitle="Detail Dataset">
       {/* Breadcrumbs */}
       <Link
         href="/datasets"
@@ -313,6 +313,6 @@ export default function DatasetDetailPage() {
           </div>
         </>
       ) : null}
-    </AuthenticatedLayout>
+    </SuperadminLayout>
   );
 }

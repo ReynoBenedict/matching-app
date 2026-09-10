@@ -40,12 +40,14 @@ export default function LoginPage() {
         // Route based on role
         if (userRole === 'ADMIN') {
           router.push('/superadmin/dashboard');
+        } else if (userRole === 'EMPLOYEE') {
+          router.push('/employee/dashboard');
         } else {
-          // For other roles, use generic dashboard for now
+          // Fallback for other roles
           router.push('/dashboard');
         }
       } else {
-        // Fallback to generic dashboard
+        // Fallback
         router.push('/dashboard');
       }
     } catch (err) {

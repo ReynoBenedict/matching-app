@@ -9,6 +9,10 @@
     "lint": "eslint .",
     "lint:fix": "eslint . --fix",
     "type-check": "tsc --noEmit",
+    "test": "tsx src/app/api/assignments/__tests__/assignments.test.ts",
+    "test:ui": "tsx src/app/superadmin/assignments/__tests__/assignments-ui.test.ts",
+    "test:labeling": "tsx src/app/employee/assignments/__tests__/employee-labeling.test.ts",
+    "test:e2e": "playwright test",
     "db:generate": "drizzle-kit generate",
     "db:migrate": "drizzle-kit migrate",
     "db:push": "drizzle-kit push",
@@ -26,6 +30,7 @@
     "tailwindcss": "^4"
   },
   "devDependencies": {
+    "@playwright/test": "^1.63.0",
     "@types/bcryptjs": "^2.4.6",
     "@types/node": "^20",
     "@types/react": "^19",

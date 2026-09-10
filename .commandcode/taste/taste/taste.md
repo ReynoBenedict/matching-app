@@ -1,0 +1,22 @@
+# Taste
+- Wants fixes actually executed (files edited, commands run, data changed) — not code reviews, plans, or summaries of what should change. Confidence: 0.9
+- Do not claim work is COMPLETE/verified from build/typecheck alone; verify end-to-end against the real runtime (live HTTP API, real database) before reporting success. Confidence: 0.9
+- When a requested action cannot be executed, stop and report the exact error instead of pretending it succeeded. Confidence: 0.85
+- Fix problems at the root/source (e.g., delete bad data in PostgreSQL) rather than masking them with frontend/UI filtering or other workarounds. Confidence: 0.8
+- Tests may seed temporary data, but must clean it up afterward — every DB-writing test needs teardown that removes exactly the rows it created. Confidence: 0.85
+- Dislikes automatic dummy/test-data seeding in the app; dev seeders that inject fake datasets/records should be removed or stopped. Confidence: 0.75
+- Prefers a single consistent column-name contract across the pipeline (snake_case for uploaded/domain columns); do not hardcode column lists or mix naming conventions. Confidence: 0.7
+- Internal DB fields (id, datasetId, createdAt, updatedAt) must be excluded wherever uploaded columns are exposed. Confidence: 0.7
+- For this internal BPS application, all UI text must be in Indonesian — replace English labels ("Assign", "Status", "Action", "Confirm Assignment") with Indonesian equivalents. Confidence: 0.85
+- Prefers compact, clean UI: show a concise summary table in main lists and move exhaustive detail (e.g., all field-level scores) into a separate detail view instead of dumping it inline. Confidence: 0.8
+- UI must stay visually consistent with the existing application and its design tokens; polish the target page without redesigning the whole app. Confidence: 0.8
+- Wants clear back navigation ("Kembali") on detail/dialog/page flows. Confidence: 0.7
+- Never use mock data, hardcoded IDs, or dummy datasets — use real matching results and database data. Confidence: 0.85
+- Respect scope: don't change database architecture or the matching algorithm, preserve existing backend APIs unless a change is genuinely required, and don't modify unrelated pages/features; when the same defect exists elsewhere, flag it but leave it untouched until asked. Confidence: 0.8
+- Performs browser/UI testing himself — do not install browser automation tooling (e.g., agent-browser) or run agent browser tests unless explicitly asked, and stop such work immediately when told to. Confidence: 0.9
+- Never claim or imply browser verification that was not performed; state plainly that browser testing was left to the user and report only the evidence actually gathered. Confidence: 0.85
+- After a fix, report in the requested structured format: files changed, root cause, typecheck result, build result. Confidence: 0.8
+- Expects typecheck (tsc --noEmit) and a production build to be run after changes, with their real results reported. Confidence: 0.75
+- Expects the exact root cause to be diagnosed from evidence (e.g., inspecting compiled/minified output) rather than guessed, and explained in the report. Confidence: 0.7
+- Modals/dialogs should render through a fixed full-screen overlay with a centered panel (~500–600px on desktop, responsive on smaller screens), portaled out of parent table/flex/grid containers so they can't be squeezed or clipped. Confidence: 0.7
+- Acceptance requires browser-testing the real end-to-end user flow, not just API/script checks. Confidence: 0.75

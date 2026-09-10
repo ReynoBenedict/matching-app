@@ -1,0 +1,30 @@
+{
+  "permissions": {
+    "allow": [
+      "Shell(docker:*)",
+      "Shell(if:*)",
+      "Shell(else:*)",
+      "Shell(node_modules.bintsx.cmd:*)",
+      "Shell(node_modules.bintsc.cmd:*)",
+      "Shell(node_modules.binnext.cmd:*)",
+      "Shell(netstat:*)",
+      "Shell(findstr:*)",
+      "Shell(del:*)",
+      "Shell(node_modules.bineslint.cmd:*)",
+      "Shell(node_modules\\.bin\\tsx.cmd src\\app\\api\\assignments\\__tests__\\assignments.test.ts > \"%TEMP%\\assign-test.log\" 2>&1 & type \"%TEMP%\\assign-test.log\" | findstr /C:\"Results:\" /C:\"cleaned up\" & del \"%TEMP%\\assign-test.log\")",
+      "Shell({:*)",
+      "Shell(curl -s -o NUL -w health:%{http_code}\\n http://localhost:3001/api/health)",
+      "Shell(curl -s -o NUL -w datasets:%{http_code}\\n http://localhost:3001/api/datasets)",
+      "powershell",
+      "Shell(curl -s -X POST http://localhost:3001/api/auth/login -H \"Content-Type: application/json\" -d \"{\\\"username\\\":\\\"employee_test\\\",\\\"password\\\":\\\"employee123456\\\"}\" -w \"\\nHTTP:%{http_code}\\n\")",
+      "Shell(type:*)",
+      "Shell(curl -s http://localhost:3001/superadmin/assignments)",
+      "Shell(set:*)",
+      "Shell(agent-browser:*)",
+      "Shell(npm:*)",
+      "Shell(more:*)"
+    ],
+    "deny": [],
+    "defaultMode": "default"
+  }
+}

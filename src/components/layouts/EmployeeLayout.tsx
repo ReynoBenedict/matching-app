@@ -1,121 +1,35 @@
 'use client';
 
-import { useState, useEffect } from 'react';
-import { useRouter, usePathname } from 'next/navigation';
+import { useRouter } from 'next/navigation';
 import Link from 'next/link';
 
-interface AuthenticatedLayoutProps {
+interface EmployeeLayoutProps {
   children: React.ReactNode;
   pageTitle?: string;
 }
 
-// Nav items that are live and routable
-// Base nav items (available to all)
-const BASE_NAV_ITEMS = [
-  { href: '/datasets', icon: 'source', label: 'Manajemen Dataset' },
-  { href: '/matching', icon: 'dataset_linked', label: 'Pencocokan Data' },
-];
-
-// Superadmin-only nav items
-const SUPERADMIN_NAV_ITEMS = [
-  { href: '/superadmin/dashboard', icon: 'dashboard', label: 'Dashboard' },
-  { href: '/superadmin/registration-requests', icon: 'group', label: 'Manajemen Pengguna' },
-  { href: '/superadmin/assignments', icon: 'assignment', label: 'Assignment' },
-];
-
-// Employee-only nav items
 const EMPLOYEE_NAV_ITEMS = [
-  { href: '/dashboard', icon: 'dashboard', label: 'Dashboard' },
+  { href: '/employee/dashboard', icon: 'dashboard', label: 'Dashboard' },
   { href: '/employee/assignments', icon: 'assignment', label: 'Penugasan Saya' },
 ];
 
-// Nav items present in Stitch but belonging to future phases — rendered visually but non-interactive
-const FUTURE_NAV_ITEMS = [
-  { icon: 'monitoring', label: 'Monitoring Progres' },
-  { icon: 'check_circle', label: 'Hasil Matching' },
-  { icon: 'history', label: 'Riwayat Proses' },
-];
-
-export function AuthenticatedLayout({ children, pageTitle }: AuthenticatedLayoutProps) {
+export function EmployeeLayout({ children, pageTitle }: EmployeeLayoutProps) {
   const router = useRouter();
-  const pathname = usePathname();
-  const [userRole, setUserRole] = useState<string | null>(null);
-  const [loading, setLoading] = useState(true);
-
-  useEffect(() => {
-    // Fetch current user's role
-    const fetchUserRole = async () => {
-      try {
-        const response = await fetch('/api/auth/me', {
-          method: 'GET',
-          headers: { 'Content-Type': 'application/json' },
-        });
-        const data = await response.json();
-        if (response.ok && data.data?.role) {
-          setUserRole(data.data.role);
-        }
-      } catch (err) {
-        console.error('Failed to fetch user role:', err);
-      } finally {
-        setLoading(false);
-      }
-    };
-
-    fetchUserRole();
-  }, []);
 
   const handleLogout = async () => {
     await fetch('/api/auth/logout', { method: 'POST' });
     router.push('/login');
   };
 
-  // Determine active nav item based on current pathname
   const isActive = (href: string) => {
-    if (href === '/dashboard') {
-      return pathname === '/dashboard';
-    }
-    if (href === '/superadmin/dashboard') {
-      return pathname === '/superadmin/dashboard';
-    }
-    if (href === '/superadmin/registration-requests') {
-      return pathname?.startsWith('/superadmin/registration-requests') ?? false;
-    }
-    if (href === '/superadmin/assignments') {
-      return pathname?.startsWith('/superadmin/assignments') ?? false;
-    }
-    if (href === '/employee/assignments') {
-      return pathname?.startsWith('/employee/assignments') ?? false;
-    }
-    if (href === '/datasets') {
-      return pathname?.startsWith('/datasets') ?? false;
-    }
-    if (href === '/matching') {
-      return pathname?.startsWith('/matching') ?? false;
-    }
-    return false;
+    if (typeof window === 'undefined') return false;
+    const pathname = window.location.pathname;
+    return pathname.startsWith(href);
   };
-
-  // Determine which nav items to show based on user role
-  const getNavItems = () => {
-    // Don't show nav items until we know the role (avoid showing wrong items briefly)
-    if (userRole === null && loading) {
-      return [];
-    }
-    if (userRole === 'EMPLOYEE') {
-      return EMPLOYEE_NAV_ITEMS;
-    }
-    // For SUPERADMIN and ADMIN roles
-    return SUPERADMIN_NAV_ITEMS.concat(BASE_NAV_ITEMS);
-  };
-
-  const navItems = getNavItems();
-
-  // Don't render future nav items for employees
-  const shouldShowFutureNav = userRole !== 'EMPLOYEE';
 
   return (
     <div className="flex min-h-screen bg-background font-body-md text-on-background">
-      {/* ── Sidebar ─────────────────────────────────────────────── */}
+      {/* ── Employee Sidebar ─────────────────────────────────────── */}
       <aside className="w-[260px] h-screen fixed left-0 top-0 bg-primary border-r border-outline-variant shadow-sm flex flex-col py-xl z-20">
 
         {/* Logo / Title */}
@@ -136,20 +50,9 @@ export function AuthenticatedLayout({ children, pageTitle }: AuthenticatedLayout
           <p className="text-on-primary-fixed-variant font-label-md text-label-md">Kota Malang</p>
         </div>
 
-        {/* CTA Button - only for admin/superadmin, not for employees */}
-        {!loading && userRole !== 'EMPLOYEE' && (
-          <div className="px-md mb-lg">
-            <button className="w-full bg-secondary-container text-on-secondary-container py-2 rounded-lg font-label-md hover:bg-secondary hover:text-on-primary transition-colors duration-200 ease-in-out">
-              Mulai Pencocokan Baru
-            </button>
-          </div>
-        )}
-
-        {/* Navigation */}
+        {/* Employee Navigation - ONLY EMPLOYEE ITEMS */}
         <nav className="flex-1 flex flex-col gap-base mt-md overflow-y-auto">
-
-          {/* Role-specific nav items */}
-          {navItems.map(({ href, icon, label }) => (
+          {EMPLOYEE_NAV_ITEMS.map(({ href, icon, label }) => (
             <Link
               key={href}
               href={href}
@@ -163,29 +66,10 @@ export function AuthenticatedLayout({ children, pageTitle }: AuthenticatedLayout
               {label}
             </Link>
           ))}
-
-          {/* Future-phase nav items — visible per Stitch for admins only, non-interactive */}
-          {shouldShowFutureNav && FUTURE_NAV_ITEMS.map(({ icon, label }) => (
-            <span
-              key={label}
-              title="Fitur ini akan tersedia pada fase berikutnya"
-              className="flex items-center gap-md px-md py-sm text-on-primary opacity-40 cursor-not-allowed select-none"
-            >
-              <span className="material-symbols-outlined">{icon}</span>
-              {label}
-            </span>
-          ))}
         </nav>
 
         {/* Footer nav */}
         <div className="mt-auto px-md py-md border-t border-on-primary-fixed-variant flex flex-col gap-sm">
-          <span
-            title="Bantuan belum tersedia"
-            className="flex items-center gap-md px-md py-sm text-on-primary opacity-40 cursor-not-allowed select-none"
-          >
-            <span className="material-symbols-outlined">help</span>
-            Bantuan
-          </span>
           <button
             onClick={handleLogout}
             className="flex items-center gap-md px-md py-sm text-on-primary hover:bg-on-primary-fixed-variant transition-colors duration-200 w-full text-left"
@@ -196,7 +80,7 @@ export function AuthenticatedLayout({ children, pageTitle }: AuthenticatedLayout
         </div>
       </aside>
 
-      {/* ── Content column (right of sidebar) ───────────────────── */}
+      {/* ── Content column ─────────────────────────────────────── */}
       <div className="ml-[260px] flex-1 flex flex-col min-h-screen">
 
         {/* Top Header */}
@@ -218,12 +102,8 @@ export function AuthenticatedLayout({ children, pageTitle }: AuthenticatedLayout
             </div>
             <div className="flex items-center gap-md border-l border-outline-variant pl-md">
               <div className="flex flex-col items-end">
-                <span className="text-on-surface font-semibold text-sm">
-                  {loading ? 'Loading...' : (userRole === 'EMPLOYEE' ? 'Karyawan' : 'Administrator BPS')}
-                </span>
-                <span className="text-on-surface-variant text-xs">
-                  Role: {loading ? 'Loading...' : userRole}
-                </span>
+                <span className="text-on-surface font-semibold text-sm">Petugas Verifikasi</span>
+                <span className="text-on-surface-variant text-xs">Role: Employee</span>
               </div>
               <div className="flex gap-sm">
                 <button className="p-1 text-on-surface-variant hover:text-primary transition-colors rounded-full hover:bg-surface-container-low relative">

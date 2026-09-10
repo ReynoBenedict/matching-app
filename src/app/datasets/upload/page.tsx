@@ -1,12 +1,12 @@
 'use client';
 
 import Link from 'next/link';
-import { AuthenticatedLayout } from '@/components/layouts/AuthenticatedLayout';
+import { SuperadminLayout } from '@/components/layouts/SuperadminLayout';
 import { UploadForm } from '@/components/datasets/UploadForm';
 
 export default function UploadDatasetPage() {
   return (
-    <AuthenticatedLayout pageTitle="Upload Dataset Baru">
+    <SuperadminLayout pageTitle="Upload Dataset Baru">
       {/* Page Header */}
       <div className="mb-xl">
         <h2 className="font-headline-lg text-on-surface mb-xs">Unggah Dataset Baru</h2>
@@ -117,6 +117,6 @@ export default function UploadDatasetPage() {
           </div>
         </div>
       </div>
-    </AuthenticatedLayout>
+    </SuperadminLayout>
   );
 }

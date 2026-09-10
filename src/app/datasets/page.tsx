@@ -3,7 +3,7 @@
 import { useEffect, useState, Suspense } from 'react';
 import { useRouter, useSearchParams } from 'next/navigation';
 import Link from 'next/link';
-import { AuthenticatedLayout } from '@/components/layouts/AuthenticatedLayout';
+import { SuperadminLayout } from '@/components/layouts/SuperadminLayout';
 import { DatasetSchemaInfo } from '@/components/datasets/DatasetSchemaInfo';
 import { DATASET_SOURCES } from '@/lib/constants/dataset-schema';
 
@@ -14,6 +14,7 @@ interface Dataset {
   source: string;
   status: 'UPLOADING' | 'VALIDATING' | 'READY' | 'FAILED';
   totalRecords: number | null;
+  columnCount: number | null;
   createdAt: string;
   originalFileName: string | null;
 }
@@ -122,7 +123,7 @@ function DatasetsContent() {
   };
 
   return (
-    <AuthenticatedLayout pageTitle="Manajemen Dataset">
+    <SuperadminLayout pageTitle="Manajemen Dataset">
       {/* Header Section */}
       <div className="flex flex-col md:flex-row justify-between items-start md:items-center mb-xl gap-md">
         <Link
@@ -296,7 +297,9 @@ function DatasetsContent() {
                     <td className="p-md text-on-surface-variant text-right">
                       {dataset.totalRecords?.toLocaleString() || '—'}
                     </td>
-                    <td className="p-md text-on-surface-variant text-center">35</td>
+                    <td className="p-md text-on-surface-variant text-center">
+                      {dataset.columnCount?.toLocaleString() || '—'}
+                    </td>
                     <td className="p-md text-on-surface-variant">{formatDate(dataset.createdAt)}</td>
                     <td className="p-md text-center">{getStatusBadge(dataset.status)}</td>
                     <td className="p-md text-right whitespace-nowrap">
@@ -366,7 +369,7 @@ function DatasetsContent() {
 
       {/* Schema Information Modal */}
       <DatasetSchemaInfo isOpen={schemaInfoOpen} onClose={() => setSchemaInfoOpen(false)} />
-    </AuthenticatedLayout>
+    </SuperadminLayout>
   );
 }
 

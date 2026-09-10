@@ -30,7 +30,7 @@
 
 import { getDatabase } from '@/lib/db';
 import { datasets, datasetColumns, datasetRecords } from '@/lib/db/schema';
-import { eq } from 'drizzle-orm';
+import { eq, and } from 'drizzle-orm';
 import type {
   IMatchingProvider,
   MatchingRequest,
@@ -105,21 +105,31 @@ export class DevelopmentMatchingProvider implements IMatchingProvider {
         };
       }
 
-      // Verify columnA exists in datasetA
+      // Verify columnA exists in datasetA (check specific column name)
       const [colA] = await db
         .select({ id: datasetColumns.id })
         .from(datasetColumns)
-        .where(eq(datasetColumns.datasetId, req.datasetAId));
+        .where(
+          and(
+            eq(datasetColumns.datasetId, req.datasetAId),
+            eq(datasetColumns.columnName, mapping.columnA)
+          )
+        );
 
       if (!colA) {
         return { valid: false, error: `Column "${mapping.columnA}" not found in Dataset A` };
       }
 
-      // Verify columnB exists in datasetB
+      // Verify columnB exists in datasetB (check specific column name)
       const [colB] = await db
         .select({ id: datasetColumns.id })
         .from(datasetColumns)
-        .where(eq(datasetColumns.datasetId, req.datasetBId));
+        .where(
+          and(
+            eq(datasetColumns.datasetId, req.datasetBId),
+            eq(datasetColumns.columnName, mapping.columnB)
+          )
+        );
 
       if (!colB) {
         return { valid: false, error: `Column "${mapping.columnB}" not found in Dataset B` };
@@ -191,8 +201,22 @@ export class DevelopmentMatchingProvider implements IMatchingProvider {
 
           // Calculate similarity for each mapped column
           for (const mapping of req.columnMappings) {
-            const valueA = (recordA as Record<string, unknown>)[toCamelCase(mapping.columnA)];
-            const valueB = (recordB as Record<string, unknown>)[toCamelCase(mapping.columnB)];
+            // Handle both snake_case (from metadata) and camelCase (from fallback) column names
+            let valueA: unknown;
+            let valueB: unknown;
+            
+            // Try the mapped name directly first (works for camelCase from DB)
+            valueA = (recordA as Record<string, unknown>)[toCamelCase(mapping.columnA)];
+            valueB = (recordB as Record<string, unknown>)[toCamelCase(mapping.columnB)];
+            
+            // If not found and the mapped name is already camelCase, the access should have worked
+            // If not found, it might be because the column truly doesn't exist in the dataset
+            if (valueA === undefined || valueB === undefined) {
+              console.warn(
+                `Column mapping "${mapping.columnA}" or "${mapping.columnB}" not found in records during matching`
+              );
+              // Still attempt similarity calculation with undefined values (will be treated as empty strings)
+            }
 
             const fieldSimilarity = calculateSimilarity(valueA, valueB);
             fieldScores.push({

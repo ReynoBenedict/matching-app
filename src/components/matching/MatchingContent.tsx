@@ -1,7 +1,7 @@
 'use client';
 
 import { useState } from 'react';
-import { AuthenticatedLayout } from '@/components/layouts/AuthenticatedLayout';
+import { SuperadminLayout } from '@/components/layouts/SuperadminLayout';
 import { DatasetSelector } from '@/components/matching/DatasetSelector';
 import { ColumnMapper } from '@/components/matching/ColumnMapper';
 import { ThresholdSelector } from '@/components/matching/ThresholdSelector';
@@ -147,7 +147,7 @@ export function MatchingContent() {
   };
 
   return (
-    <AuthenticatedLayout pageTitle="Pencocokan Data">
+    <SuperadminLayout pageTitle="Pencocokan Data">
       <div className="space-y-6">
         {/* Error message */}
         {state.error && (
@@ -258,6 +258,6 @@ export function MatchingContent() {
           </>
         )}
       </div>
-    </AuthenticatedLayout>
+    </SuperadminLayout>
   );
 }

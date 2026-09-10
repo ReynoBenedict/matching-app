@@ -3,7 +3,7 @@
 import { useEffect, useState } from 'react';
 import { useRouter } from 'next/navigation';
 import Link from 'next/link';
-import { AuthenticatedLayout } from '@/components/layouts/AuthenticatedLayout';
+import { SuperadminLayout } from '@/components/layouts/SuperadminLayout';
 
 interface RegistrationRequest {
   id: number;
@@ -82,7 +82,7 @@ export default function RegistrationRequestsPage() {
   };
 
   return (
-    <AuthenticatedLayout pageTitle="Persetujuan Registrasi Pengguna">
+    <SuperadminLayout pageTitle="Persetujuan Registrasi Pengguna">
       <div style={{ maxWidth: '1280px', margin: '0 auto' }}>
           {/* Breadcrumbs */}
           <nav style={{ display: 'flex', alignItems: 'center', gap: '8px', fontSize: '12px', color: '#424750', marginBottom: '24px' }}>
@@ -385,7 +385,7 @@ export default function RegistrationRequestsPage() {
             </>
           )}
         </div>
-      </AuthenticatedLayout>
+      </SuperadminLayout>
     );
   }
   

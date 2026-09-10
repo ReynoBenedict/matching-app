@@ -33,31 +33,79 @@ export function ColumnMapper({
   const [error, setError] = useState<string | null>(null);
 
   useEffect(() => {
-    async function fetchColumns() {
+    async function fetchColumnsForDataset(datasetId: number): Promise<Column[]> {
       try {
-        setLoading(true);
-        const [resA, resB] = await Promise.all([
-          fetch(`/api/datasets/${datasetAId}/columns`),
-          fetch(`/api/datasets/${datasetBId}/columns`),
-        ]);
-
-        if (!resA.ok || !resB.ok) {
-          throw new Error('Failed to fetch columns');
+        // First, try to fetch column metadata
+        const metaRes = await fetch(`/api/datasets/${datasetId}/columns`);
+        
+        if (metaRes.ok) {
+          const metaData = await metaRes.json();
+          if (metaData.data && metaData.data.length > 0) {
+            return metaData.data;
+          }
         }
 
-        const dataA = await resA.json();
-        const dataB = await resB.json();
+        // Metadata not available or empty, extract from records
+        const recordRes = await fetch(`/api/datasets/${datasetId}`);
+        if (!recordRes.ok) {
+          console.error(`Failed to fetch records for dataset ${datasetId}`);
+          return [];
+        }
 
-        setColumnsA(dataA.data || []);
-        setColumnsB(dataB.data || []);
+        const recordData = await recordRes.json();
+        
+        // Extract columns from first record in preview (fallback when metadata is absent)
+        if (recordData.data && recordData.data.preview && recordData.data.preview.length > 0) {
+          const firstRecord = recordData.data.preview[0];
+          // Internal DB fields are never uploaded columns and must not be selectable
+          const internalFields = new Set(['id', 'datasetId', 'createdAt', 'updatedAt']);
+          const extractedColumns = Object.keys(firstRecord)
+            .filter((key) => !internalFields.has(key))
+            // Records come back camelCase; the uploaded-column contract is snake_case
+            .map((key, idx) => ({
+              id: idx,
+              columnName: toSnakeCase(key),
+              dataType: 'string',
+              isRequired: false,
+            }));
+          return extractedColumns;
+        }
+
+        return [];
       } catch (err) {
-        setError('Error loading columns: ' + (err instanceof Error ? err.message : 'Unknown error'));
-      } finally {
+        console.error(`Error loading columns for dataset ${datasetId}:`, err);
+        return [];
+      }
+    }
+
+    async function loadColumns() {
+      try {
+        setLoading(true);
+        setError(null);
+
+        // Fetch columns for both datasets in parallel
+        const [colsA, colsB] = await Promise.all([
+          fetchColumnsForDataset(datasetAId),
+          fetchColumnsForDataset(datasetBId),
+        ]);
+
+        if (colsA.length === 0 || colsB.length === 0) {
+          setError('Could not load columns from one or both datasets');
+          setLoading(false);
+          return;
+        }
+
+        setColumnsA(colsA);
+        setColumnsB(colsB);
+        setLoading(false);
+      } catch (err) {
+        console.error('Error loading columns:', err);
+        setError('Failed to load columns');
         setLoading(false);
       }
     }
 
-    fetchColumns();
+    loadColumns();
   }, [datasetAId, datasetBId]);
 
   const handleAddMapping = () => {
@@ -90,7 +138,7 @@ export function ColumnMapper({
     );
   }
 
-  if (error) {
+  if (error && columnsA.length === 0 && columnsB.length === 0) {
     return (
       <div className="text-error text-sm bg-error-container p-3 rounded-lg">
         {error}
@@ -123,8 +171,8 @@ export function ColumnMapper({
                 >
                   <option value="">Pilih kolom...</option>
                   {columnsA.map((col) => (
-                    <option key={col.id} value={col.columnName}>
-                      {col.columnName} ({col.dataType})
+                    <option key={col.columnName} value={col.columnName}>
+                      {col.columnName}
                     </option>
                   ))}
                 </select>
@@ -145,8 +193,8 @@ export function ColumnMapper({
                 >
                   <option value="">Pilih kolom...</option>
                   {columnsB.map((col) => (
-                    <option key={col.id} value={col.columnName}>
-                      {col.columnName} ({col.dataType})
+                    <option key={col.columnName} value={col.columnName}>
+                      {col.columnName}
                     </option>
                   ))}
                 </select>
@@ -165,10 +213,18 @@ export function ColumnMapper({
 
       <button
         onClick={handleAddMapping}
-        className="w-full border border-primary text-primary py-2 rounded-lg font-label-md hover:bg-primary-container transition-colors"
+        disabled={columnsA.length === 0 || columnsB.length === 0}
+        className="w-full border border-primary text-primary py-2 rounded-lg font-label-md hover:bg-primary-container disabled:opacity-50 disabled:cursor-not-allowed transition-colors"
       >
         + Tambah Pemetaan Kolom
       </button>
     </div>
   );
+}
+
+/**
+ * Convert a camelCase record key back to the snake_case uploaded-column contract.
+ */
+function toSnakeCase(value: string): string {
+  return value.replace(/([a-z0-9])([A-Z])/g, '$1_$2').toLowerCase();
 }
