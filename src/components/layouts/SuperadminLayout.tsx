@@ -1,4 +1,4 @@
-'use client';
+﻿'use client';
 
 import { useRouter } from 'next/navigation';
 import Link from 'next/link';
@@ -12,13 +12,13 @@ const SUPERADMIN_NAV_ITEMS = [
   { href: '/superadmin/dashboard', icon: 'dashboard', label: 'Dashboard' },
   { href: '/superadmin/registration-requests', icon: 'group', label: 'Manajemen Pengguna' },
   { href: '/superadmin/assignments', icon: 'assignment', label: 'Penugasan' },
+  { href: '/superadmin/monitoring', icon: 'monitoring', label: 'Monitoring Progres' },
   { href: '/datasets', icon: 'source', label: 'Manajemen Dataset' },
   { href: '/matching', icon: 'dataset_linked', label: 'Pencocokan Data' },
 ];
 
 // Future-phase nav items shown visually but non-interactive
 const FUTURE_NAV_ITEMS = [
-  { icon: 'monitoring', label: 'Monitoring Progres' },
   { icon: 'check_circle', label: 'Hasil Matching' },
   { icon: 'history', label: 'Riwayat Proses' },
 ];
@@ -43,6 +43,9 @@ export function SuperadminLayout({ children, pageTitle }: SuperadminLayoutProps)
     }
     if (href === '/superadmin/assignments') {
       return pathname.startsWith('/superadmin/assignments');
+    }
+    if (href === '/superadmin/monitoring') {
+      return pathname.startsWith('/superadmin/monitoring');
     }
     if (href === '/datasets') {
       return pathname.startsWith('/datasets');
