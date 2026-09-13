@@ -1,6 +1,6 @@
 'use client';
 
-import { useState, useEffect, useMemo } from 'react';
+import { useState, useEffect, useMemo, useCallback } from 'react';
 import type { HistoryRecord, HistoryActionType } from '@/types/phase6';
 import { mockHistoryRecords, historyActionMeta, mockHistoryStatistics } from '@/lib/mock/phase6';
 
@@ -39,10 +39,14 @@ export default function HistoryPage() {
   }, [records]);
 
   // Reset page when filters change
-  // eslint-disable-next-line react-hooks/set-state-in-effect
-  useEffect(() => {
+  const handleFilterChange = useCallback(() => {
     setCurrentPage(1);
-  }, [filterAction, filterUser, dateRangeStart, dateRangeEnd]);
+  }, []);
+
+  useEffect(() => {
+    // eslint-disable-next-line react-hooks/set-state-in-effect
+    handleFilterChange();
+  }, [filterAction, filterUser, dateRangeStart, dateRangeEnd, handleFilterChange]);
 
   // Apply filters
   const filteredRecords = useMemo(() => {

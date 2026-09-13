@@ -1,6 +1,6 @@
 'use client';
 
-import { useState, useEffect } from 'react';
+import { useState, useEffect, useCallback } from 'react';
 import { useRouter, useSearchParams, useParams } from 'next/navigation';
 import { EmployeeLayout } from '@/components/layouts/EmployeeLayout';
 
@@ -26,6 +26,16 @@ interface AssignmentDetail {
   recordB: any;
 }
 
+// Helper component to render a single record field
+function RecordField({ label, value }: { label: string; value: string | null | undefined }) {
+  return (
+    <div className="py-3 border-b border-outline-variant last:border-b-0">
+      <p className="text-xs font-semibold text-on-surface-variant mb-2">{label}</p>
+      <p className="text-sm text-on-surface">{value || '-'}</p>
+    </div>
+  );
+}
+
 export function AssignmentDetailContent() {
   const router = useRouter();
   const params = useParams();
@@ -45,11 +55,7 @@ export function AssignmentDetailContent() {
     result: null,
   });
 
-  useEffect(() => {
-    loadAssignment();
-  }, []);
-
-  const loadAssignment = async () => {
+  const loadAssignment = useCallback(async () => {
     setLoading(true);
     setError(null);
 
@@ -73,7 +79,12 @@ export function AssignmentDetailContent() {
       setError('Gagal memuat detail penugasan: ' + (err instanceof Error ? err.message : 'Kesalahan tidak diketahui'));
       setLoading(false);
     }
-  };
+  }, [assignmentId]);
+
+  useEffect(() => {
+    // eslint-disable-next-line react-hooks/set-state-in-effect
+    loadAssignment();
+  }, [loadAssignment]);
 
   const handleVerifyClick = (result: 'MATCH' | 'NON_MATCH') => {
     // Show confirmation dialog instead of immediately verifying
@@ -190,14 +201,6 @@ export function AssignmentDetailContent() {
 
   const score = (parseFloat(assignment.similarityScore) * 100).toFixed(1);
   const isVerified = assignment.verificationResult !== null;
-
-  // Helper component to render a single record field
-  const RecordField = ({ label, value }: { label: string; value: string | null | undefined }) => (
-    <div className="py-3 border-b border-outline-variant last:border-b-0">
-      <p className="text-xs font-semibold text-on-surface-variant mb-2">{label}</p>
-      <p className="text-sm text-on-surface">{value || '-'}</p>
-    </div>
-  );
 
   return (
     <EmployeeLayout pageTitle="Verifikasi Penugasan">

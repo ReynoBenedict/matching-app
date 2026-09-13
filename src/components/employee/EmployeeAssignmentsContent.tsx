@@ -1,6 +1,6 @@
 'use client';
 
-import { useState, useEffect } from 'react';
+import { useState, useEffect, useCallback } from 'react';
 import { useRouter } from 'next/navigation';
 import { EmployeeLayout } from '@/components/layouts/EmployeeLayout';
 
@@ -21,11 +21,7 @@ export function EmployeeAssignmentsContent() {
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState<string | null>(null);
 
-  useEffect(() => {
-    loadAssignments();
-  }, []);
-
-  const loadAssignments = async () => {
+  const loadAssignments = useCallback(async () => {
     setLoading(true);
     setError(null);
 
@@ -49,7 +45,12 @@ export function EmployeeAssignmentsContent() {
       setError('Gagal memuat daftar penugasan: ' + (err instanceof Error ? err.message : 'Kesalahan tidak diketahui'));
       setLoading(false);
     }
-  };
+  }, []);
+
+  useEffect(() => {
+    // eslint-disable-next-line react-hooks/set-state-in-effect
+    loadAssignments();
+  }, [loadAssignments]);
 
   const handleOpenAssignment = (assignmentId: number) => {
     router.push(`/employee/assignments/${assignmentId}`);
