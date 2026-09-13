@@ -1,4 +1,4 @@
-'use client';
+﻿'use client';
 
 import { useState } from 'react';
 import Link from 'next/link';
@@ -42,6 +42,8 @@ export default function LoginPage() {
           router.push('/superadmin/dashboard');
         } else if (userRole === 'EMPLOYEE') {
           router.push('/employee/dashboard');
+        } else if (userRole === 'HEAD') {
+          router.push('/kepala-bps/dashboard');
         } else {
           // Fallback for other roles
           router.push('/dashboard');
@@ -143,7 +145,7 @@ export default function LoginPage() {
         </div>
 
         <div className="mt-8 text-center">
-          <p className="text-xs text-[#737781]">© 2024 Badan Pusat Statistik Kota Malang - Tim IT BPS</p>
+          <p className="text-xs text-[#737781]"> 2024 Badan Pusat Statistik Kota Malang - Tim IT BPS</p>
           <p className="text-xs text-[#737781] mt-1">Akses terbatas hanya untuk pegawai berwenang.</p>
         </div>
       </main>

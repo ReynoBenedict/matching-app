@@ -13,15 +13,15 @@ const SUPERADMIN_NAV_ITEMS = [
   { href: '/superadmin/registration-requests', icon: 'group', label: 'Manajemen Pengguna' },
   { href: '/superadmin/assignments', icon: 'assignment', label: 'Penugasan' },
   { href: '/superadmin/monitoring', icon: 'monitoring', label: 'Monitoring Progres' },
-  { href: '/superadmin/matching-results', icon: 'check_circle', label: 'Hasil Matching' },
-  { href: '/superadmin/history', icon: 'history', label: 'Riwayat Proses' },
-  { href: '/superadmin/report', icon: 'description', label: 'Laporan' },
   { href: '/datasets', icon: 'source', label: 'Manajemen Dataset' },
   { href: '/matching', icon: 'dataset_linked', label: 'Pencocokan Data' },
 ];
 
 // Future-phase nav items shown visually but non-interactive
-const FUTURE_NAV_ITEMS: Array<{ icon: string; label: string }> = [];
+const FUTURE_NAV_ITEMS = [
+  { icon: 'check_circle', label: 'Hasil Matching' },
+  { icon: 'history', label: 'Riwayat Proses' },
+];
 
 export function SuperadminLayout({ children, pageTitle }: SuperadminLayoutProps) {
   const router = useRouter();
@@ -47,27 +47,18 @@ export function SuperadminLayout({ children, pageTitle }: SuperadminLayoutProps)
     if (href === '/superadmin/monitoring') {
       return pathname.startsWith('/superadmin/monitoring');
     }
-    if (href === '/superadmin/matching-results') {
-      return pathname.startsWith('/superadmin/matching-results');
-    }
     if (href === '/datasets') {
       return pathname.startsWith('/datasets');
     }
     if (href === '/matching') {
       return pathname.startsWith('/matching');
     }
-    if (href === '/superadmin/history') {
-      return pathname.startsWith('/superadmin/history');
-    }
-    if (href === '/superadmin/report') {
-      return pathname === '/superadmin/report';
-    }
     return false;
   };
 
   return (
     <div className="flex min-h-screen bg-background font-body-md text-on-background">
-      {/* -- Superadmin Sidebar ----------------------------------- */}
+      {/* ── Superadmin Sidebar ─────────────────────────────────── */}
       <aside className="w-[260px] h-screen fixed left-0 top-0 bg-primary border-r border-outline-variant shadow-sm flex flex-col py-xl z-20">
 
         {/* Logo / Title */}
@@ -112,7 +103,7 @@ export function SuperadminLayout({ children, pageTitle }: SuperadminLayoutProps)
             </Link>
           ))}
 
-          {/* Future-phase nav items -- visible per Stitch for admins only, non-interactive */}
+          {/* Future-phase nav items — visible per Stitch for admins only, non-interactive */}
           {FUTURE_NAV_ITEMS.map(({ icon, label }) => (
             <span
               key={label}
@@ -144,7 +135,7 @@ export function SuperadminLayout({ children, pageTitle }: SuperadminLayoutProps)
         </div>
       </aside>
 
-      {/* -- Content column --------------------------------------- */}
+      {/* ── Content column ─────────────────────────────────────── */}
       <div className="ml-[260px] flex-1 flex flex-col min-h-screen">
 
         {/* Top Header */}
@@ -204,6 +195,3 @@ export function SuperadminLayout({ children, pageTitle }: SuperadminLayoutProps)
     </div>
   );
 }
-
-
-
