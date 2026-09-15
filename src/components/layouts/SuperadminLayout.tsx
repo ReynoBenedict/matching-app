@@ -1,6 +1,6 @@
 ﻿'use client';
 
-import { useRouter } from 'next/navigation';
+import { usePathname, useRouter } from 'next/navigation';
 import Link from 'next/link';
 
 interface SuperadminLayoutProps {
@@ -25,6 +25,7 @@ const FUTURE_NAV_ITEMS: Array<{ icon: string; label: string }> = [];
 
 export function SuperadminLayout({ children, pageTitle }: SuperadminLayoutProps) {
   const router = useRouter();
+  const pathname = usePathname();
 
   const handleLogout = async () => {
     await fetch('/api/auth/logout', { method: 'POST' });
@@ -32,9 +33,6 @@ export function SuperadminLayout({ children, pageTitle }: SuperadminLayoutProps)
   };
 
   const isActive = (href: string) => {
-    if (typeof window === 'undefined') return false;
-    const pathname = window.location.pathname;
-    
     if (href === '/superadmin/dashboard') {
       return pathname === '/superadmin/dashboard';
     }

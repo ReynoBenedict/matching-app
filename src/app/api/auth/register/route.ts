@@ -4,14 +4,20 @@ import { registrationRequests } from '@/lib/db/schema';
 import { hashPassword } from '@/lib/auth/password';
 import { recordAuditLog } from '@/lib/audit';
 
+/**
+ * Public registration is restricted to employee accounts only.
+ * The role is fixed server-side so it cannot be escalated via the request body.
+ */
+const REGISTRATION_ROLE = 'EMPLOYEE';
+
 export async function POST(request: NextRequest) {
   try {
     // Parse request body
     const body = await request.json();
-    const { fullName, email, username, requestedRole, password } = body;
+    const { fullName, email, username, password } = body;
 
     // Validate input
-    if (!fullName || !email || !username || !requestedRole || !password) {
+    if (!fullName || !email || !username || !password) {
       return NextResponse.json(
         { error: 'Semua field harus diisi' },
         { status: 400 }
@@ -30,14 +36,12 @@ export async function POST(request: NextRequest) {
     const trimmedFullName = fullName.trim();
     const trimmedEmail = email.trim();
     const trimmedUsername = username.trim();
-    const trimmedRole = requestedRole.trim();
     const trimmedPassword = password.trim();
 
     if (
       !trimmedFullName ||
       !trimmedEmail ||
       !trimmedUsername ||
-      !trimmedRole ||
       !trimmedPassword
     ) {
       return NextResponse.json(
@@ -55,7 +59,7 @@ export async function POST(request: NextRequest) {
       fullName: trimmedFullName,
       email: trimmedEmail,
       username: trimmedUsername,
-      requestedRole: trimmedRole,
+      requestedRole: REGISTRATION_ROLE,
       passwordHash,
       status: 'PENDING',
     }).returning({ id: registrationRequests.id });
@@ -69,7 +73,7 @@ export async function POST(request: NextRequest) {
         metadata: {
           email: trimmedEmail,
           username: trimmedUsername,
-          requestedRole: trimmedRole,
+          requestedRole: REGISTRATION_ROLE,
         },
       });
     }

@@ -4,9 +4,9 @@ interface LayoutProps {
   children: React.ReactNode;
 }
 
-export default function ResultDetailLayout({ children }: LayoutProps) {
+export default function ReportLayout({ children }: LayoutProps) {
   return (
-    <SuperadminLayout pageTitle="Detail Hasil Matching">
+    <SuperadminLayout pageTitle="Laporan">
       {children}
     </SuperadminLayout>
   );

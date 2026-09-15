@@ -1,30 +1,36 @@
 /**
  * Matching Service Module
  *
- * Exports the matching provider factory.
- * This allows swapping between different matching implementations
- * (development fallback, Model Service, etc.) without changing consumers.
+ * Public entry point for the matching subsystem:
+ * - `getMatchingProvider()` selects the active provider (development fallback
+ *   or the opt-in Model Service adapter) without changing consumers.
+ * - The job API lets an HTTP request start a long-running matching run and
+ *   return immediately, with status recovered later.
  */
 
-import { DevelopmentMatchingProvider } from './development-provider';
-import type { IMatchingProvider } from './provider';
+export {
+  getMatchingProvider,
+  getMatchingProviderKind,
+  type MatchingProviderKind,
+} from './factory';
 
-/**
- * Get the active matching provider
- *
- * SRS COMPLIANCE:
- * This factory allows the application to use different matching providers:
- * 1. Development Fallback (current) — Levenshtein-based, deterministic
- * 2. Model Service Provider (future) — External service-based
- *
- * The selection logic can check MODEL_SERVICE_URL environment variable
- * and route to the appropriate provider.
- */
-export function getMatchingProvider(): IMatchingProvider {
-  // TODO: In future phases, check MODEL_SERVICE_URL and route accordingly
-  // For now, use development fallback
-  return new DevelopmentMatchingProvider();
-}
+export {
+  createMatchingJob,
+  ensureMatchingJobRunner,
+  getMatchingJob,
+  getMatchingJobView,
+  type MatchingJob,
+  type MatchingJobState,
+  type MatchingJobView,
+} from './jobs';
 
 // Re-export types for consumers
-export type { IMatchingProvider, MatchingRequest, MatchingResponse, CandidatePair, FieldScore } from './provider';
+export {
+  isMatchingResponseData,
+  type IMatchingProvider,
+  type MatchingRequest,
+  type MatchingResponse,
+  type CandidatePair,
+  type FieldScore,
+  type ColumnMapping,
+} from './provider';

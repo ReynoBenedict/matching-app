@@ -1,27 +1,34 @@
 ﻿/**
- * MonitoringContent - Main monitoring dashboard component
- * Phase 6A: Superadmin Monitoring Dashboard with Assignment Progress & Statistics
+ * MonitoringContent - Superadmin monitoring dashboard
+ * Phase 6A: All figures are aggregated from the database via
+ * /api/superadmin/monitoring. No mock or hardcoded statistics.
  */
 
 'use client';
 
-import { useState, useEffect, useMemo } from 'react';
+import { useCallback, useEffect, useState } from 'react';
+import Link from 'next/link';
 import { SuperadminLayout } from '@/components/layouts/SuperadminLayout';
-import { 
-  mockMonitoringProcesses, 
-  mockEmployeeProgress, 
-  mockMonitoringSummary 
-} from '@/lib/mock/phase6/monitoring';
-import type { MonitoringProcess, EmployeeProgress, MonitoringSummary, ProcessStatus } from '@/types/phase6';
+import type {
+  AssignmentMonitoringStats,
+  EmployeeMonitoringProgress,
+  MonitoringDashboardData,
+} from '@/lib/services/monitoring';
+
+type MonitoringTab = 'penugasan' | 'petugas' | 'proses';
+
+function formatNumber(value: number): string {
+  return value.toLocaleString('id-ID');
+}
 
 // ============================================================================
-// Helper Components (reused from existing patterns)
+// Helper Components
 // ============================================================================
 
-function StatCard({ label, value, icon, tone, subtext }: { 
-  label: string; 
-  value: number | string; 
-  icon: string; 
+function StatCard({ label, value, icon, tone, subtext }: {
+  label: string;
+  value: number | string;
+  icon: string;
   tone?: string;
   subtext?: string;
 }) {
@@ -41,30 +48,11 @@ function StatCard({ label, value, icon, tone, subtext }: {
   );
 }
 
-function StatusBadge({ status }: { status: ProcessStatus }) {
-  const styles = {
-    RUNNING: 'bg-secondary-fixed text-on-secondary-fixed',
-    COMPLETED: 'bg-surface-container-high text-on-surface',
-    FAILED: 'bg-error-container text-on-error-container',
-    PAUSED: 'bg-warning-container text-on-warning-container',
-  };
-  
-  const labels = {
-    RUNNING: 'Berjalan',
-    COMPLETED: 'Selesai',
-    FAILED: 'Gagal',
-    PAUSED: 'Dijeda',
-  };
-
-  return (
-    <span className={`inline-flex items-center px-2 py-0.5 rounded-full text-xs font-medium ${styles[status]}`}>
-      {status === 'RUNNING' && <span className="material-symbols-outlined animate-spin text-[12px] mr-1">sync</span>}
-      {labels[status]}
-    </span>
-  );
-}
-
-function ProgressBar({ value, showLabel = true, className = '' }: { value: number; showLabel?: boolean; className?: string }) {
+function ProgressBar({ value, showLabel = true, className = '' }: {
+  value: number;
+  showLabel?: boolean;
+  className?: string;
+}) {
   const getColor = (val: number) => {
     if (val >= 80) return 'bg-primary';
     if (val >= 50) return 'bg-secondary';
@@ -74,9 +62,9 @@ function ProgressBar({ value, showLabel = true, className = '' }: { value: numbe
   return (
     <div className={`flex items-center gap-2 ${className}`}>
       <div className="w-20 bg-surface-container-highest rounded-full h-2">
-        <div 
-          className={`${getColor(value)} h-2 rounded-full transition-all duration-300`} 
-          style={{ width: `${value}%` }} 
+        <div
+          className={`${getColor(value)} h-2 rounded-full transition-all duration-300`}
+          style={{ width: `${Math.min(Math.max(value, 0), 100)}%` }}
         />
       </div>
       {showLabel && <span className="text-xs text-on-surface-variant w-10">{value}%</span>}
@@ -84,11 +72,17 @@ function ProgressBar({ value, showLabel = true, className = '' }: { value: numbe
   );
 }
 
-function EmployeeStatusBadge({ completionRate }: { completionRate: number }) {
+function EmployeeStatusBadge({ totalAssigned, completionRate }: {
+  totalAssigned: number;
+  completionRate: number;
+}) {
   let status: string;
   let style: string;
-  
-  if (completionRate >= 90) {
+
+  if (totalAssigned === 0) {
+    status = 'Belum Ada Tugas';
+    style = 'bg-surface-container-high text-on-surface-variant';
+  } else if (completionRate >= 90) {
     status = 'Sangat Baik';
     style = 'bg-success-container text-on-success-container';
   } else if (completionRate >= 75) {
@@ -103,35 +97,35 @@ function EmployeeStatusBadge({ completionRate }: { completionRate: number }) {
   }
 
   return (
-    <span className={`inline-flex items-center px-2 py-0.5 rounded-full text-xs font-medium ${style}`}>
+    <span className={`inline-flex items-center px-2 py-0.5 rounded-full text-xs font-medium whitespace-nowrap ${style}`}>
       {status}
     </span>
   );
 }
 
 // ============================================================================
-// Chart Components (matching existing Superadmin dashboard patterns)
+// Chart Components
 // ============================================================================
 
 function BarChart({ data, height = 200 }: { data: { label: string; value: number }[]; height?: number }) {
-  const maxValue = Math.max(...data.map(d => d.value), 1);
-  
+  const maxValue = Math.max(...data.map((item) => item.value), 1);
+
   return (
     <div className="flex items-end justify-between gap-2 px-4 pb-4 pt-6" style={{ height }}>
       {data.map((item, idx) => {
         const heightPercent = (item.value / maxValue) * 100;
         const isHigh = heightPercent >= 70;
-        
+
         return (
-          <div key={idx} className="flex-1 flex flex-col items-center gap-2">
-            <div 
+          <div key={idx} className="flex-1 flex flex-col items-center gap-2 min-w-0">
+            <div
               className={`w-full rounded-t-sm transition-colors ${
                 isHigh ? 'bg-primary-container hover:bg-primary' : 'bg-secondary-container hover:bg-secondary'
               }`}
               style={{ height: `${heightPercent}%`, minHeight: '4px' }}
               title={`${item.label}: ${item.value}`}
             />
-            <span className="font-label-md text-xs text-on-surface-variant">{item.label}</span>
+            <span className="font-label-md text-xs text-on-surface-variant truncate max-w-full">{item.label}</span>
           </div>
         );
       })}
@@ -139,16 +133,32 @@ function BarChart({ data, height = 200 }: { data: { label: string; value: number
   );
 }
 
-function DonutChart({ data, size = 160 }: { data: { label: string; value: number; color: string }[]; size?: number }) {
-  const total = data.reduce((sum, d) => sum + d.value, 0);
-  
-  // Calculate gradient stops without mutation
+function DonutChart({ data, size = 160 }: {
+  data: { label: string; value: number; color: string }[];
+  size?: number;
+}) {
+  const total = data.reduce((sum, item) => sum + item.value, 0);
+  const innerSize = size * 0.6;
+
+  if (total === 0) {
+    return (
+      <div
+        className="rounded-full border-8 border-surface-container-highest flex items-center justify-center"
+        style={{ width: size, height: size }}
+      >
+        <span className="font-label-md text-xs text-on-surface-variant text-center px-2">
+          Tidak ada data
+        </span>
+      </div>
+    );
+  }
+
   const gradientStops = data.reduce<{ stops: string; accumulated: number }>(
-    (acc, d) => {
-      const percentage = (d.value / total) * 100;
+    (acc, item) => {
+      const percentage = (item.value / total) * 100;
       const start = acc.accumulated;
       const end = acc.accumulated + percentage;
-      const stop = `${d.color} ${start}% ${end}%`;
+      const stop = `${item.color} ${start}% ${end}%`;
       return {
         stops: acc.stops ? `${acc.stops}, ${stop}` : stop,
         accumulated: end,
@@ -156,12 +166,10 @@ function DonutChart({ data, size = 160 }: { data: { label: string; value: number
     },
     { stops: '', accumulated: 0 }
   ).stops;
-  
-  const innerSize = size * 0.6;
-  
+
   return (
     <div className="relative flex items-center justify-center">
-      <div 
+      <div
         className="rounded-full"
         style={{
           width: size,
@@ -169,122 +177,58 @@ function DonutChart({ data, size = 160 }: { data: { label: string; value: number
           background: `conic-gradient(${gradientStops})`,
         }}
       />
-      <div 
+      <div
         className="absolute rounded-full bg-surface flex flex-col items-center justify-center"
         style={{ width: innerSize, height: innerSize }}
       >
-        <span className="font-headline-sm text-primary">{total.toLocaleString('id-ID')}</span>
+        <span className="font-headline-sm text-primary">{formatNumber(total)}</span>
         <span className="font-label-md text-xs text-on-surface-variant">Total</span>
       </div>
     </div>
   );
 }
 
-function ProcessCard({ process }: { process: MonitoringProcess }) {
-  return (
-    <div className="bg-surface-container-lowest border border-outline-variant rounded-lg p-4 hover:shadow-md transition-shadow">
-      <div className="flex items-start justify-between mb-3">
-        <div>
-          <h4 className="font-headline-sm text-on-surface">{process.id}</h4>
-          <p className="font-label-md text-xs text-on-surface-variant mt-1">
-            {process.datasetA} ↔ {process.datasetB}
-          </p>
-        </div>
-        <StatusBadge status={process.status} />
-      </div>
-      
-      <div className="space-y-3">
-        <div>
-          <div className="flex justify-between mb-1">
-            <span className="font-label-md text-xs text-on-surface-variant">Progress</span>
-            <span className="font-label-md text-xs text-on-surface">
-              {process.processedRecords.toLocaleString('id-ID')} / {process.totalRecords.toLocaleString('id-ID')}
-            </span>
-          </div>
-          <ProgressBar value={process.progress} />
-        </div>
-        
-        <div className="flex items-center justify-between text-xs text-on-surface-variant">
-          <span className="flex items-center gap-1">
-            <span className="material-symbols-outlined" style={{ fontSize: '14px' }}>schedule</span>
-            Threshold: {Math.round(process.threshold * 100)}%
-          </span>
-          <span>
-            {process.status === 'COMPLETED' && process.endTime 
-              ? new Date(process.endTime).toLocaleDateString('id-ID', { day: 'numeric', month: 'short', year: 'numeric' })
-              : process.status === 'RUNNING'
-              ? new Date(process.startTime).toLocaleDateString('id-ID', { day: 'numeric', month: 'short', hour: '2-digit', minute: '2-digit' })
-              : '-'
-            }
-          </span>
-        </div>
-        
-        {process.status === 'FAILED' && process.errorMessage && (
-          <div className="bg-error-container text-on-error-container p-2 rounded text-xs">
-            <span className="material-symbols-outlined text-[14px] mr-1">error</span>
-            {process.errorMessage}
-          </div>
-        )}
-      </div>
-    </div>
-  );
-}
-
 // ============================================================================
-// Assignment Progress Section Component
+// Assignment Progress Tab
 // ============================================================================
 
-function AssignmentProgressSection({ employees }: { employees: EmployeeProgress[] }) {
-  // Calculate totals from employee data (ensure consistency)
-  const totals = useMemo(() => {
-    const totalAssigned = employees.reduce((sum, e) => sum + e.totalAssigned, 0);
-    const totalCompleted = employees.reduce((sum, e) => sum + e.completed, 0);
-    const totalPending = employees.reduce((sum, e) => sum + e.pending, 0);
-    const totalInProgress = employees.reduce((sum, e) => sum + e.inProgress, 0);
-    const completionRate = totalAssigned > 0 ? Math.round((totalCompleted / totalAssigned) * 100) : 0;
-    
-    return { totalAssigned, totalCompleted, totalPending, totalInProgress, completionRate };
-  }, [employees]);
-
-  // Donut chart data
-  const donutData = [
-    { label: 'Selesai', value: totals.totalCompleted, color: '#006493' },
-    { label: 'Menunggu', value: totals.totalPending, color: '#F9A825' },
-    { label: 'Sedang Dikerjakan', value: totals.totalInProgress, color: '#6B7280' },
+function AssignmentProgressSection({ stats, employees }: {
+  stats: AssignmentMonitoringStats;
+  employees: EmployeeMonitoringProgress[];
+}) {
+  const distribution = [
+    { label: 'Selesai', value: stats.completed, color: '#006493' },
+    { label: 'Menunggu Verifikasi', value: stats.pending, color: '#F9A825' },
+    { label: 'Sedang Dikerjakan', value: stats.inProgress, color: '#6B7280' },
   ];
 
   return (
     <div className="space-y-6">
       {/* Assignment Stats */}
-      <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-4">
-        <StatCard 
-          label="Total Penugasan" 
-          value={totals.totalAssigned} 
-          icon="assignment" 
-          tone="text-secondary"
-          subtext="Semua status"
-        />
-        <StatCard 
-          label="Selesai" 
-          value={totals.totalCompleted} 
-          icon="check_circle" 
-          tone="text-primary"
-          subtext="Terverifikasi"
-        />
-        <StatCard 
-          label="Menunggu" 
-          value={totals.totalPending} 
-          icon="pending" 
-          tone="text-warning"
-          subtext="Belum dimulai"
-        />
-        <StatCard 
-          label="Progres" 
-          value={`${totals.completionRate}%`} 
-          icon="trending_up" 
-          tone="text-primary"
-          subtext={`${totals.totalCompleted} dari ${totals.totalAssigned}`}
-        />
+      <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 xl:grid-cols-6 gap-4">
+        <StatCard label="Total Penugasan" value={formatNumber(stats.total)} icon="assignment" tone="text-secondary" subtext="Seluruh penugasan" />
+        <StatCard label="Sudah Selesai" value={formatNumber(stats.completed)} icon="check_circle" tone="text-primary" subtext="Sudah diverifikasi" />
+        <StatCard label="Menunggu Verifikasi" value={formatNumber(stats.pending)} icon="pending" tone="text-warning" subtext="Ditugaskan, belum diverifikasi" />
+        <StatCard label="Sedang Dikerjakan" value={formatNumber(stats.inProgress)} icon="autorenew" tone="text-secondary" subtext="Sedang diproses petugas" />
+        <StatCard label="MATCH" value={formatNumber(stats.matchCount)} icon="thumb_up" tone="text-primary" subtext="Hasil verifikasi petugas" />
+        <StatCard label="NON-MATCH" value={formatNumber(stats.nonMatchCount)} icon="thumb_down" tone="text-warning" subtext="Hasil verifikasi petugas" />
+      </div>
+
+      {/* Overall Progress */}
+      <div className="bg-surface border border-outline-variant rounded-xl p-6">
+        <div className="flex items-center justify-between mb-3">
+          <h3 className="font-headline-sm text-primary">Progres Keseluruhan</h3>
+          <span className="font-headline-sm text-primary">{stats.overallProgress}%</span>
+        </div>
+        <div className="w-full bg-surface-container-highest rounded-full h-3">
+          <div
+            className="bg-primary h-3 rounded-full transition-all duration-300"
+            style={{ width: `${stats.overallProgress}%` }}
+          />
+        </div>
+        <p className="font-label-md text-xs text-on-surface-variant mt-2">
+          {formatNumber(stats.completed)} dari {formatNumber(stats.total)} penugasan telah selesai.
+        </p>
       </div>
 
       {/* Charts Row */}
@@ -293,14 +237,14 @@ function AssignmentProgressSection({ employees }: { employees: EmployeeProgress[
         <div className="bg-surface border border-outline-variant rounded-xl p-6">
           <h3 className="font-headline-sm text-primary mb-4">Distribusi Penugasan</h3>
           <div className="flex items-center justify-center gap-8">
-            <DonutChart data={donutData} />
+            <DonutChart data={distribution} />
             <div className="flex flex-col gap-2">
-              {donutData.map((item) => (
+              {distribution.map((item) => (
                 <div key={item.label} className="flex items-center gap-2">
                   <div className="w-3 h-3 rounded" style={{ backgroundColor: item.color }} />
                   <span className="font-label-md text-xs text-on-surface-variant">{item.label}</span>
                   <span className="font-label-md text-xs text-on-surface font-semibold ml-auto">
-                    {item.value}
+                    {formatNumber(item.value)}
                   </span>
                 </div>
               ))}
@@ -311,15 +255,22 @@ function AssignmentProgressSection({ employees }: { employees: EmployeeProgress[
         {/* Bar Chart - Employee Performance */}
         <div className="bg-surface border border-outline-variant rounded-xl p-6">
           <h3 className="font-headline-sm text-primary mb-4">Kinerja Petugas</h3>
-          <div className="bg-surface-container-low rounded-lg border border-outline-variant/50">
-            <BarChart 
-              data={employees.map(e => ({
-                label: e.employeeName.split(' ')[0],
-                value: e.completed,
-              }))} 
-              height={180}
-            />
-          </div>
+          {employees.length === 0 ? (
+            <div className="h-[180px] flex flex-col items-center justify-center text-on-surface-variant">
+              <span className="material-symbols-outlined text-[40px] opacity-30">bar_chart</span>
+              <p className="font-body-sm text-body-sm mt-2">Belum ada petugas terdaftar.</p>
+            </div>
+          ) : (
+            <div className="bg-surface-container-low rounded-lg border border-outline-variant/50">
+              <BarChart
+                data={employees.map((employee) => ({
+                  label: employee.fullName.split(' ')[0],
+                  value: employee.completed,
+                }))}
+                height={180}
+              />
+            </div>
+          )}
           <p className="font-label-md text-xs text-on-surface-variant mt-3 text-center">
             Jumlah penugasan selesai per petugas
           </p>
@@ -334,38 +285,72 @@ function AssignmentProgressSection({ employees }: { employees: EmployeeProgress[
 // ============================================================================
 
 export function MonitoringContent() {
+  const [data, setData] = useState<MonitoringDashboardData | null>(null);
   const [loading, setLoading] = useState(true);
-  const [processes, setProcesses] = useState<MonitoringProcess[]>([]);
-  const [employees, setEmployees] = useState<EmployeeProgress[]>([]);
-  const [summary, setSummary] = useState<MonitoringSummary | null>(null);
-  const [activeTab, setActiveTab] = useState<'processes' | 'employees' | 'assignments'>('processes');
+  const [refreshing, setRefreshing] = useState(false);
   const [error, setError] = useState<string | null>(null);
+  const [activeTab, setActiveTab] = useState<MonitoringTab>('penugasan');
 
-  // Simulate data fetching with mock data
-  useEffect(() => {
-    const fetchData = async () => {
-      try {
-        setLoading(true);
-        // Simulate network delay
-        await new Promise(resolve => setTimeout(resolve, 500));
-        
-        // Use mock data (in real app, this would be an API call)
-        setProcesses(mockMonitoringProcesses);
-        setEmployees(mockEmployeeProgress);
-        setSummary(mockMonitoringSummary);
-        setError(null);
-      } catch (err) {
-        setError('Gagal memuat data monitoring');
-        console.error('Monitoring fetch error:', err);
-      } finally {
-        setLoading(false);
-      }
-    };
+  // Pure fetcher — performs no state updates, so it is safe to await anywhere.
+  const fetchMonitoringData = useCallback(async (): Promise<MonitoringDashboardData> => {
+    const response = await fetch('/api/superadmin/monitoring');
+    const payload = await response.json();
 
-    fetchData();
+    if (!response.ok || !payload.success) {
+      throw new Error(payload.error || 'Gagal memuat data monitoring');
+    }
+
+    return payload.data as MonitoringDashboardData;
   }, []);
 
-  // Render loading state
+  useEffect(() => {
+    let cancelled = false;
+
+    (async () => {
+      try {
+        const result = await fetchMonitoringData();
+        if (cancelled) return;
+        setData(result);
+        setError(null);
+      } catch (err) {
+        if (cancelled) return;
+        setError(err instanceof Error ? err.message : 'Gagal memuat data monitoring');
+      } finally {
+        if (!cancelled) setLoading(false);
+      }
+    })();
+
+    return () => {
+      cancelled = true;
+    };
+  }, [fetchMonitoringData]);
+
+  const handleRefresh = async () => {
+    setRefreshing(true);
+    try {
+      const result = await fetchMonitoringData();
+      setData(result);
+      setError(null);
+    } catch (err) {
+      setError(err instanceof Error ? err.message : 'Gagal memuat data monitoring');
+    } finally {
+      setRefreshing(false);
+    }
+  };
+
+  const handleRetry = async () => {
+    setLoading(true);
+    try {
+      const result = await fetchMonitoringData();
+      setData(result);
+      setError(null);
+    } catch (err) {
+      setError(err instanceof Error ? err.message : 'Gagal memuat data monitoring');
+    } finally {
+      setLoading(false);
+    }
+  };
+
   if (loading) {
     return (
       <SuperadminLayout pageTitle="Monitoring Progres">
@@ -381,8 +366,7 @@ export function MonitoringContent() {
     );
   }
 
-  // Render error state
-  if (error) {
+  if (error || !data) {
     return (
       <SuperadminLayout pageTitle="Monitoring Progres">
         <div className="bg-error-container border border-error rounded-xl p-6 mb-6 flex items-start gap-3">
@@ -390,9 +374,11 @@ export function MonitoringContent() {
             error
           </span>
           <div>
-            <p className="font-body-md text-on-error-container">{error}</p>
-            <button 
-              onClick={() => window.location.reload()}
+            <p className="font-body-md text-on-error-container">
+              {error || 'Gagal memuat data monitoring'}
+            </p>
+            <button
+              onClick={handleRetry}
               className="mt-3 px-4 py-2 bg-on-error-container text-error-container rounded-lg font-label-md hover:opacity-80"
             >
               Coba Lagi
@@ -403,12 +389,19 @@ export function MonitoringContent() {
     );
   }
 
-  const runningProcesses = processes.filter(p => p.status === 'RUNNING');
-  const completedProcesses = processes.filter(p => p.status === 'COMPLETED');
-  const failedProcesses = processes.filter(p => p.status === 'FAILED');
+  const { summary, assignments: assignmentStats, employees } = data;
 
   return (
     <SuperadminLayout pageTitle="Monitoring Progres">
+      {/* Back navigation */}
+      <Link
+        href="/superadmin/dashboard"
+        className="inline-flex items-center gap-2 text-secondary font-semibold text-sm mb-4 hover:underline"
+      >
+        <span className="material-symbols-outlined text-[18px]">arrow_back</span>
+        Kembali ke Dashboard
+      </Link>
+
       {/* Breadcrumb */}
       <div className="mb-2">
         <span className="text-on-surface-variant text-label-md text-xs">
@@ -418,73 +411,109 @@ export function MonitoringContent() {
       </div>
 
       {/* Page Header */}
-      <div className="mb-6">
-        <h2 className="font-headline-lg text-headline-lg text-primary mb-1">
-          Monitoring Progres
-        </h2>
-        <p className="font-body-md text-on-surface-variant">
-          Pantau progres proses pencocokan dan kinerja petugas verifikasi.
-        </p>
+      <div className="mb-6 flex flex-wrap justify-between items-end gap-3">
+        <div>
+          <h2 className="font-headline-lg text-headline-lg text-primary mb-1">
+            Monitoring Progres
+          </h2>
+          <p className="font-body-md text-on-surface-variant">
+            Pantau progres penugasan dan kinerja petugas verifikasi berdasarkan data terkini.
+          </p>
+        </div>
+        <button
+          onClick={handleRefresh}
+          disabled={refreshing}
+          className="px-4 py-2 bg-surface border border-outline-variant text-primary rounded-lg font-label-md hover:bg-surface-container-low transition-colors shadow-sm flex items-center gap-2 disabled:opacity-60 disabled:cursor-not-allowed text-sm"
+        >
+          <span
+            className={`material-symbols-outlined text-[18px] ${refreshing ? 'animate-spin' : ''}`}
+          >
+            refresh
+          </span>
+          {refreshing ? 'Memperbarui...' : 'Perbarui'}
+        </button>
       </div>
 
-      {/* KPI Cards */}
-      <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-5 gap-4 mb-6">
-        <StatCard 
-          label="Proses Berjalan" 
-          value={runningProcesses.length} 
-          icon="sync" 
-          tone="text-secondary"
-          subtext="Aktif saat ini"
-        />
-        <StatCard 
-          label="Selesai" 
-          value={completedProcesses.length} 
-          icon="check_circle" 
-          tone="text-primary"
-          subtext="Bulan ini"
-        />
-        <StatCard 
-          label="Gagal" 
-          value={failedProcesses.length} 
-          icon="error" 
-          tone="text-error"
-          subtext="Perlu perhatian"
-        />
-        <StatCard 
-          label="Total Petugas" 
-          value={employees.length} 
-          icon="groups" 
-          tone="text-secondary"
-          subtext="Aktif"
-        />
-        <StatCard 
-          label="Rata-rata Penyelesaian" 
-          value={`${summary?.averageCompletionRate || 0}%`} 
-          icon="trending_up" 
-          tone="text-primary"
-          subtext="Semua petugas"
-        />
+      {/* Matching-process metrics (system-level, NOT employee verification) */}
+      <div className="mb-6">
+        <div className="flex flex-wrap items-baseline justify-between gap-2 mb-3">
+          <h3 className="font-headline-sm text-headline-sm text-on-surface">
+            Proses Pencocokan (Skala Sistem)
+          </h3>
+          <span className="font-label-md text-xs text-on-surface-variant">
+            Metrik ini bukan progres verifikasi petugas
+          </span>
+        </div>
+        <div className="grid grid-cols-1 sm:grid-cols-3 gap-4">
+          <StatCard
+            label="Proses Berjalan"
+            value={formatNumber(summary.runningProcesses)}
+            icon="sync"
+            tone="text-secondary"
+            subtext="Riwayat proses pencocokan belum tersedia."
+          />
+          <StatCard
+            label="Proses Selesai"
+            value={formatNumber(summary.completedProcesses)}
+            icon="check_circle"
+            tone="text-primary"
+            subtext="Riwayat proses pencocokan belum tersedia."
+          />
+          <StatCard
+            label="Proses Gagal"
+            value={formatNumber(summary.failedProcesses)}
+            icon="error"
+            tone="text-error"
+            subtext="Riwayat proses pencocokan belum tersedia."
+          />
+        </div>
+        {summary.runningProcesses + summary.completedProcesses + summary.failedProcesses === 0 && (
+          <div className="mt-3 bg-surface-container-low border border-outline-variant rounded-lg px-4 py-3 flex items-start gap-2">
+            <span className="material-symbols-outlined text-on-surface-variant flex-shrink-0" style={{ fontSize: '20px' }}>
+              info
+            </span>
+            <p className="font-label-md text-xs text-on-surface-variant">
+              Riwayat proses pencocokan belum tersedia. Sistem belum menyimpan riwayat proses pencocokan ke basis data,
+              sehingga metrik proses ditampilkan sebagai 0. Untuk progres verifikasi, gunakan tab Progres Penugasan dan Progres Petugas.
+            </p>
+          </div>
+        )}
+      </div>
+
+      {/* Employee-verification metrics (database-backed) */}
+      <div className="mb-6">
+        <div className="flex flex-wrap items-baseline justify-between gap-2 mb-3">
+          <h3 className="font-headline-sm text-headline-sm text-on-surface">
+            Verifikasi Petugas
+          </h3>
+          <span className="font-label-md text-xs text-on-surface-variant">
+            Berdasarkan data penugasan pada basis data
+          </span>
+        </div>
+        <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
+          <StatCard
+            label="Total Petugas"
+            value={formatNumber(summary.totalEmployees)}
+            icon="groups"
+            tone="text-secondary"
+            subtext="Akun pegawai terdaftar"
+          />
+          <StatCard
+            label="Rata-rata Penyelesaian"
+            value={`${summary.averageCompletionRate}%`}
+            icon="trending_up"
+            tone="text-primary"
+            subtext="Petugas dengan penugasan"
+          />
+        </div>
       </div>
 
       {/* Tab Navigation */}
-      <div className="flex border-b border-outline-variant mb-6">
+      <div className="flex border-b border-outline-variant mb-6 overflow-x-auto">
         <button
-          onClick={() => setActiveTab('processes')}
-          className={`px-4 py-2 font-label-md transition-colors border-b-2 -mb-px ${
-            activeTab === 'processes'
-              ? 'text-primary border-primary'
-              : 'text-on-surface-variant border-transparent hover:text-on-surface'
-          }`}
-        >
-          <span className="flex items-center gap-2">
-            <span className="material-symbols-outlined" style={{ fontSize: '18px' }}>sync</span>
-            Proses Pencocokan ({processes.length})
-          </span>
-        </button>
-        <button
-          onClick={() => setActiveTab('assignments')}
-          className={`px-4 py-2 font-label-md transition-colors border-b-2 -mb-px ${
-            activeTab === 'assignments'
+          onClick={() => setActiveTab('penugasan')}
+          className={`px-4 py-2 font-label-md transition-colors border-b-2 -mb-px whitespace-nowrap ${
+            activeTab === 'penugasan'
               ? 'text-primary border-primary'
               : 'text-on-surface-variant border-transparent hover:text-on-surface'
           }`}
@@ -495,52 +524,40 @@ export function MonitoringContent() {
           </span>
         </button>
         <button
-          onClick={() => setActiveTab('employees')}
-          className={`px-4 py-2 font-label-md transition-colors border-b-2 -mb-px ${
-            activeTab === 'employees'
+          onClick={() => setActiveTab('petugas')}
+          className={`px-4 py-2 font-label-md transition-colors border-b-2 -mb-px whitespace-nowrap ${
+            activeTab === 'petugas'
               ? 'text-primary border-primary'
               : 'text-on-surface-variant border-transparent hover:text-on-surface'
           }`}
         >
           <span className="flex items-center gap-2">
             <span className="material-symbols-outlined" style={{ fontSize: '18px' }}>groups</span>
-            Progres Petugas ({employees.length})
+            Progres Petugas ({formatNumber(employees.length)})
+          </span>
+        </button>
+        <button
+          onClick={() => setActiveTab('proses')}
+          className={`px-4 py-2 font-label-md transition-colors border-b-2 -mb-px whitespace-nowrap ${
+            activeTab === 'proses'
+              ? 'text-primary border-primary'
+              : 'text-on-surface-variant border-transparent hover:text-on-surface'
+          }`}
+        >
+          <span className="flex items-center gap-2">
+            <span className="material-symbols-outlined" style={{ fontSize: '18px' }}>sync</span>
+            Proses Pencocokan
           </span>
         </button>
       </div>
 
-      {/* Processes Tab */}
-      {activeTab === 'processes' && (
-        <div>
-          {processes.length === 0 ? (
-            <div className="bg-surface-container-lowest border border-outline-variant rounded-xl p-8 text-center">
-              <span className="material-symbols-outlined text-[48px] text-on-surface-variant opacity-30">
-                folder_open
-              </span>
-              <p className="font-body-md text-on-surface-variant mt-4">
-                Tidak ada proses pencocokan.
-              </p>
-              <p className="font-body-sm text-on-surface-variant mt-1">
-                Mulai proses pencocokan baru untuk melihat monitoring.
-              </p>
-            </div>
-          ) : (
-            <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-4">
-              {processes.map((process) => (
-                <ProcessCard key={process.id} process={process} />
-              ))}
-            </div>
-          )}
-        </div>
+      {/* Assignments Tab */}
+      {activeTab === 'penugasan' && (
+        <AssignmentProgressSection stats={assignmentStats} employees={employees} />
       )}
 
-      {/* Assignments Tab - NEW */}
-      {activeTab === 'assignments' && (
-        <AssignmentProgressSection employees={employees} />
-      )}
-
-      {/* Employees Tab - Table View */}
-      {activeTab === 'employees' && (
+      {/* Employees Tab */}
+      {activeTab === 'petugas' && (
         <div>
           {employees.length === 0 ? (
             <div className="bg-surface-container-lowest border border-outline-variant rounded-xl p-8 text-center">
@@ -551,26 +568,27 @@ export function MonitoringContent() {
                 Tidak ada petugas verifikasi.
               </p>
               <p className="font-body-sm text-on-surface-variant mt-1">
-                Tambah petugas untuk melihat progres mereka.
+                Tambah pegawai dengan role EMPLOYEE untuk melihat progres mereka.
               </p>
             </div>
           ) : (
             <div className="bg-surface-container-lowest border border-outline-variant rounded-xl overflow-hidden">
               <div className="overflow-x-auto">
-                <table className="w-full text-left border-collapse">
+                <table className="w-full text-left border-collapse min-w-[940px]">
                   <thead>
                     <tr className="bg-surface-container-high border-b border-outline-variant">
                       <th className="px-4 py-3 font-label-md text-label-md text-on-surface">Nama Petugas</th>
                       <th className="px-4 py-3 font-label-md text-label-md text-on-surface text-center">Ditugaskan</th>
                       <th className="px-4 py-3 font-label-md text-label-md text-on-surface text-center">Selesai</th>
-                      <th className="px-4 py-3 font-label-md text-label-md text-on-surface text-center">Menunggu</th>
+                      <th className="px-4 py-3 font-label-md text-label-md text-on-surface text-center whitespace-nowrap">Menunggu Verifikasi</th>
+                      <th className="px-4 py-3 font-label-md text-label-md text-on-surface text-center whitespace-nowrap">Sedang Dikerjakan</th>
                       <th className="px-4 py-3 font-label-md text-label-md text-on-surface text-center">Progres</th>
                       <th className="px-4 py-3 font-label-md text-label-md text-on-surface text-center">Status</th>
                     </tr>
                   </thead>
                   <tbody>
                     {employees.map((employee, index) => (
-                      <tr 
+                      <tr
                         key={employee.employeeId}
                         className={`border-b border-outline-variant last:border-b-0 hover:bg-surface-container-highest/40 transition-colors ${
                           index % 2 === 0 ? 'bg-surface' : 'bg-surface-container-low'
@@ -578,47 +596,79 @@ export function MonitoringContent() {
                       >
                         <td className="px-4 py-3">
                           <div>
-                            <p className="font-body-md text-on-surface font-semibold">{employee.employeeName}</p>
-                            <p className="font-label-md text-xs text-on-surface-variant">{employee.email}</p>
+                            <p className="font-body-md text-on-surface font-semibold flex items-center gap-2">
+                              {employee.fullName}
+                              {employee.accountStatus !== 'ACTIVE' && (
+                                <span className="inline-flex items-center px-2 py-0.5 rounded-full text-[10px] font-medium bg-surface-container-high text-on-surface-variant">
+                                  Nonaktif
+                                </span>
+                              )}
+                            </p>
+                            <p className="font-label-md text-xs text-on-surface-variant">
+                              {employee.email} · {employee.username}
+                            </p>
                           </div>
                         </td>
                         <td className="px-4 py-3 text-center">
-                          <span className="font-headline-sm text-on-surface">{employee.totalAssigned}</span>
+                          <span className="font-headline-sm text-on-surface">{formatNumber(employee.totalAssigned)}</span>
                         </td>
                         <td className="px-4 py-3 text-center">
-                          <span className="font-headline-sm text-primary">{employee.completed}</span>
+                          <span className="font-headline-sm text-primary">{formatNumber(employee.completed)}</span>
                         </td>
                         <td className="px-4 py-3 text-center">
-                          <span className="font-headline-sm text-warning">{employee.pending}</span>
+                          <span className="font-headline-sm text-warning">{formatNumber(employee.pending)}</span>
+                        </td>
+                        <td className="px-4 py-3 text-center">
+                          <span className="font-headline-sm text-secondary">{formatNumber(employee.inProgress)}</span>
                         </td>
                         <td className="px-4 py-3">
                           <div className="flex flex-col gap-1">
                             <ProgressBar value={employee.completionRate} showLabel={false} className="justify-start" />
                             <span className="font-label-md text-xs text-on-surface-variant">
-                              {employee.completed} dari {employee.totalAssigned} ({employee.completionRate}%)
+                              {formatNumber(employee.completed)} dari {formatNumber(employee.totalAssigned)} ({employee.completionRate}%)
                             </span>
                           </div>
                         </td>
                         <td className="px-4 py-3 text-center">
-                          <EmployeeStatusBadge completionRate={employee.completionRate} />
+                          <EmployeeStatusBadge
+                            totalAssigned={employee.totalAssigned}
+                            completionRate={employee.completionRate}
+                          />
                         </td>
                       </tr>
                     ))}
                   </tbody>
                 </table>
               </div>
-              
+
               {/* Summary Footer */}
-              <div className="px-4 py-3 bg-surface-container-high border-t border-outline-variant flex justify-between items-center">
+              <div className="px-4 py-3 bg-surface-container-high border-t border-outline-variant flex flex-wrap justify-between items-center gap-2">
                 <span className="font-label-md text-xs text-on-surface-variant">
-                  Total: {employees.length} petugas
+                  Total: {formatNumber(employees.length)} petugas
                 </span>
                 <span className="font-label-md text-xs text-on-surface-variant">
-                  Rata-rata progres: {summary?.averageCompletionRate || 0}%
+                  Rata-rata progres: {summary.averageCompletionRate}% (petugas dengan penugasan)
                 </span>
               </div>
             </div>
           )}
+        </div>
+      )}
+
+      {/* Matching Process Tab */}
+      {activeTab === 'proses' && (
+        <div className="bg-surface-container-lowest border border-outline-variant rounded-xl p-8 text-center">
+          <span className="material-symbols-outlined text-[48px] text-on-surface-variant opacity-30">
+            history_toggle_off
+          </span>
+          <p className="font-body-md text-on-surface-variant mt-4">
+            Belum ada riwayat proses pencocokan yang tersimpan.
+          </p>
+          <p className="font-body-sm text-body-sm text-on-surface-variant mt-2 max-w-[520px] mx-auto">
+            Sistem menjalankan pencocokan secara langsung dan belum menyimpan riwayat proses pencocokan ke basis data.
+            Karena itu, tidak ada proses berjalan, selesai, maupun gagal yang dapat ditampilkan, dan metrik proses
+            ditampilkan sebagai 0. Riwayat akan tampil di sini setelah proses pencocokan mulai dipersistenkan.
+          </p>
         </div>
       )}
     </SuperadminLayout>

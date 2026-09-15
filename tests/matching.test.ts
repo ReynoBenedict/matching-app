@@ -32,7 +32,7 @@ async function makeRequest(
   if (withAuth && authToken) {
     options.headers = {
       ...options.headers,
-      Cookie: `session=${authToken}`,
+      Cookie: authToken,
     };
   }
 
@@ -61,6 +61,44 @@ function recordTest(
   console.log(`${pass ? '✓' : '✗'} ${name}`);
 }
 
+// Helper: extract the `name=value` pair from a Set-Cookie header
+function extractCookie(setCookieHeader: string | null): string {
+  if (!setCookieHeader) return '';
+  return setCookieHeader.split(';')[0]?.trim() ?? '';
+}
+
+// Helper: start a matching JOB and poll it until it reaches a terminal state.
+// Matching is asynchronous now, so callers no longer receive the result in the
+// POST response.
+const JOB_POLL_INTERVAL_MS = 1000;
+const JOB_WAIT_TIMEOUT_MS = 15 * 60 * 1000;
+
+async function startAndWaitForMatching(body: Record<string, unknown>) {
+  const start = await makeRequest('POST', '/api/matching', body);
+
+  const jobId: string | undefined = start.data?.data?.jobId;
+  if (start.status !== 202 || !start.data?.success || !jobId) {
+    return { start, terminal: null as any };
+  }
+
+  const deadline = Date.now() + JOB_WAIT_TIMEOUT_MS;
+  while (Date.now() < deadline) {
+    await new Promise((resolve) => setTimeout(resolve, JOB_POLL_INTERVAL_MS));
+    const status = await makeRequest('GET', `/api/matching/${jobId}`);
+    if (status.status !== 200 || !status.data?.success) continue;
+
+    const state = status.data.job?.state;
+    if (state === 'COMPLETED' || state === 'FAILED') {
+      return { start, terminal: status.data };
+    }
+  }
+
+  return {
+    start,
+    terminal: { success: false, job: { state: 'TIMEOUT' }, error: 'job tidak selesai sebelum batas waktu' },
+  };
+}
+
 async function runTests() {
   console.log('=== PHASE 4B MATCHING MVP TESTS ===\n');
 
@@ -68,14 +106,16 @@ async function runTests() {
   // AUTHENTICATE
   // ==========================================
   console.log('[AUTH] Authenticating...');
-  const authRes = await makeRequest('POST', '/api/auth/login', {
-    username: 'admin',
-    password: 'admin123456',
-  }, false);
+  const authRes = await fetch(`${BASE_URL}/api/auth/login`, {
+    method: 'POST',
+    headers: { 'Content-Type': 'application/json' },
+    body: JSON.stringify({ username: 'admin', password: 'admin123456' }),
+  });
+  const authData = await authRes.json().catch(() => ({}));
+  const sessionCookie = extractCookie(authRes.headers.get('set-cookie'));
 
-  if (authRes.status === 200 && authRes.data.success) {
-    // Extract token from response - in real app would be in Set-Cookie
-    authToken = 'test-token'; // Placeholder - in real curl tests would come from cookie
+  if (authRes.status === 200 && authData.success && sessionCookie) {
+    authToken = sessionCookie;
     console.log('✓ Authenticated\n');
   } else {
     console.log('✗ Authentication failed\n');
@@ -155,8 +195,8 @@ async function runTests() {
   // ==========================================
   // TEST 3: Valid matching request
   // ==========================================
-  console.log('[T3] Valid matching request...');
-  const matchRes = await makeRequest('POST', '/api/matching', {
+  console.log('[T3] Valid matching request (job)...');
+  const matchRes = await startAndWaitForMatching({
     datasetAId: DATASET_A_ID,
     datasetBId: DATASET_B_ID,
     columnMappings: [
@@ -166,14 +206,14 @@ async function runTests() {
   });
 
   recordTest(
-    'T3: Matching request succeeds',
-    'success=true',
-    `success=${matchRes.data.success}`,
-    matchRes.data.success === true
+    'T3: Matching job completes',
+    'job state=COMPLETED',
+    `state=${matchRes.terminal?.job?.state}`,
+    matchRes.terminal?.job?.state === 'COMPLETED'
   );
 
-  if (matchRes.data.data) {
-    const { summary, candidates } = matchRes.data.data;
+  if (matchRes.terminal?.data) {
+    const { summary, candidates } = matchRes.terminal.data;
     recordTest(
       'T3: Returns candidate count',
       'totalCandidates >= 0',
@@ -217,8 +257,8 @@ async function runTests() {
   // ==========================================
   // TEST 4: Multiple column mappings
   // ==========================================
-  console.log('[T4] Multiple column mappings...');
-  const multiMapRes = await makeRequest('POST', '/api/matching', {
+  console.log('[T4] Multiple column mappings (job)...');
+  const multiMapRes = await startAndWaitForMatching({
     datasetAId: DATASET_A_ID,
     datasetBId: DATASET_B_ID,
     columnMappings: [
@@ -230,13 +270,13 @@ async function runTests() {
 
   recordTest(
     'T4: Multiple mappings accepted',
-    'success=true',
-    `success=${multiMapRes.data.success}`,
-    multiMapRes.data.success === true
+    'job state=COMPLETED',
+    `state=${multiMapRes.terminal?.job?.state}`,
+    multiMapRes.terminal?.job?.state === 'COMPLETED'
   );
 
-  if (multiMapRes.data.data?.candidates?.length > 0) {
-    const candidate = multiMapRes.data.data.candidates[0];
+  if (multiMapRes.terminal?.data?.candidates?.length > 0) {
+    const candidate = multiMapRes.terminal.data.candidates[0];
     recordTest(
       'T4: Returns multiple field scores',
       'fieldScores.length >= 2',
@@ -310,8 +350,8 @@ async function runTests() {
   // ==========================================
   // TEST 8: Different thresholds
   // ==========================================
-  console.log('[T8] Different threshold values...');
-  const high = await makeRequest('POST', '/api/matching', {
+  console.log('[T8] Different threshold values (job)...');
+  const high = await startAndWaitForMatching({
     datasetAId: DATASET_A_ID,
     datasetBId: DATASET_B_ID,
     columnMappings: [
@@ -320,7 +360,7 @@ async function runTests() {
     threshold: 0.95,
   });
 
-  const low = await makeRequest('POST', '/api/matching', {
+  const low = await startAndWaitForMatching({
     datasetAId: DATASET_A_ID,
     datasetBId: DATASET_B_ID,
     columnMappings: [
@@ -329,8 +369,8 @@ async function runTests() {
     threshold: 0.5,
   });
 
-  const highCount = high.data.data?.summary?.totalCandidates || 0;
-  const lowCount = low.data.data?.summary?.totalCandidates || 0;
+  const highCount = high.terminal?.data?.summary?.totalCandidates || 0;
+  const lowCount = low.terminal?.data?.summary?.totalCandidates || 0;
 
   recordTest(
     'T8: Higher threshold reduces candidates',

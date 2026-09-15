@@ -66,3 +66,41 @@ export interface IMatchingProvider {
    */
   runMatching(req: MatchingRequest): Promise<MatchingResponse>;
 }
+
+/**
+ * Runtime guard for a matching response payload.
+ *
+ * A provider must never be trusted to return a well-formed body: an external
+ * Model Service can reply with a truncated, empty, or unexpected JSON document.
+ * Callers use this to reject malformed payloads instead of persisting or
+ * displaying fabricated results.
+ */
+export function isMatchingResponseData(
+  value: unknown
+): value is NonNullable<MatchingResponse['data']> {
+  if (!value || typeof value !== 'object') return false;
+  const data = value as Record<string, unknown>;
+
+  const datasetA = data.datasetA as Record<string, unknown> | undefined;
+  const datasetB = data.datasetB as Record<string, unknown> | undefined;
+  const config = data.config as Record<string, unknown> | undefined;
+  const summary = data.summary as Record<string, unknown> | undefined;
+
+  if (!datasetA || typeof datasetA.id !== 'number') return false;
+  if (!datasetB || typeof datasetB.id !== 'number') return false;
+  if (!config || typeof config.threshold !== 'number') return false;
+  if (!Array.isArray(config.columnMappings)) return false;
+  if (!summary || typeof summary.totalCandidates !== 'number') return false;
+  if (!Array.isArray(data.candidates)) return false;
+
+  return data.candidates.every((candidate) => {
+    if (!candidate || typeof candidate !== 'object') return false;
+    const entry = candidate as Record<string, unknown>;
+    return (
+      typeof entry.recordAId === 'number' &&
+      typeof entry.recordBId === 'number' &&
+      typeof entry.overallScore === 'number' &&
+      Array.isArray(entry.fieldScores)
+    );
+  });
+}

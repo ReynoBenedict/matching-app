@@ -1,7 +1,14 @@
 'use client';
 
+import {
+  percentToThreshold,
+  thresholdToPercent,
+} from '@/lib/services/matching/threshold';
+
 interface ThresholdSelectorProps {
+  /** Canonical normalized decimal in [0, 1]. */
   threshold: number;
+  /** Always called with a normalized decimal in [0, 1]. */
   onThresholdChange: (threshold: number) => void;
 }
 
@@ -9,19 +16,20 @@ export function ThresholdSelector({
   threshold,
   onThresholdChange,
 }: ThresholdSelectorProps) {
+  // The slider and the number input both work in whole percentages; the value
+  // stored in state stays normalized. Convert exactly once, at the edge.
+  const percentageValue = thresholdToPercent(threshold);
+
   const handleSliderChange = (e: React.ChangeEvent<HTMLInputElement>) => {
-    const value = parseFloat(e.target.value);
-    onThresholdChange(value);
+    onThresholdChange(percentToThreshold(parseFloat(e.target.value)));
   };
 
   const handleInputChange = (e: React.ChangeEvent<HTMLInputElement>) => {
     const value = parseInt(e.target.value, 10);
     if (!isNaN(value) && value >= 0 && value <= 100) {
-      onThresholdChange(value / 100);
+      onThresholdChange(percentToThreshold(value));
     }
   };
-
-  const percentageValue = Math.round(threshold * 100);
 
   return (
     <div className="bg-surface-container-low p-6 rounded-lg border border-outline-variant space-y-4">

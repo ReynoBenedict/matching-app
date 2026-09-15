@@ -4,6 +4,7 @@ import { users } from '@/lib/db/schema';
 import { eq } from 'drizzle-orm';
 import { verifyPassword } from '@/lib/auth/password';
 import { createSession } from '@/lib/auth/session';
+import { recordAuditLog } from '@/lib/audit';
 
 export async function POST(request: NextRequest) {
   try {
@@ -76,6 +77,14 @@ export async function POST(request: NextRequest) {
 
     // Password is valid - create session
     await createSession(user.id);
+
+    // Record real activity for Riwayat Proses
+    await recordAuditLog({
+      userId: user.id,
+      action: 'LOGIN',
+      entityType: 'user',
+      entityId: user.id,
+    });
 
     return NextResponse.json(
       { 

@@ -1,8 +1,22 @@
 import { NextResponse } from 'next/server';
-import { destroySession } from '@/lib/auth/session';
+import { destroySession, getAuthenticatedUser } from '@/lib/auth/session';
+import { recordAuditLog } from '@/lib/audit';
 
 export async function POST() {
   try {
+    // Capture the user before the session is destroyed
+    const user = await getAuthenticatedUser();
+
+    if (user) {
+      // Record real activity for Riwayat Proses
+      await recordAuditLog({
+        userId: user.id,
+        action: 'LOGOUT',
+        entityType: 'user',
+        entityId: user.id,
+      });
+    }
+
     // Destroy the session
     await destroySession();
 

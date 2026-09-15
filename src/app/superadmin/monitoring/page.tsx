@@ -1,15 +1,18 @@
 ﻿/**
  * /superadmin/monitoring
  * Superadmin Monitoring Dashboard for Phase 6A
- * Displays process monitoring and employee progress
+ * Displays assignment progress and employee progress from the database.
+ * Server-side restricted to superadmin (role ADMIN).
  */
 
 import { Suspense } from 'react';
+import { redirect } from 'next/navigation';
+import { getAuthenticatedUser } from '@/lib/auth/session';
 import { MonitoringContent } from './MonitoringContent';
 
 export const metadata = {
   title: 'Monitoring Progres - BPS Data Matching System',
-  description: 'Monitor proses pencocokan dan progres verifikasi petugas',
+  description: 'Monitor progres penugasan dan kinerja petugas verifikasi',
 };
 
 function MonitoringLoader() {
@@ -23,7 +26,14 @@ function MonitoringLoader() {
   );
 }
 
-export default function MonitoringPage() {
+export default async function MonitoringPage() {
+  const user = await getAuthenticatedUser();
+
+  // Only superadmin may access the monitoring page.
+  if (!user || user.role !== 'ADMIN') {
+    redirect('/login');
+  }
+
   return (
     <Suspense fallback={<MonitoringLoader />}>
       <MonitoringContent />

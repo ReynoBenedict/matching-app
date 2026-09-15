@@ -1,138 +1,225 @@
+/**
+ * /superadmin/dashboard
+ * Fully database-backed Superadmin dashboard.
+ * Every KPI, chart series and activity row is fetched from
+ * /api/superadmin/dashboard (superadmin-only). No hardcoded statistics.
+ */
+
 'use client';
 
-import { useEffect, useState } from 'react';
+import { useCallback, useEffect, useState } from 'react';
 import { useRouter } from 'next/navigation';
 import { SuperadminLayout } from '@/components/layouts/SuperadminLayout';
+import { describeAuditLog, getAuditActionMeta } from '@/lib/constants/audit-actions';
+import type { SuperadminDashboardData } from '@/lib/services/superadmin-dashboard';
+import type { HistoryEntry } from '@/lib/services/history';
 
-interface User {
-  id: number;
-  fullName: string;
-  email: string;
-  username: string;
-  role: string;
-  status: string;
+const AUTH_ERROR = 'UNAUTHORIZED';
+
+function formatNumber(value: number): string {
+  return value.toLocaleString('id-ID');
 }
 
-// Synthetic sample data matching the Stitch reference exactly.
-// These are illustrative placeholders — not live production statistics.
-const SAMPLE_PROCESSES = [
-  {
-    id: 'PR-2024-089',
-    datasetUtama: 'Sensus_Penduduk_2020',
-    datasetPembanding: 'Dukcapil_Malang_2023',
-    status: 'Running' as const,
-    progress: 45,
-  },
-  {
-    id: 'PR-2024-088',
-    datasetUtama: 'Data_Kemiskinan_DTKS',
-    datasetPembanding: 'Penerima_Bansos_Kota',
-    status: 'Completed' as const,
-    progress: 100,
-  },
-  {
-    id: 'PR-2024-087',
-    datasetUtama: 'Data_UMKM_Diskop',
-    datasetPembanding: 'Pajak_Daerah_Bapenda',
-    status: 'Failed' as const,
-    progress: 12,
-  },
-];
-
-const BAR_HEIGHTS = [40, 60, 85, 45, 30, 70, 55, 90];
-
-function StatusBadge({ status }: { status: 'Running' | 'Completed' | 'Failed' }) {
-  if (status === 'Running') {
-    return (
-      <span className="inline-flex items-center px-2 py-0.5 rounded-full text-xs font-medium bg-secondary-fixed text-on-secondary-fixed">
-        Running
-      </span>
-    );
-  }
-  if (status === 'Completed') {
-    return (
-      <span className="inline-flex items-center px-2 py-0.5 rounded-full text-xs font-medium bg-surface-container-high text-on-surface">
-        Completed
-      </span>
-    );
-  }
-  return (
-    <span className="inline-flex items-center px-2 py-0.5 rounded-full text-xs font-medium bg-error-container text-on-error-container">
-      Failed
-    </span>
-  );
+function formatDateTime(value: string): string {
+  return new Date(value).toLocaleDateString('id-ID', {
+    day: 'numeric',
+    month: 'long',
+    year: 'numeric',
+    hour: '2-digit',
+    minute: '2-digit',
+  });
 }
 
-function ProgressBar({ value, status }: { value: number; status: 'Running' | 'Completed' | 'Failed' }) {
-  const barColor =
-    status === 'Running'
-      ? 'bg-secondary'
-      : status === 'Completed'
-      ? 'bg-primary-container'
-      : 'bg-error';
+function round2(value: number): number {
+  return Math.round(value * 100) / 100;
+}
 
+function StatCard({ label, value, icon, tone, subtext }: {
+  label: string;
+  value: number | string;
+  icon: string;
+  tone?: string;
+  subtext?: string;
+}) {
   return (
-    <div className="flex items-center gap-2">
-      <div className="w-16 bg-surface-container-highest rounded-full h-1.5">
-        <div className={`${barColor} h-1.5 rounded-full`} style={{ width: `${value}%` }} />
+    <div className="bg-surface p-4 rounded-xl border border-outline-variant shadow-sm hover:shadow-md transition-shadow">
+      <div className="flex items-center justify-between mb-2 text-on-surface-variant">
+        <span className="font-label-md text-xs">{label}</span>
+        <span className={`material-symbols-outlined ${tone || 'text-secondary'}`}>{icon}</span>
       </div>
-      <span className="text-xs">{value}%</span>
+      <div className="font-headline-lg text-headline-lg text-primary">{value}</div>
+      {subtext && (
+        <div className="font-label-md text-xs text-on-surface-variant mt-1">{subtext}</div>
+      )}
     </div>
   );
 }
 
 export default function SuperadminDashboardPage() {
   const router = useRouter();
-  const [user, setUser] = useState<User | null>(null);
+  const [data, setData] = useState<SuperadminDashboardData | null>(null);
   const [loading, setLoading] = useState(true);
-  const [error, setError] = useState('');
+  const [refreshing, setRefreshing] = useState(false);
+  const [error, setError] = useState<string | null>(null);
+
+  // Pure fetcher — performs no state updates, so it is safe to await anywhere.
+  const fetchDashboard = useCallback(async (): Promise<SuperadminDashboardData> => {
+    const response = await fetch('/api/superadmin/dashboard');
+    if (response.status === 401 || response.status === 403) {
+      throw new Error(AUTH_ERROR);
+    }
+    const payload = await response.json();
+    if (!response.ok || !payload.success) {
+      throw new Error(payload.error || 'Gagal memuat dashboard');
+    }
+    return payload.data as SuperadminDashboardData;
+  }, []);
 
   useEffect(() => {
-    const fetchUser = async () => {
-      try {
-        const response = await fetch('/api/auth/me');
-        if (!response.ok) {
-          router.push('/login');
-          return;
-        }
-        const data = await response.json();
-        if (data.user?.role !== 'ADMIN') {
-          router.push('/login');
-          return;
-        }
-        setUser(data.user);
-      } catch {
-        setError('Terjadi kesalahan saat memuat data');
-      } finally {
-        setLoading(false);
-      }
-    };
+    let cancelled = false;
 
-    fetchUser();
-  }, [router]);
+    (async () => {
+      try {
+        const result = await fetchDashboard();
+        if (cancelled) return;
+        setData(result);
+        setError(null);
+      } catch (err) {
+        if (cancelled) return;
+        if (err instanceof Error && err.message === AUTH_ERROR) {
+          router.push('/login');
+          return;
+        }
+        setError(err instanceof Error ? err.message : 'Gagal memuat dashboard');
+      } finally {
+        if (!cancelled) setLoading(false);
+      }
+    })();
+
+    return () => {
+      cancelled = true;
+    };
+  }, [fetchDashboard, router]);
+
+  const handleRefresh = async () => {
+    setRefreshing(true);
+    try {
+      const result = await fetchDashboard();
+      setData(result);
+      setError(null);
+    } catch (err) {
+      if (err instanceof Error && err.message === AUTH_ERROR) {
+        router.push('/login');
+        return;
+      }
+      setError(err instanceof Error ? err.message : 'Gagal memuat dashboard');
+    } finally {
+      setRefreshing(false);
+    }
+  };
+
+  const handleRetry = async () => {
+    setLoading(true);
+    try {
+      const result = await fetchDashboard();
+      setData(result);
+      setError(null);
+    } catch (err) {
+      if (err instanceof Error && err.message === AUTH_ERROR) {
+        router.push('/login');
+        return;
+      }
+      setError(err instanceof Error ? err.message : 'Gagal memuat dashboard');
+    } finally {
+      setLoading(false);
+    }
+  };
+
+  const header = (
+    <div className="mb-8 flex flex-wrap justify-between items-end gap-4">
+      <div>
+        <h2 className="font-headline-lg text-headline-lg text-primary mb-1">
+          Dashboard Superadmin
+        </h2>
+        <p className="font-body-md text-on-surface-variant">
+          Ringkasan data tercatat: dataset, pengguna, penugasan, dan aktivitas sistem.
+        </p>
+      </div>
+      <button
+        onClick={handleRefresh}
+        disabled={refreshing}
+        className="px-4 py-2 bg-surface border border-outline-variant text-primary rounded-lg font-label-md hover:bg-surface-container-low transition-colors shadow-sm flex items-center gap-1 text-sm disabled:opacity-60 disabled:cursor-not-allowed"
+      >
+        <span className={`material-symbols-outlined text-[18px] ${refreshing ? 'animate-spin' : ''}`}>
+          refresh
+        </span>
+        {refreshing ? 'Memperbarui...' : 'Perbarui'}
+      </button>
+    </div>
+  );
 
   if (loading) {
     return (
-      <div className="flex min-h-screen items-center justify-center bg-background">
-        <div className="text-center">
-          <span className="material-symbols-outlined text-[40px] inline-block" style={{ animation: 'spin 2s linear infinite' }}>
-            hourglass_empty
+      <SuperadminLayout pageTitle="Dashboard Superadmin">
+        <div className="mb-2">
+          <span className="text-on-surface-variant text-label-md text-xs">
+            Sistem Pencocokan Data /{' '}
+            <span className="text-primary font-semibold">Dashboard</span>
           </span>
-          <p className="mt-4 text-on-surface-variant">Memuat...</p>
         </div>
-      </div>
+        {header}
+        <div className="flex flex-col items-center justify-center py-24 gap-4">
+          <span className="material-symbols-outlined animate-spin text-primary" style={{ fontSize: '48px' }}>
+            progress_activity
+          </span>
+          <p className="text-on-surface-variant font-body-lg">Memuat data dashboard...</p>
+        </div>
+      </SuperadminLayout>
     );
   }
 
-  if (error || !user) {
+  if (error || !data) {
     return (
-      <div className="flex min-h-screen items-center justify-center bg-background p-8">
-        <div className="text-center bg-surface border border-outline-variant rounded p-8 max-w-[400px]">
-          <p className="text-on-error-container text-sm">{error || 'Akses ditolak'}</p>
+      <SuperadminLayout pageTitle="Dashboard Superadmin">
+        <div className="mb-2">
+          <span className="text-on-surface-variant text-label-md text-xs">
+            Sistem Pencocokan Data /{' '}
+            <span className="text-primary font-semibold">Dashboard</span>
+          </span>
         </div>
-      </div>
+        {header}
+        <div className="bg-error-container border-l-4 border-error p-6 rounded-lg">
+          <div className="flex items-start justify-between gap-4">
+            <div className="flex items-center gap-4">
+              <span className="material-symbols-outlined text-error">error</span>
+              <p className="text-on-error-container font-body-md">{error || 'Gagal memuat dashboard'}</p>
+            </div>
+            <button
+              onClick={handleRetry}
+              className="px-4 py-2 bg-error text-on-error font-label-md rounded-lg hover:opacity-90 transition-opacity"
+            >
+              Coba Lagi
+            </button>
+          </div>
+        </div>
+      </SuperadminLayout>
     );
   }
+
+  const { datasets, users, assignments, verification, monthlyActivity, recentActivities } = data;
+
+  const maxMonthly = Math.max(...monthlyActivity.map((month) => month.total), 1);
+
+  const totalCandidates = verification.totalCandidates;
+  const hasCandidates = totalCandidates > 0;
+  const matchPercent = hasCandidates ? round2((verification.matchCount / totalCandidates) * 100) : 0;
+  const nonMatchPercent = hasCandidates ? round2((verification.nonMatchCount / totalCandidates) * 100) : 0;
+  const unverifiedPercent = hasCandidates ? round2(100 - matchPercent - nonMatchPercent) : 0;
+  const donutGradient =
+    `conic-gradient(` +
+    `#006493 0% ${matchPercent}%, ` +
+    `#ba1a1a ${matchPercent}% ${matchPercent + nonMatchPercent}%, ` +
+    `#c3c6d2 ${matchPercent + nonMatchPercent}% 100%)`;
 
   return (
     <SuperadminLayout pageTitle="Dashboard Superadmin">
@@ -145,82 +232,68 @@ export default function SuperadminDashboardPage() {
         </span>
       </div>
 
-      {/* Page Header */}
-      <div className="mb-8 flex justify-between items-end">
-        <div>
-          <h2 className="font-headline-lg text-headline-lg text-primary mb-1">
-            Dashboard Superadmin
-          </h2>
-          <p className="font-body-md text-on-surface-variant">
-            Overview aktivitas pencocokan data dan metrik sistem.
-          </p>
-        </div>
-        <div className="flex gap-2">
-          <button className="px-4 py-2 bg-surface border border-outline-variant text-primary rounded-lg font-label-md hover:bg-surface-container-low transition-colors shadow-sm flex items-center gap-1 text-sm">
-            <span className="material-symbols-outlined text-[18px]">download</span>
-            Export Laporan
-          </button>
-        </div>
-      </div>
+      {header}
 
       {/* ── KPI Bento Grid ────────────────────────────────────────── */}
       <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-5 gap-4 mb-8">
 
         {/* Total Dataset */}
-        <div className="bg-surface p-4 rounded-xl border border-outline-variant shadow-sm hover:shadow-md transition-shadow">
-          <div className="flex items-center justify-between mb-2 text-on-surface-variant">
-            <span className="font-label-md text-xs">Total Dataset</span>
-            <span className="material-symbols-outlined text-secondary">database</span>
-          </div>
-          <div className="font-headline-lg text-headline-lg text-primary">1,428</div>
-          <div className="font-label-md text-xs text-secondary mt-1 flex items-center gap-1">
-            <span className="material-symbols-outlined text-[14px]">arrow_upward</span>
-            +8.4% bln ini
-          </div>
-        </div>
+        <StatCard
+          label="Total Dataset"
+          value={formatNumber(datasets.total)}
+          icon="database"
+          tone="text-secondary"
+          subtext={`${formatNumber(datasets.ready)} berstatus READY`}
+        />
 
-        {/* Proses Berjalan */}
-        <div className="bg-surface p-4 rounded-xl border border-outline-variant shadow-sm hover:shadow-md transition-shadow">
-          <div className="flex items-center justify-between mb-2 text-on-surface-variant">
-            <span className="font-label-md text-xs">Proses Berjalan</span>
-            <span className="material-symbols-outlined text-secondary">sync</span>
-          </div>
-          <div className="font-headline-lg text-headline-lg text-primary">12</div>
-          <div className="font-label-md text-xs text-on-surface-variant mt-1">Aktif saat ini</div>
-        </div>
+        {/* Total Record */}
+        <StatCard
+          label="Total Record"
+          value={formatNumber(datasets.totalRecords)}
+          icon="table_rows"
+          tone="text-secondary"
+          subtext="Baris data tersimpan"
+        />
 
-        {/* Kandidat Matching */}
-        <div className="bg-surface p-4 rounded-xl border border-outline-variant shadow-sm hover:shadow-md transition-shadow">
-          <div className="flex items-center justify-between mb-2 text-on-surface-variant">
-            <span className="font-label-md text-xs">Kandidat Matching</span>
-            <span className="material-symbols-outlined text-primary-container">fact_check</span>
-          </div>
-          <div className="font-headline-lg text-headline-lg text-primary">24.8k</div>
-          <div className="font-label-md text-xs text-on-surface-variant mt-1">Menunggu validasi</div>
-        </div>
+        {/* Kandidat Ditugaskan */}
+        <StatCard
+          label="Kandidat Ditugaskan"
+          value={formatNumber(assignments.total)}
+          icon="fact_check"
+          tone="text-primary-container"
+          subtext={`${formatNumber(assignments.pending)} menunggu verifikasi`}
+        />
 
-        {/* Anomali Data */}
-        <div className="bg-surface p-4 rounded-xl border border-outline-variant shadow-sm hover:shadow-md transition-shadow">
-          <div className="flex items-center justify-between mb-2 text-on-surface-variant">
-            <span className="font-label-md text-xs">Anomali Data</span>
-            <span className="material-symbols-outlined text-error">warning</span>
-          </div>
-          <div className="font-headline-lg text-headline-lg text-error">156</div>
-          <div className="font-label-md text-xs text-on-surface-variant mt-1">Perlu penanganan</div>
-        </div>
+        {/* Pegawai Aktif */}
+        <StatCard
+          label="Pegawai Aktif"
+          value={formatNumber(users.activeEmployees)}
+          icon="groups"
+          tone="text-secondary"
+          subtext={`${formatNumber(users.total)} pengguna terdaftar`}
+        />
 
-        {/* Target Bulanan — filled primary card */}
+        {/* Tingkat Match — filled primary card */}
         <div className="bg-primary text-on-primary p-4 rounded-xl shadow-sm flex flex-col justify-between">
           <div className="flex items-center justify-between mb-2">
-            <span className="font-label-md text-xs">Target Bulanan</span>
+            <span className="font-label-md text-xs">Tingkat Match</span>
             <span className="material-symbols-outlined">trending_up</span>
           </div>
           <div>
-            <div className="font-headline-lg text-headline-lg mb-1">82%</div>
-            <div className="w-full rounded-full h-1.5 mb-1" style={{ backgroundColor: 'rgba(169,199,255,0.3)' }}>
-              <div className="bg-secondary-fixed h-1.5 rounded-full" style={{ width: '82%' }} />
+            <div className="font-headline-lg text-headline-lg mb-1">
+              {verification.verified === 0 ? '—' : `${verification.matchRate}%`}
             </div>
-            <div className="font-label-md text-xs opacity-80">1.2M baris diproses</div>
+            <div className="w-full rounded-full h-1.5 mb-1" style={{ backgroundColor: 'rgba(169,199,255,0.3)' }}>
+              <div
+                className="bg-secondary-fixed h-1.5 rounded-full"
+                style={{ width: `${verification.verified === 0 ? 0 : verification.matchRate}%` }}
+              />
+            </div>
+            <div className="font-label-md text-xs opacity-80">
+              {verification.verified === 0
+                ? 'Belum ada data terverifikasi'
+                : `${formatNumber(verification.matchCount)} dari ${formatNumber(verification.verified)} terverifikasi`}
+            </div>
           </div>
         </div>
       </div>
@@ -228,116 +301,176 @@ export default function SuperadminDashboardPage() {
       {/* ── Charts Area ───────────────────────────────────────────── */}
       <div className="grid grid-cols-1 lg:grid-cols-3 gap-6 mb-8">
 
-        {/* Bar Chart */}
+        {/* Bar Chart — real audit activity per month */}
         <div className="bg-surface border border-outline-variant rounded-xl shadow-sm p-6 lg:col-span-2">
-          <h3 className="font-headline-sm text-primary mb-4">Aktivitas Matching (30 Hari)</h3>
-          <div className="h-64 w-full bg-surface-container-low rounded-lg border border-outline-variant/50 relative overflow-hidden flex items-end px-4 pb-4 pt-6 gap-2 justify-between">
-            {BAR_HEIGHTS.map((height, idx) => {
-              const isPeak = height >= 80;
-              return (
-                <div
-                  key={idx}
-                  className={`w-full rounded-t-sm transition-colors relative group ${
-                    isPeak
-                      ? 'bg-primary-container hover:bg-primary'
-                      : 'bg-secondary-container hover:bg-secondary'
-                  }`}
-                  style={{ height: `${height}%` }}
-                >
-                  <div className="hidden group-hover:block absolute -top-8 left-1/2 -translate-x-1/2 bg-inverse-surface text-inverse-on-surface px-2 py-1 rounded text-xs whitespace-nowrap z-10">
-                    {height}
+          <h3 className="font-headline-sm text-primary mb-4">Aktivitas Sistem (per Bulan)</h3>
+
+          {monthlyActivity.length === 0 ? (
+            <div className="h-64 w-full bg-surface-container-low rounded-lg border border-outline-variant/50 flex flex-col items-center justify-center">
+              <span className="material-symbols-outlined text-outline" style={{ fontSize: '40px' }}>
+                insights
+              </span>
+              <p className="text-on-surface-variant font-body-md mt-2">Belum ada data historis.</p>
+              <p className="text-on-surface-variant font-body-sm mt-1">
+                Grafik akan terisi setelah aktivitas tercatat pada log audit.
+              </p>
+            </div>
+          ) : (
+            <>
+              <div className="h-64 w-full bg-surface-container-low rounded-lg border border-outline-variant/50 flex items-end px-4 pb-4 pt-6 gap-2 justify-between overflow-x-auto">
+                {monthlyActivity.map((month) => (
+                  <div
+                    key={month.month}
+                    className="flex-1 min-w-[40px] h-full flex items-end"
+                  >
+                    <div
+                      title={`${month.label}: ${formatNumber(month.total)} aktivitas`}
+                      className="w-full rounded-t-sm bg-secondary-container hover:bg-secondary transition-colors relative group"
+                      style={{ height: `${(month.total / maxMonthly) * 100}%` }}
+                    >
+                      <div className="hidden group-hover:block absolute -top-8 left-1/2 -translate-x-1/2 bg-inverse-surface text-inverse-on-surface px-2 py-1 rounded text-xs whitespace-nowrap z-10">
+                        {formatNumber(month.total)}
+                      </div>
+                    </div>
                   </div>
-                </div>
-              );
-            })}
-          </div>
+                ))}
+              </div>
+              <div className="flex gap-2 mt-2">
+                {monthlyActivity.map((month) => (
+                  <div key={month.month} className="flex-1 min-w-[40px] text-center text-[10px] text-on-surface-variant truncate">
+                    {month.label}
+                  </div>
+                ))}
+              </div>
+              <p className="font-label-md text-xs text-on-surface-variant mt-3">
+                Dihitung dari log audit sistem (tabel audit_logs).
+              </p>
+            </>
+          )}
         </div>
 
-        {/* Donut Chart — CSS conic-gradient matching Stitch */}
+        {/* Donut Chart — real verification status */}
         <div className="bg-surface border border-outline-variant rounded-xl shadow-sm p-6">
-          <h3 className="font-headline-sm text-primary mb-4">Status Hasil (Overall)</h3>
-          <div className="h-64 w-full flex flex-col items-center justify-center gap-4">
-            {/* Donut via conic-gradient */}
-            <div className="relative flex items-center justify-center">
-              <div
-                className="w-48 h-48 rounded-full"
-                style={{
-                  background: 'conic-gradient(#006493 0% 65%, #c3c6d2 65% 90%, #ba1a1a 90% 100%)',
-                }}
-              />
-              {/* Inner cutout */}
-              <div className="absolute w-32 h-32 bg-surface rounded-full flex flex-col items-center justify-center">
-                <span className="font-headline-sm text-primary">85k</span>
-                <span className="font-label-md text-xs text-on-surface-variant">Total Data</span>
+          <h3 className="font-headline-sm text-primary mb-4">Status Verifikasi Kandidat</h3>
+
+          {!hasCandidates ? (
+            <div className="h-64 w-full flex flex-col items-center justify-center gap-2">
+              <span className="material-symbols-outlined text-outline" style={{ fontSize: '40px' }}>
+                donut_large
+              </span>
+              <p className="text-on-surface-variant font-body-md">Belum ada kandidat tersimpan.</p>
+              <p className="text-on-surface-variant font-body-sm text-center px-4">
+                Diagram terisi setelah kandidat pencocokan ditugaskan dan diverifikasi.
+              </p>
+            </div>
+          ) : (
+            <div className="h-64 w-full flex flex-col items-center justify-center gap-4">
+              <div className="relative flex items-center justify-center">
+                <div className="w-48 h-48 rounded-full" style={{ background: donutGradient }} />
+                <div className="absolute w-32 h-32 bg-surface rounded-full flex flex-col items-center justify-center">
+                  <span className="font-headline-sm text-primary">{formatNumber(totalCandidates)}</span>
+                  <span className="font-label-md text-xs text-on-surface-variant">Total Kandidat</span>
+                </div>
+              </div>
+              <div className="flex flex-col gap-1 font-label-md text-xs">
+                <div className="flex items-center gap-2">
+                  <div className="w-3 h-3 rounded bg-secondary" />
+                  <span>Match ({formatNumber(verification.matchCount)} · {Math.round(matchPercent)}%)</span>
+                </div>
+                <div className="flex items-center gap-2">
+                  <div className="w-3 h-3 rounded bg-error" />
+                  <span>Non-Match ({formatNumber(verification.nonMatchCount)} · {Math.round(nonMatchPercent)}%)</span>
+                </div>
+                <div className="flex items-center gap-2">
+                  <div className="w-3 h-3 rounded bg-outline-variant" />
+                  <span>Belum Diverifikasi ({formatNumber(verification.unverified)} · {Math.round(unverifiedPercent)}%)</span>
+                </div>
               </div>
             </div>
-            {/* Legend */}
-            <div className="flex flex-col gap-1 font-label-md text-xs">
-              <div className="flex items-center gap-2">
-                <div className="w-3 h-3 rounded bg-secondary" />
-                <span>Match (65%)</span>
-              </div>
-              <div className="flex items-center gap-2">
-                <div className="w-3 h-3 rounded bg-outline-variant" />
-                <span>Non-Match (25%)</span>
-              </div>
-              <div className="flex items-center gap-2">
-                <div className="w-3 h-3 rounded bg-error" />
-                <span>Anomali (10%)</span>
-              </div>
-            </div>
-          </div>
+          )}
         </div>
       </div>
 
-      {/* ── Recent Processes Table ────────────────────────────────── */}
+      {/* ── Recent Activity ───────────────────────────────────────── */}
       <div className="bg-surface border border-outline-variant rounded-xl shadow-sm overflow-hidden mb-8">
         <div className="px-6 py-4 border-b border-outline-variant flex justify-between items-center bg-surface-container-lowest">
-          <h3 className="font-headline-sm text-primary">Proses Terbaru</h3>
-          <button className="text-secondary font-label-md text-xs hover:underline">
-            Lihat Semua
-          </button>
+          <h3 className="font-headline-sm text-primary">Aktivitas Terbaru</h3>
+          <span className="text-on-surface-variant font-label-md text-xs">
+            Sumber: log audit (tabel audit_logs)
+          </span>
         </div>
-        <div className="overflow-x-auto">
-          <table className="w-full text-left border-collapse">
-            <thead>
-              <tr className="bg-surface-container-low border-b border-outline-variant font-label-md text-xs text-on-surface-variant">
-                <th className="px-4 py-3">ID Proses</th>
-                <th className="px-4 py-3">Dataset Utama</th>
-                <th className="px-4 py-3">Dataset Pembanding</th>
-                <th className="px-4 py-3">Status</th>
-                <th className="px-4 py-3">Progress</th>
-                <th className="px-4 py-3 text-right">Aksi</th>
-              </tr>
-            </thead>
-            <tbody className="text-on-surface text-sm">
-              {SAMPLE_PROCESSES.map((proc) => (
-                <tr
-                  key={proc.id}
-                  className="border-b border-outline-variant/50 hover:bg-surface-container-highest/20 transition-colors"
-                >
-                  <td className="px-4 py-3 font-data-tabular">{proc.id}</td>
-                  <td className="px-4 py-3 font-data-tabular">{proc.datasetUtama}</td>
-                  <td className="px-4 py-3 font-data-tabular">{proc.datasetPembanding}</td>
-                  <td className="px-4 py-3">
-                    <StatusBadge status={proc.status} />
-                  </td>
-                  <td className="px-4 py-3">
-                    <ProgressBar value={proc.progress} status={proc.status} />
-                  </td>
-                  <td className="px-4 py-3 text-right">
-                    <button
-                      disabled
-                      title="Detail tersedia pada fase berikutnya"
-                      className="text-primary hover:text-secondary px-2 py-1 rounded hover:bg-surface-container-low disabled:opacity-40 disabled:cursor-not-allowed text-xs"
-                    >
-                      Detail
-                    </button>
-                  </td>
+
+        {recentActivities.length === 0 ? (
+          <div className="py-16 text-center">
+            <span className="material-symbols-outlined text-outline" style={{ fontSize: '40px' }}>
+              history
+            </span>
+            <p className="text-on-surface-variant font-body-md mt-2">Belum ada aktivitas tercatat.</p>
+          </div>
+        ) : (
+          <div className="overflow-x-auto">
+            <table className="w-full text-left border-collapse">
+              <thead>
+                <tr className="bg-surface-container-low border-b border-outline-variant font-label-md text-xs text-on-surface-variant">
+                  <th className="px-4 py-3">Waktu</th>
+                  <th className="px-4 py-3">Aktivitas</th>
+                  <th className="px-4 py-3">Keterangan</th>
+                  <th className="px-4 py-3">Pengguna</th>
                 </tr>
-              ))}
-            </tbody>
-          </table>
+              </thead>
+              <tbody className="text-on-surface text-sm">
+                {recentActivities.map((activity: HistoryEntry) => {
+                  const meta = getAuditActionMeta(activity.action);
+                  return (
+                    <tr
+                      key={activity.id}
+                      className="border-b border-outline-variant/50 hover:bg-surface-container-highest/20 transition-colors"
+                    >
+                      <td className="px-4 py-3 font-data-tabular whitespace-nowrap">
+                        {formatDateTime(activity.createdAt)}
+                      </td>
+                      <td className="px-4 py-3 whitespace-nowrap">
+                        <span className="inline-flex items-center gap-1">
+                          <span className={`material-symbols-outlined ${meta.color}`} style={{ fontSize: '16px' }}>
+                            {meta.icon}
+                          </span>
+                          {meta.label}
+                        </span>
+                      </td>
+                      <td className="px-4 py-3 text-on-surface-variant">
+                        {describeAuditLog(activity.action, activity.metadata, activity.entityType, activity.entityId)}
+                      </td>
+                      <td className="px-4 py-3 whitespace-nowrap">{activity.userName ?? '-'}</td>
+                    </tr>
+                  );
+                })}
+              </tbody>
+            </table>
+          </div>
+        )}
+      </div>
+
+      {/* ── Info ──────────────────────────────────────────────────── */}
+      <div className="bg-surface-container rounded-lg border border-outline p-6">
+        <div className="flex items-start gap-4">
+          <span className="material-symbols-outlined text-primary">info</span>
+          <div>
+            <h3 className="font-label-lg text-label-lg text-on-surface font-semibold mb-2">
+              Tentang Dashboard Superadmin
+            </h3>
+            <p className="text-on-surface-variant font-body-md">
+              Seluruh angka dan aktivitas pada halaman ini diambil langsung dari basis data
+              (dataset, record, pengguna, penugasan, verifikasi, dan log audit), sehingga selalu
+              konsisten dengan halaman Monitoring Progres, Hasil Matching, Riwayat Proses,
+              Penugasan, dan Manajemen Dataset.
+            </p>
+            <p className="text-on-surface-variant font-body-md mt-2">
+              Riwayat proses pencocokan belum dipersistenkan sebagai tabel tersendiri — pencocokan
+              berjalan sebagai job di memori. Karena itu halaman ini tidak menampilkan kartu
+              &quot;proses berjalan&quot; maupun riwayat proses historis; aktivitas yang benar-benar
+              tercatat ditampilkan melalui log audit.
+            </p>
+          </div>
         </div>
       </div>
 

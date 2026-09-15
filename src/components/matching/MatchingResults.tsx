@@ -1,6 +1,7 @@
 'use client';
 
 import { useState } from 'react';
+import { thresholdToPercent } from '@/lib/services/matching/threshold';
 
 interface FieldScore {
   columnA: string;
@@ -73,7 +74,7 @@ export function MatchingResults({ results }: MatchingResultsProps) {
           <div>
             <p className="text-sm text-on-surface-variant">Threshold</p>
             <p className="font-semibold text-on-surface mt-1">
-              {Math.round(results.config.threshold * 100)}%
+              {thresholdToPercent(results.config.threshold)}%
             </p>
           </div>
           <div>
@@ -92,7 +93,7 @@ export function MatchingResults({ results }: MatchingResultsProps) {
             info
           </span>
           <p className="text-on-surface-variant">
-            Tidak ada pasangan yang memenuhi threshold {Math.round(results.config.threshold * 100)}%
+            Tidak ada pasangan yang memenuhi threshold {thresholdToPercent(results.config.threshold)}%
           </p>
         </div>
       ) : (
@@ -195,7 +196,7 @@ export function MatchingResults({ results }: MatchingResultsProps) {
           <div className="bg-secondary-container text-on-secondary-container p-4 rounded-lg">
             <p className="text-sm">
               Ditemukan <span className="font-semibold">{results.summary.totalCandidates}</span>{' '}
-              pasangan record dengan nilai kesamaan ≥ {Math.round(results.config.threshold * 100)}%
+              pasangan record dengan nilai kesamaan ≥ {thresholdToPercent(results.config.threshold)}%
             </p>
           </div>
         </>

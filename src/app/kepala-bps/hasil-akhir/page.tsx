@@ -1,19 +1,19 @@
 /**
- * /kepala-bps/report
- * Real, read-only reports for Kepala BPS.
+ * /kepala-bps/hasil-akhir
+ * Real, read-only final verification results for Kepala BPS.
  * Server-side restricted to the Kepala BPS role (HEAD).
  */
 
 import { redirect } from 'next/navigation';
 import { getAuthenticatedUser } from '@/lib/auth/session';
-import { ReportContent } from '@/components/reports/ReportContent';
+import { HasilAkhirContent } from './HasilAkhirContent';
 
 export const metadata = {
-  title: 'Laporan - BPS Data Matching System',
-  description: 'Ringkasan laporan sistem pencocokan data',
+  title: 'Hasil Akhir - BPS Data Matching System',
+  description: 'Hasil akhir verifikasi kandidat pencocokan data',
 };
 
-export default async function KepalaReportPage() {
+export default async function HasilAkhirPage() {
   const user = await getAuthenticatedUser();
 
   // Only Kepala BPS may access this page.
@@ -21,5 +21,5 @@ export default async function KepalaReportPage() {
     redirect('/login');
   }
 
-  return <ReportContent backHref="/kepala-bps/dashboard" />;
+  return <HasilAkhirContent />;
 }

@@ -10,7 +10,6 @@ export default function RegisterPage() {
     fullName: '',
     email: '',
     username: '',
-    role: '',
     password: '',
     confirmPassword: '',
   });
@@ -52,7 +51,6 @@ export default function RegisterPage() {
           fullName: formData.fullName,
           email: formData.email,
           username: formData.username,
-          requestedRole: formData.role,
           password: formData.password,
         }),
       });
@@ -105,8 +103,8 @@ export default function RegisterPage() {
               </h2>
               <p className="text-sm text-[#e8f1ff] mb-6">
                 Pendaftaran akun ini bersifat pengajuan. Setelah Anda mengisi
-                formulir ini, tim administrator akan memverifikasi data dan peran
-                yang Anda ajukan sebelum akses diberikan.
+                formulir ini, tim administrator akan memverifikasi data Anda
+                sebelum akses diberikan.
               </p>
               <ul className="space-y-2 text-xs text-[#e8f1ff]">
                 <li className="flex items-start gap-2">
@@ -119,7 +117,9 @@ export default function RegisterPage() {
                   <span className="material-symbols-outlined text-[16px] flex-shrink-0 mt-0.5">
                     admin_panel_settings
                   </span>
-                  <span>Pemilihan peran harus sesuai dengan SK tugas.</span>
+                  <span>
+                    Pendaftaran hanya untuk akun Pegawai (Employee).
+                  </span>
                 </li>
                 <li className="flex items-start gap-2">
                   <span className="material-symbols-outlined text-[16px] flex-shrink-0 mt-0.5">
@@ -150,6 +150,11 @@ export default function RegisterPage() {
             <h2 className="text-lg font-semibold text-[#002b5a] mb-4 border-b border-[#c3c6d2] pb-2">
               Formulir Registrasi
             </h2>
+
+            <p className="text-xs text-[#424750] mb-4 bg-[#f8f9ff] border border-[#c3c6d2] rounded px-3 py-2">
+              Akun yang diajukan akan memiliki peran Pegawai (Employee) dan perlu
+              disetujui oleh administrator.
+            </p>
 
             {error && (
               <div className="bg-[#ffdad6] border border-[#ba1a1a] rounded p-4 mb-4">
@@ -202,59 +207,25 @@ export default function RegisterPage() {
                 </div>
               </div>
 
-              <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
-                {/* Username / NIP */}
-                <div>
-                  <label
-                    className="block text-xs font-semibold text-[#0b1c30] mb-1 tracking-wide"
-                    htmlFor="username"
-                  >
-                    Username / NIP
-                  </label>
-                  <input
-                    type="text"
-                    id="username"
-                    name="username"
-                    placeholder="Username atau NIP"
-                    value={formData.username}
-                    onChange={handleChange}
-                    disabled={loading}
-                    required
-                    className="w-full border border-[#c3c6d2] rounded px-3 py-2 text-sm text-[#0b1c30] bg-[#f8f9ff] focus:border-[#006493] focus:ring-2 focus:ring-[rgba(0,100,147,0.2)] focus:outline-none disabled:opacity-50 disabled:cursor-not-allowed"
-                  />
-                </div>
-
-                {/* Peran */}
-                <div>
-                  <label
-                    className="block text-xs font-semibold text-[#0b1c30] mb-1 tracking-wide"
-                    htmlFor="role"
-                  >
-                    Peran yang Diajukan
-                  </label>
-                  <div className="relative">
-                    <select
-                      id="role"
-                      name="role"
-                      value={formData.role}
-                      onChange={handleChange}
-                      disabled={loading}
-                      required
-                      className="w-full border border-[#c3c6d2] rounded px-3 py-2 text-sm text-[#0b1c30] bg-[#f8f9ff] focus:border-[#006493] focus:ring-2 focus:ring-[rgba(0,100,147,0.2)] focus:outline-none appearance-none disabled:opacity-50 disabled:cursor-not-allowed"
-                    >
-                      <option value="">Pilih Peran...</option>
-                      <option value="ADMIN">Superadmin</option>
-                      <option value="EMPLOYEE">Employee</option>
-                      <option value="HEAD">Kepala BPS</option>
-                      <option value="VERIFICATION_OFFICER">
-                        Petugas Verifikasi
-                      </option>
-                    </select>
-                    <span className="material-symbols-outlined absolute right-3 top-2 text-[#737781] text-lg pointer-events-none">
-                      arrow_drop_down
-                    </span>
-                  </div>
-                </div>
+              {/* Username / NIP */}
+              <div>
+                <label
+                  className="block text-xs font-semibold text-[#0b1c30] mb-1 tracking-wide"
+                  htmlFor="username"
+                >
+                  Username / NIP
+                </label>
+                <input
+                  type="text"
+                  id="username"
+                  name="username"
+                  placeholder="Username atau NIP"
+                  value={formData.username}
+                  onChange={handleChange}
+                  disabled={loading}
+                  required
+                  className="w-full border border-[#c3c6d2] rounded px-3 py-2 text-sm text-[#0b1c30] bg-[#f8f9ff] focus:border-[#006493] focus:ring-2 focus:ring-[rgba(0,100,147,0.2)] focus:outline-none disabled:opacity-50 disabled:cursor-not-allowed"
+                />
               </div>
 
               <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
