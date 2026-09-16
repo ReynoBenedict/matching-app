@@ -414,8 +414,8 @@ export function MatchingContent() {
         {/* Step 4: Threshold */}
         {state.step === 'threshold' && (
           <>
-            <div className="bg-surface-container-low p-6 rounded-lg border border-outline-variant">
-              <h3 className="font-headline-sm text-primary mb-4">Konfigurasi Pencocokan</h3>
+            <div className="bg-surface-container-low p-6 rounded-xl border border-outline-variant">
+              <h3 className="font-headline-sm text-headline-sm text-primary mb-4">Konfigurasi Pencocokan</h3>
               <div className="space-y-4">
                 <div>
                   <p className="text-sm font-semibold text-on-surface mb-2">Kolom yang dipetakan:</p>
@@ -435,7 +435,7 @@ export function MatchingContent() {
             />
 
             {isJobActive ? (
-              <div className="bg-surface-container-low p-6 rounded-lg border border-outline-variant space-y-4">
+              <div className="bg-surface-container-low p-6 rounded-xl border border-outline-variant space-y-4">
                 <div className="flex items-center gap-3">
                   <div className="animate-spin rounded-full h-6 w-6 border-b-2 border-primary" />
                   <div>
@@ -467,7 +467,7 @@ export function MatchingContent() {
 
                 <button
                   onClick={handleRefreshStatus}
-                  className="w-full bg-surface border border-outline text-primary py-3 rounded-lg font-label-md hover:bg-surface-container transition-colors"
+                  className="w-full bg-surface border border-outline-variant text-primary py-3 rounded-lg font-label-md hover:bg-surface-container transition-colors"
                 >
                   Perbarui Status
                 </button>

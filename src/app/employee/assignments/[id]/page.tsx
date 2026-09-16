@@ -8,8 +8,8 @@ import { Suspense } from 'react';
 import { AssignmentDetailContent } from '@/components/employee/AssignmentDetailContent';
 
 export const metadata = {
-  title: 'Verifikasi Penugasan - BPS Data Matching System',
-  description: 'Verifikasi penugasan kandidat pencocokan data',
+  title: 'Detail Penugasan - BPS Data Matching System',
+  description: 'Detail penugasan kandidat pencocokan data untuk diverifikasi',
 };
 
 function AssignmentDetailLoader() {

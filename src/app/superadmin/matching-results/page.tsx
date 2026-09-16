@@ -1,7 +1,7 @@
 ﻿/**
  * /superadmin/matching-results
- * Phase 6B: Real, database-backed matching results.
- * Server-side restricted to superadmin (role ADMIN).
+ * Hasil pencocokan berbasis basis data.
+ * Hanya untuk Superadmin (role ADMIN).
  */
 
 import { redirect } from 'next/navigation';
@@ -16,7 +16,7 @@ export const metadata = {
 export default async function MatchingResultsPage() {
   const user = await getAuthenticatedUser();
 
-  // Only superadmin may access the matching results page.
+  // Hanya Superadmin yang boleh mengakses hasil pencocokan.
   if (!user || user.role !== 'ADMIN') {
     redirect('/login');
   }

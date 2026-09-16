@@ -32,8 +32,8 @@ export function ThresholdSelector({
   };
 
   return (
-    <div className="bg-surface-container-low p-6 rounded-lg border border-outline-variant space-y-4">
-      <h3 className="font-headline-sm text-primary">Langkah 4: Atur Threshold Kesamaan</h3>
+    <div className="bg-surface-container-low p-6 rounded-xl border border-outline-variant space-y-4">
+      <h3 className="font-headline-sm text-headline-sm text-primary">Langkah 4: Atur Threshold Kesamaan</h3>
 
       <p className="text-sm text-on-surface-variant">
         Hanya pasangan record dengan nilai kesamaan di atas threshold yang akan ditampilkan.

@@ -1,8 +1,7 @@
 ﻿/**
  * /superadmin/monitoring
- * Superadmin Monitoring Dashboard for Phase 6A
- * Displays assignment progress and employee progress from the database.
- * Server-side restricted to superadmin (role ADMIN).
+ * Dasbor pemantauan progres penugasan dan pegawai dari basis data.
+ * Hanya untuk Superadmin (role ADMIN).
  */
 
 import { Suspense } from 'react';
@@ -29,7 +28,7 @@ function MonitoringLoader() {
 export default async function MonitoringPage() {
   const user = await getAuthenticatedUser();
 
-  // Only superadmin may access the monitoring page.
+  // Hanya Superadmin yang boleh mengakses halaman pemantauan.
   if (!user || user.role !== 'ADMIN') {
     redirect('/login');
   }

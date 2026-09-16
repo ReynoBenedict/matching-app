@@ -1,8 +1,10 @@
 'use client';
 
-import { useEffect, useState } from 'react';
+import { useCallback, useEffect, useState } from 'react';
 import { useRouter } from 'next/navigation';
+import Link from 'next/link';
 import { EmployeeLayout } from '@/components/layouts/EmployeeLayout';
+import { formatPercent, scoreBadgeClass } from '@/components/assignments/score';
 
 interface User {
   id: number;
@@ -13,25 +15,79 @@ interface User {
   status: string;
 }
 
-interface AssignmentSummary {
-  total: number;
-  pending: number;
-  completed: number;
+interface Assignment {
+  id: number;
+  recordAId: number;
+  recordBId: number;
+  similarityScore: string;
+  status: string;
+  verificationResult: string | null;
+  verifiedAt: string | null;
+  createdAt: string;
+}
+
+function toScore(value: string): number {
+  const parsed = Number.parseFloat(value);
+  return Number.isFinite(parsed) ? parsed : 0;
+}
+
+function formatDate(value: string): string {
+  return new Date(value).toLocaleDateString('id-ID', {
+    day: 'numeric',
+    month: 'short',
+    year: 'numeric',
+  });
+}
+
+function PageLoader() {
+  return (
+    <div className="flex flex-col items-center justify-center gap-4 py-24">
+      <span className="material-symbols-outlined animate-spin text-primary" style={{ fontSize: '48px' }}>
+        progress_activity
+      </span>
+      <p className="font-body-lg text-on-surface-variant">Memuat data dashboard...</p>
+    </div>
+  );
+}
+
+function StatCard({ label, value, icon, tone = 'text-secondary', valueTone = 'text-primary', subtext }: {
+  label: string;
+  value: number | string;
+  icon: string;
+  tone?: string;
+  valueTone?: string;
+  subtext?: string;
+}) {
+  return (
+    <div className="bg-surface p-4 rounded-xl border border-outline-variant shadow-sm hover:shadow-md transition-shadow">
+      <div className="flex items-center justify-between mb-2 text-on-surface-variant">
+        <span className="font-label-md text-xs uppercase tracking-wide">{label}</span>
+        <span className={`material-symbols-outlined ${tone}`} style={{ fontSize: '20px' }}>
+          {icon}
+        </span>
+      </div>
+      <div className={`font-headline-lg text-headline-lg ${valueTone}`}>{value}</div>
+      {subtext && (
+        <div className="font-label-md text-xs text-on-surface-variant mt-1">{subtext}</div>
+      )}
+    </div>
+  );
 }
 
 export default function EmployeeDashboardPage() {
   const router = useRouter();
   const [user, setUser] = useState<User | null>(null);
-  const [assignmentSummary, setAssignmentSummary] = useState<AssignmentSummary>({
-    total: 0,
-    pending: 0,
-    completed: 0,
-  });
+  const [assignments, setAssignments] = useState<Assignment[]>([]);
   const [loading, setLoading] = useState(true);
+  const [refreshing, setRefreshing] = useState(false);
   const [error, setError] = useState('');
 
-  useEffect(() => {
-    const fetchDashboardData = async () => {
+  const fetchDashboard = useCallback(
+    async (silent = false) => {
+      if (silent) setRefreshing(true);
+      else setLoading(true);
+      setError('');
+
       try {
         // Fetch current user
         const userResponse = await fetch('/api/auth/me');
@@ -41,7 +97,7 @@ export default function EmployeeDashboardPage() {
         }
         const userData = await userResponse.json();
         const userRole = userData.user?.role;
-        
+
         // Enforce Employee-only access
         if (userRole !== 'EMPLOYEE') {
           // Redirect non-employees away from employee dashboard
@@ -55,203 +111,328 @@ export default function EmployeeDashboardPage() {
 
         setUser(userData.user);
 
-        // Fetch assignment summary for Employee
+        // Fetch assignments for Employee
         const assignResponse = await fetch('/api/assignments/my');
         if (assignResponse.ok) {
           const assignData = await assignResponse.json();
-          const assignments = assignData.data || [];
-          
-          const summary = {
-            total: assignments.length,
-            pending: assignments.filter((a: any) => a.status === 'PENDING').length,
-            completed: assignments.filter((a: any) => a.status === 'COMPLETED').length,
-          };
-          setAssignmentSummary(summary);
+          setAssignments(assignData.data || []);
         }
-      } catch (err) {
+      } catch {
         setError('Terjadi kesalahan saat memuat data');
       } finally {
-        setLoading(false);
+        if (silent) setRefreshing(false);
+        else setLoading(false);
       }
-    };
+    },
+    [router]
+  );
 
-    fetchDashboardData();
-  }, [router]);
+  useEffect(() => {
+    // eslint-disable-next-line react-hooks/set-state-in-effect
+    fetchDashboard();
+  }, [fetchDashboard]);
+
+  const breadcrumb = (
+    <div className="mb-2">
+      <span className="text-on-surface-variant text-label-md text-xs">
+        Sistem Pencocokan Data /{' '}
+        <span className="text-primary font-semibold">Dashboard</span>
+      </span>
+    </div>
+  );
 
   if (loading) {
     return (
-      <div className="flex min-h-screen items-center justify-center bg-background">
-        <div className="text-center">
-          <span className="material-symbols-outlined text-[40px] inline-block" style={{ animation: 'spin 2s linear infinite' }}>
-            hourglass_empty
-          </span>
-          <p className="mt-4 text-on-surface-variant">Memuat...</p>
+      <EmployeeLayout pageTitle="Dashboard Employee">
+        {breadcrumb}
+        <div className="mb-8">
+          <h2 className="font-headline-lg-mobile md:font-headline-lg text-headline-lg-mobile md:text-headline-lg text-primary mb-1">Dashboard Employee</h2>
+          <p className="font-body-md text-on-surface-variant">Ringkasan penugasan verifikasi Anda.</p>
         </div>
-      </div>
+        <PageLoader />
+      </EmployeeLayout>
     );
   }
 
   if (error || !user) {
     return (
-      <div className="flex min-h-screen items-center justify-center bg-background p-8">
-        <div className="text-center bg-surface border border-outline-variant rounded p-8 max-w-[400px]">
-          <p className="text-on-error-container text-sm">{error || 'Akses ditolak'}</p>
+      <EmployeeLayout pageTitle="Dashboard Employee">
+        {breadcrumb}
+        <div className="mb-8">
+          <h2 className="font-headline-lg-mobile md:font-headline-lg text-headline-lg-mobile md:text-headline-lg text-primary mb-1">Dashboard Employee</h2>
+          <p className="font-body-md text-on-surface-variant">Ringkasan penugasan verifikasi Anda.</p>
         </div>
-      </div>
+        <div className="bg-error-container border-l-4 border-error p-6 rounded-lg">
+          <div className="flex items-start justify-between gap-4">
+            <div className="flex items-center gap-4">
+              <span className="material-symbols-outlined text-error">error</span>
+              <p className="text-on-error-container font-body-md">{error || 'Akses ditolak'}</p>
+            </div>
+            <button
+              onClick={() => fetchDashboard()}
+              className="px-4 py-2 bg-error text-on-error font-label-md rounded-lg hover:opacity-90 transition-opacity"
+            >
+              Coba Lagi
+            </button>
+          </div>
+        </div>
+      </EmployeeLayout>
     );
   }
 
+  const completedAssignments = assignments.filter((item) => item.status === 'COMPLETED');
+  const summary = {
+    total: assignments.length,
+    completed: completedAssignments.length,
+    pending: assignments.length - completedAssignments.length,
+    matchCount: completedAssignments.filter((item) => item.verificationResult === 'MATCH').length,
+    nonMatchCount: completedAssignments.filter((item) => item.verificationResult === 'NON_MATCH').length,
+    completionRate:
+      assignments.length === 0 ? 0 : Math.round((completedAssignments.length / assignments.length) * 100),
+  };
+
+  // Work queue: the longest-waiting assignments first.
+  const pendingAssignments = assignments
+    .filter((item) => item.status !== 'COMPLETED')
+    .sort((a, b) => new Date(a.createdAt).getTime() - new Date(b.createdAt).getTime());
+  const pendingPreview = pendingAssignments.slice(0, 3);
+
   return (
-    <EmployeeLayout pageTitle="Dashboard Petugas Verifikasi">
-      {/* Breadcrumb */}
-      <div className="mb-2">
-        <span className="text-on-surface-variant text-label-md text-xs">
-          Sistem Pencocokan Data /{' '}
-          <span className="text-primary font-semibold">Dashboard</span>
-        </span>
+    <EmployeeLayout pageTitle="Dashboard Employee">
+
+      {breadcrumb}
+
+      {/* Page header */}
+      <div className="mb-8 flex flex-wrap justify-between items-end gap-4">
+        <div>
+          <h2 className="font-headline-lg-mobile md:font-headline-lg text-headline-lg-mobile md:text-headline-lg text-primary mb-1">
+            Selamat Datang, {user.fullName}
+          </h2>
+          <p className="font-body-md text-on-surface-variant">
+            Ringkasan penugasan verifikasi data yang ditugaskan kepada Anda.
+          </p>
+        </div>
+        <button
+          onClick={() => fetchDashboard(true)}
+          disabled={refreshing}
+          className="px-4 py-2 bg-surface border border-outline-variant text-primary rounded-lg font-label-md hover:bg-surface-container-low transition-colors shadow-sm flex items-center gap-1 text-sm disabled:opacity-60 disabled:cursor-not-allowed"
+        >
+          <span className={`material-symbols-outlined text-[18px] ${refreshing ? 'animate-spin' : ''}`}>
+            refresh
+          </span>
+          {refreshing ? 'Memperbarui...' : 'Perbarui'}
+        </button>
       </div>
 
-      {/* Page Header */}
-      <div className="mb-8">
-        <h2 className="font-headline-lg text-headline-lg text-primary mb-2">
-          Dashboard Petugas Verifikasi
-        </h2>
-        <p className="font-body-md text-on-surface-variant">
-          Kelola tugas verifikasi data Anda
-        </p>
-      </div>
+      {/* KPI cards */}
+      <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-4 mb-8">
+        <StatCard
+          label="Total Penugasan"
+          value={summary.total}
+          icon="assignment"
+          tone="text-secondary"
+          subtext="Seluruh penugasan untuk Anda"
+        />
+        <StatCard
+          label="Menunggu Verifikasi"
+          value={summary.pending}
+          icon="schedule"
+          tone="text-warning"
+          valueTone="text-warning"
+          subtext="Belum Anda verifikasi"
+        />
+        <StatCard
+          label="Sudah Diverifikasi"
+          value={summary.completed}
+          icon="check_circle"
+          tone="text-success"
+          valueTone="text-success"
+          subtext="Penugasan selesai"
+        />
 
-      {/* KPI Cards */}
-      <div className="grid grid-cols-1 md:grid-cols-3 gap-4 mb-8">
-        {/* Total Assignments */}
-        <div className="bg-surface p-6 rounded-xl border border-outline-variant shadow-sm hover:shadow-md transition-shadow">
-          <div className="flex items-center justify-between mb-4 text-on-surface-variant">
-            <span className="font-label-md text-sm">Total Penugasan</span>
-            <span className="material-symbols-outlined text-secondary" style={{ fontSize: '24px' }}>
-              assignment
-            </span>
+        {/* Tingkat penyelesaian — filled primary card */}
+        <div className="bg-primary text-on-primary p-4 rounded-xl shadow-sm flex flex-col justify-between">
+          <div className="flex items-center justify-between mb-2">
+            <span className="font-label-md text-xs uppercase tracking-wide">Tingkat Penyelesaian</span>
+            <span className="material-symbols-outlined">trending_up</span>
           </div>
-          <div className="font-headline-lg text-headline-lg text-primary mb-1">
-            {assignmentSummary.total}
-          </div>
-          <div className="font-label-md text-xs text-on-surface-variant">
-            Penugasan yang ditugaskan kepada Anda
-          </div>
-        </div>
-
-        {/* Pending Assignments */}
-        <div className="bg-surface p-6 rounded-xl border border-outline-variant shadow-sm hover:shadow-md transition-shadow">
-          <div className="flex items-center justify-between mb-4 text-on-surface-variant">
-            <span className="font-label-md text-sm">Menunggu Verifikasi</span>
-            <span className="material-symbols-outlined text-warning" style={{ fontSize: '24px' }}>
-              schedule
-            </span>
-          </div>
-          <div className="font-headline-lg text-headline-lg text-warning mb-1">
-            {assignmentSummary.pending}
-          </div>
-          <div className="font-label-md text-xs text-on-surface-variant">
-            Penugasan yang perlu diverifikasi
-          </div>
-        </div>
-
-        {/* Completed Assignments */}
-        <div className="bg-surface p-6 rounded-xl border border-outline-variant shadow-sm hover:shadow-md transition-shadow">
-          <div className="flex items-center justify-between mb-4 text-on-surface-variant">
-            <span className="font-label-md text-sm">Sudah Diverifikasi</span>
-            <span className="material-symbols-outlined text-success" style={{ fontSize: '24px' }}>
-              check_circle
-            </span>
-          </div>
-          <div className="font-headline-lg text-headline-lg text-success mb-1">
-            {assignmentSummary.completed}
-          </div>
-          <div className="font-label-md text-xs text-on-surface-variant">
-            Penugasan yang telah selesai
-          </div>
-        </div>
-      </div>
-
-      {/* Progress Section */}
-      <div className="bg-surface border border-outline-variant rounded-xl shadow-sm p-6 mb-8">
-        <h3 className="font-headline-sm text-primary mb-4">Progres Verifikasi</h3>
-        <div className="space-y-4">
           <div>
-            <div className="flex justify-between mb-2">
-              <span className="font-label-md text-sm text-on-surface-variant">Penugasan Selesai</span>
-              <span className="font-headline-md text-md text-primary">
-                {assignmentSummary.completed} dari {assignmentSummary.total}
-              </span>
-            </div>
-            <div className="w-full bg-surface-container h-2 rounded-full overflow-hidden">
+            <div className="font-headline-lg text-headline-lg mb-1">{summary.completionRate}%</div>
+            <div className="w-full rounded-full h-1.5 mb-1" style={{ backgroundColor: 'rgba(169,199,255,0.3)' }}>
               <div
-                className="bg-primary h-full transition-all duration-500"
-                style={{
-                  width: `${assignmentSummary.total === 0 ? 0 : Math.round((assignmentSummary.completed / assignmentSummary.total) * 100)}%`,
-                }}
+                className="bg-secondary-fixed h-1.5 rounded-full"
+                style={{ width: `${summary.completionRate}%` }}
               />
             </div>
-            <p className="font-label-md text-xs text-on-surface-variant mt-2">
-              {assignmentSummary.total === 0 ? '0%' : Math.round((assignmentSummary.completed / assignmentSummary.total) * 100)}% selesai
-            </p>
+            <div className="font-label-md text-xs opacity-80">
+              {summary.completed} dari {summary.total} penugasan selesai
+            </div>
           </div>
         </div>
       </div>
 
-      {/* Assignment Entry Section */}
-      <div className="bg-primary text-on-primary p-8 rounded-xl shadow-sm mb-8">
-        <div className="grid grid-cols-1 md:grid-cols-2 gap-8">
+      {/* Pending work queue */}
+      <div className="bg-surface border border-outline-variant rounded-xl shadow-sm overflow-hidden mb-8">
+        <div className="px-6 py-4 border-b border-outline-variant flex flex-wrap justify-between items-center gap-3 bg-surface-container-lowest">
           <div>
-            <h3 className="font-headline-sm text-headline-sm mb-2">Penugasan Saya</h3>
-            <p className="font-body-md opacity-90 mb-6">
-              {assignmentSummary.pending > 0
-                ? `Anda memiliki ${assignmentSummary.pending} penugasan yang menunggu verifikasi. Buka daftar penugasan untuk memulai.`
-                : 'Tidak ada penugasan yang menunggu. Periksa kembali nanti.'}
+            <h3 className="font-headline-sm text-headline-sm text-primary">Menunggu Verifikasi</h3>
+            <p className="font-label-md text-xs text-on-surface-variant mt-1">
+              {summary.pending === 0
+                ? 'Tidak ada penugasan yang menunggu verifikasi.'
+                : `${summary.pending} penugasan perlu diverifikasi.`}
             </p>
-            <button
-              onClick={() => router.push('/employee/assignments')}
-              className="px-6 py-3 bg-secondary-container text-on-secondary-container rounded-lg font-label-lg hover:bg-secondary hover:text-on-primary transition-colors flex items-center gap-2"
-            >
-              <span className="material-symbols-outlined" style={{ fontSize: '20px' }}>
-                arrow_forward
-              </span>
-              Buka Penugasan Saya
-            </button>
           </div>
-          <div className="flex items-center justify-center">
-            <div className="text-center">
-              <span className="material-symbols-outlined text-[60px] mb-4 block" style={{ fontVariationSettings: "'FILL' 1" }}>
-                fact_check
+          <button
+            onClick={() => router.push('/employee/assignments')}
+            className="inline-flex items-center gap-1 bg-secondary-container text-on-secondary-container px-4 py-2 rounded-lg font-label-md hover:bg-secondary hover:text-on-primary transition-colors"
+          >
+            Buka Penugasan Saya
+            <span className="material-symbols-outlined text-[18px]">arrow_forward</span>
+          </button>
+        </div>
+
+        {pendingPreview.length === 0 ? (
+          <div className="py-12 px-6 text-center">
+            <span
+              className="material-symbols-outlined text-success"
+              style={{ fontSize: '40px', fontVariationSettings: "'FILL' 1" }}
+            >
+              task_alt
+            </span>
+            <p className="font-body-md text-on-surface mt-2">
+              {summary.total === 0
+                ? 'Anda belum memiliki penugasan verifikasi.'
+                : 'Semua penugasan Anda sudah selesai diverifikasi.'}
+            </p>
+            <p className="font-body-sm text-on-surface-variant mt-1">
+              Penugasan baru akan ditampilkan di sini.
+            </p>
+          </div>
+        ) : (
+          <div>
+            <div className="flex items-center justify-between px-6 py-2 bg-surface-container-low border-b border-outline-variant">
+              <span className="font-label-md text-xs text-on-surface-variant">
+                Diurutkan dari yang paling lama menunggu
               </span>
-              <p className="font-label-md text-sm opacity-80">
-                Verifikasi data dengan cermat dan teliti
+              <span className="font-label-md text-xs text-on-surface-variant">
+                Menampilkan {pendingPreview.length} dari {summary.pending}
+              </span>
+            </div>
+            <ul>
+              {pendingPreview.map((assignment) => (
+                <li key={assignment.id} className="border-b border-outline-variant last:border-b-0">
+                  <Link
+                    href={`/employee/assignments/${assignment.id}`}
+                    className="w-full text-left px-6 py-4 hover:bg-surface-container-low transition-colors flex items-center justify-between gap-4"
+                  >
+                    <span className="flex items-center gap-4 min-w-0">
+                      <span className="w-10 h-10 rounded-lg bg-surface-container-high flex items-center justify-center flex-shrink-0">
+                        <span className="material-symbols-outlined text-warning" style={{ fontSize: '20px' }}>
+                          fact_check
+                        </span>
+                      </span>
+                      <span className="min-w-0">
+                        <span className="block font-body-md font-semibold text-on-surface">
+                          Penugasan #{assignment.id}
+                        </span>
+                        <span className="block font-label-md text-xs text-on-surface-variant mt-1 truncate">
+                          Record A {assignment.recordAId} · Record B {assignment.recordBId} · Dibuat{' '}
+                          {formatDate(assignment.createdAt)}
+                        </span>
+                      </span>
+                    </span>
+                    <span className="flex items-center gap-3 flex-shrink-0">
+                      <span
+                        className={`px-2 py-1 rounded font-label-md ${scoreBadgeClass(
+                          toScore(assignment.similarityScore)
+                        )}`}
+                      >
+                        {formatPercent(toScore(assignment.similarityScore))}
+                      </span>
+                      <span className="material-symbols-outlined text-primary" style={{ fontSize: '20px' }}>
+                        arrow_forward
+                      </span>
+                    </span>
+                  </Link>
+                </li>
+              ))}
+            </ul>
+          </div>
+        )}
+      </div>
+
+      {/* Progress + account */}
+      <div className="grid grid-cols-1 lg:grid-cols-3 gap-6">
+
+        {/* Progress */}
+        <div className="bg-surface border border-outline-variant rounded-xl shadow-sm p-6 lg:col-span-2">
+          <h3 className="font-headline-sm text-headline-sm text-primary mb-4">Progres Verifikasi</h3>
+
+          <div className="flex justify-between mb-2">
+            <span className="font-body-md text-on-surface-variant">Penugasan selesai</span>
+            <span className="font-headline-md text-headline-md text-primary">
+              {summary.completed} dari {summary.total}
+            </span>
+          </div>
+          <div className="w-full bg-surface-container h-2 rounded-full overflow-hidden">
+            <div
+              className="bg-primary h-full transition-all duration-500"
+              style={{ width: `${summary.completionRate}%` }}
+            />
+          </div>
+          <p className="font-label-md text-xs text-on-surface-variant mt-2">
+            {summary.total === 0
+              ? 'Belum ada penugasan untuk dihitung.'
+              : `${summary.completionRate}% dari seluruh penugasan telah diverifikasi.`}
+          </p>
+
+          <div className="mt-6 pt-6 border-t border-outline-variant grid grid-cols-2 gap-4">
+            <div>
+              <p className="font-label-md text-xs text-on-surface-variant mb-1">Hasil MATCH</p>
+              <p className="font-headline-md text-headline-md text-success">{summary.matchCount}</p>
+              <p className="font-label-md text-xs text-on-surface-variant mt-1">
+                Dinyatakan data yang sama
+              </p>
+            </div>
+            <div>
+              <p className="font-label-md text-xs text-on-surface-variant mb-1">Hasil NON-MATCH</p>
+              <p className="font-headline-md text-headline-md text-error">{summary.nonMatchCount}</p>
+              <p className="font-label-md text-xs text-on-surface-variant mt-1">
+                Dinyatakan data berbeda
               </p>
             </div>
           </div>
         </div>
-      </div>
 
-      {/* Account Information Card */}
-      <div className="bg-surface border border-outline-variant rounded-xl shadow-sm p-6">
-        <h3 className="font-headline-sm text-primary mb-4">Informasi Akun Anda</h3>
-        <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
-          <div>
-            <p className="font-label-md text-xs text-on-surface-variant mb-1">Nama Lengkap</p>
-            <p className="font-body-md text-on-surface">{user.fullName}</p>
-          </div>
-          <div>
-            <p className="font-label-md text-xs text-on-surface-variant mb-1">Email</p>
-            <p className="font-body-md text-on-surface">{user.email}</p>
-          </div>
-          <div>
-            <p className="font-label-md text-xs text-on-surface-variant mb-1">Username</p>
-            <p className="font-body-md text-on-surface">{user.username}</p>
-          </div>
-          <div>
-            <p className="font-label-md text-xs text-on-surface-variant mb-1">Status</p>
-            <span className="inline-flex items-center px-3 py-1 rounded-full text-xs font-medium bg-success-container text-on-success-container">
-              {user.status === 'ACTIVE' ? 'Aktif' : user.status}
-            </span>
+        {/* Account information */}
+        <div className="bg-surface border border-outline-variant rounded-xl shadow-sm p-6">
+          <h3 className="font-headline-sm text-headline-sm text-primary mb-4">Informasi Akun</h3>
+          <div className="flex flex-col gap-4">
+            <div>
+              <p className="font-label-md text-xs text-on-surface-variant mb-1">Nama Lengkap</p>
+              <p className="font-body-md text-on-surface">{user.fullName}</p>
+            </div>
+            <div>
+              <p className="font-label-md text-xs text-on-surface-variant mb-1">Email</p>
+              <p className="font-body-md text-on-surface break-all">{user.email}</p>
+            </div>
+            <div>
+              <p className="font-label-md text-xs text-on-surface-variant mb-1">Username</p>
+              <p className="font-body-md text-on-surface">{user.username}</p>
+            </div>
+            <div>
+              <p className="font-label-md text-xs text-on-surface-variant mb-1">Status</p>
+              <span
+                className={`inline-flex items-center gap-1 px-3 py-1 rounded-full font-label-md ${
+                  user.status === 'ACTIVE'
+                    ? 'bg-success-container text-on-success-container'
+                    : 'bg-surface-container-high text-on-surface-variant'
+                }`}
+              >
+                <span className="w-1.5 h-1.5 rounded-full bg-current" />
+                {user.status === 'ACTIVE' ? 'Aktif' : user.status}
+              </span>
+            </div>
           </div>
         </div>
       </div>

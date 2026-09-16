@@ -29,7 +29,7 @@ test.describe('Phase 5C - Employee Workflow', () => {
     
     // Verify employee dashboard loads
     await expect(page).toHaveURL(/\/employee\/dashboard/);
-    await expect(page.locator('text=Dashboard Petugas Verifikasi')).toBeVisible();
+    await expect(page.locator('text=Dashboard Employee')).toBeVisible();
   });
 
   test('Employee Dashboard Shows Employee-Specific Content', async ({ page }) => {
@@ -88,14 +88,13 @@ test.describe('Phase 5C - Employee Workflow', () => {
     await page.waitForURL('**/employee/assignments');
     
     // Verify assignment list page
-    await expect(page.locator('text=Penugasan Verifikasi')).toBeVisible();
+    await expect(
+      page.locator('text=Daftar penugasan verifikasi yang ditugaskan kepada Anda.')
+    ).toBeVisible();
     
     // If assignments exist, click one
-    const assignmentButton = page.locator('button:has-text("Record A")').first();
+    const assignmentButton = page.locator('a[href^="/employee/assignments/"]').first();
     if (await assignmentButton.isVisible({ timeout: 1000 }).catch(() => false)) {
-      // Get the assignment URL before clicking
-      const href = await assignmentButton.locator('..').getAttribute('onclick');
-      
       await assignmentButton.click();
       
       // Wait for detail page to load
@@ -105,7 +104,7 @@ test.describe('Phase 5C - Employee Workflow', () => {
       await expect(page.locator('text=This page could not be found')).not.toBeVisible();
       
       // Verify detail page content
-      await expect(page.locator('text=Record A') || page.locator('text=Informasi Penugasan')).toBeVisible();
+      await expect(page.locator('text=Perbandingan Record')).toBeVisible();
     }
   });
 

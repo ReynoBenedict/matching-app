@@ -1,7 +1,7 @@
 /**
  * /superadmin/report
- * Real, database-backed operational reports for Superadmin.
- * Server-side restricted to superadmin (role ADMIN).
+ * Laporan operasional berbasis basis data.
+ * Hanya untuk Superadmin (role ADMIN).
  */
 
 import { redirect } from 'next/navigation';
@@ -16,7 +16,7 @@ export const metadata = {
 export default async function SuperadminReportPage() {
   const user = await getAuthenticatedUser();
 
-  // Only superadmin may access the operational report page.
+  // Hanya Superadmin yang boleh mengakses laporan operasional.
   if (!user || user.role !== 'ADMIN') {
     redirect('/login');
   }

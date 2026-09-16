@@ -1,8 +1,7 @@
 /**
  * /superadmin/dashboard
- * Fully database-backed Superadmin dashboard.
- * Every KPI, chart series and activity row is fetched from
- * /api/superadmin/dashboard (superadmin-only). No hardcoded statistics.
+ * Dasbor Superadmin berbasis basis data. Seluruh KPI, grafik, dan aktivitas
+ * diambil dari /api/superadmin/dashboard.
  */
 
 'use client';
@@ -62,7 +61,7 @@ export default function SuperadminDashboardPage() {
   const [refreshing, setRefreshing] = useState(false);
   const [error, setError] = useState<string | null>(null);
 
-  // Pure fetcher — performs no state updates, so it is safe to await anywhere.
+  // Pengambil data murni tanpa perubahan state.
   const fetchDashboard = useCallback(async (): Promise<SuperadminDashboardData> => {
     const response = await fetch('/api/superadmin/dashboard');
     if (response.status === 401 || response.status === 403) {
@@ -138,7 +137,7 @@ export default function SuperadminDashboardPage() {
   const header = (
     <div className="mb-8 flex flex-wrap justify-between items-end gap-4">
       <div>
-        <h2 className="font-headline-lg text-headline-lg text-primary mb-1">
+        <h2 className="font-headline-lg-mobile md:font-headline-lg text-headline-lg-mobile md:text-headline-lg text-primary mb-1">
           Dashboard Superadmin
         </h2>
         <p className="font-body-md text-on-surface-variant">
@@ -303,7 +302,7 @@ export default function SuperadminDashboardPage() {
 
         {/* Bar Chart — real audit activity per month */}
         <div className="bg-surface border border-outline-variant rounded-xl shadow-sm p-6 lg:col-span-2">
-          <h3 className="font-headline-sm text-primary mb-4">Aktivitas Sistem (per Bulan)</h3>
+          <h3 className="font-headline-sm text-headline-sm text-primary mb-4">Aktivitas Sistem (per Bulan)</h3>
 
           {monthlyActivity.length === 0 ? (
             <div className="h-64 w-full bg-surface-container-low rounded-lg border border-outline-variant/50 flex flex-col items-center justify-center">
@@ -351,7 +350,7 @@ export default function SuperadminDashboardPage() {
 
         {/* Donut Chart — real verification status */}
         <div className="bg-surface border border-outline-variant rounded-xl shadow-sm p-6">
-          <h3 className="font-headline-sm text-primary mb-4">Status Verifikasi Kandidat</h3>
+          <h3 className="font-headline-sm text-headline-sm text-primary mb-4">Status Verifikasi Kandidat</h3>
 
           {!hasCandidates ? (
             <div className="h-64 w-full flex flex-col items-center justify-center gap-2">
@@ -368,7 +367,7 @@ export default function SuperadminDashboardPage() {
               <div className="relative flex items-center justify-center">
                 <div className="w-48 h-48 rounded-full" style={{ background: donutGradient }} />
                 <div className="absolute w-32 h-32 bg-surface rounded-full flex flex-col items-center justify-center">
-                  <span className="font-headline-sm text-primary">{formatNumber(totalCandidates)}</span>
+                  <span className="font-headline-sm text-headline-sm text-primary">{formatNumber(totalCandidates)}</span>
                   <span className="font-label-md text-xs text-on-surface-variant">Total Kandidat</span>
                 </div>
               </div>
@@ -394,7 +393,7 @@ export default function SuperadminDashboardPage() {
       {/* ── Recent Activity ───────────────────────────────────────── */}
       <div className="bg-surface border border-outline-variant rounded-xl shadow-sm overflow-hidden mb-8">
         <div className="px-6 py-4 border-b border-outline-variant flex justify-between items-center bg-surface-container-lowest">
-          <h3 className="font-headline-sm text-primary">Aktivitas Terbaru</h3>
+          <h3 className="font-headline-sm text-headline-sm text-primary">Aktivitas Terbaru</h3>
           <span className="text-on-surface-variant font-label-md text-xs">
             Sumber: log audit (tabel audit_logs)
           </span>
@@ -448,30 +447,6 @@ export default function SuperadminDashboardPage() {
             </table>
           </div>
         )}
-      </div>
-
-      {/* ── Info ──────────────────────────────────────────────────── */}
-      <div className="bg-surface-container rounded-lg border border-outline p-6">
-        <div className="flex items-start gap-4">
-          <span className="material-symbols-outlined text-primary">info</span>
-          <div>
-            <h3 className="font-label-lg text-label-lg text-on-surface font-semibold mb-2">
-              Tentang Dashboard Superadmin
-            </h3>
-            <p className="text-on-surface-variant font-body-md">
-              Seluruh angka dan aktivitas pada halaman ini diambil langsung dari basis data
-              (dataset, record, pengguna, penugasan, verifikasi, dan log audit), sehingga selalu
-              konsisten dengan halaman Monitoring Progres, Hasil Matching, Riwayat Proses,
-              Penugasan, dan Manajemen Dataset.
-            </p>
-            <p className="text-on-surface-variant font-body-md mt-2">
-              Riwayat proses pencocokan belum dipersistenkan sebagai tabel tersendiri — pencocokan
-              berjalan sebagai job di memori. Karena itu halaman ini tidak menampilkan kartu
-              &quot;proses berjalan&quot; maupun riwayat proses historis; aktivitas yang benar-benar
-              tercatat ditampilkan melalui log audit.
-            </p>
-          </div>
-        </div>
       </div>
 
     </SuperadminLayout>

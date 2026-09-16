@@ -121,7 +121,7 @@ function PendingContent() {
                 </div>
               </div>
               <div className="flex items-start gap-2">
-                <span className="material-symbols-outlined text-[#f59e0b] flex-shrink-0 mt-0.5">
+                <span className="material-symbols-outlined text-warning flex-shrink-0 mt-0.5">
                   hourglass_empty
                 </span>
                 <div>

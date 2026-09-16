@@ -1,7 +1,7 @@
 /**
  * /superadmin/assignments
- * Superadmin Assignment UI for Phase 5B
- * Wraps AssignmentContent with Suspense for Next.js pre-rendering
+ * Halaman manajemen penugasan Superadmin.
+ * Membungkus AssignmentContent dengan Suspense.
  */
 
 import { Suspense } from 'react';

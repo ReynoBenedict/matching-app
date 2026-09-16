@@ -1,7 +1,6 @@
 /**
- * ReportContent - shared Laporan UI for Superadmin and Kepala BPS (read-only).
- * Every figure comes from /api/reports/summary, which aggregates the real
- * database. No mock data and no hardcoded report values.
+ * Tampilan Laporan bersama untuk Superadmin dan Kepala BPS (hanya-baca).
+ * Seluruh angka berasal dari /api/reports/summary.
  */
 
 'use client';
@@ -46,7 +45,7 @@ export function ReportContent({ backHref }: { backHref: string }) {
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState<string | null>(null);
 
-  // Pure fetcher — performs no state updates, so it is safe to await anywhere.
+  // Pengambil data murni tanpa perubahan state.
   const fetchReport = useCallback(
     async (reportType: ReportTypeKey, fromDate: string, toDate: string): Promise<ReportResult> => {
       const params = new URLSearchParams({ type: reportType });
@@ -105,16 +104,16 @@ export function ReportContent({ backHref }: { backHref: string }) {
       {/* Back navigation */}
       <Link
         href={backHref}
-        className="inline-flex items-center gap-sm text-secondary font-label-md hover:underline"
+        className="inline-flex items-center gap-2 text-primary font-label-md hover:underline"
       >
-        <span className="material-symbols-outlined" style={{ fontSize: '18px' }}>arrow_back</span>
+        <span className="material-symbols-outlined" style={{ fontSize: '20px' }}>arrow_back</span>
         Kembali ke Dashboard
       </Link>
 
       {/* Header */}
       <div className="flex flex-wrap justify-between items-end gap-md">
         <div className="flex flex-col gap-xs">
-          <h1 className="font-headline-lg text-headline-lg font-bold text-on-surface">Laporan</h1>
+          <h1 className="font-headline-lg-mobile md:font-headline-lg text-headline-lg-mobile md:text-headline-lg font-bold text-on-surface">Laporan</h1>
           <p className="text-on-surface-variant font-body-md text-body-md">
             Ringkasan laporan berdasarkan data nyata pada basis data sistem.
           </p>
@@ -122,7 +121,7 @@ export function ReportContent({ backHref }: { backHref: string }) {
         <button
           onClick={handleRefresh}
           disabled={loading}
-          className="px-md py-sm bg-surface border border-outline text-primary rounded-lg font-label-md hover:bg-surface-container-low transition-colors flex items-center gap-sm disabled:opacity-60 disabled:cursor-not-allowed"
+          className="px-md py-sm bg-surface border border-outline-variant text-primary rounded-lg font-label-md hover:bg-surface-container-low transition-colors flex items-center gap-sm disabled:opacity-60 disabled:cursor-not-allowed"
         >
           <span className={`material-symbols-outlined ${loading ? 'animate-spin' : ''}`} style={{ fontSize: '20px' }}>
             refresh
@@ -132,8 +131,8 @@ export function ReportContent({ backHref }: { backHref: string }) {
       </div>
 
       {/* Configuration */}
-      <div className="bg-surface rounded-lg border border-outline p-lg">
-        <h2 className="font-headline-md text-headline-md font-bold text-on-surface mb-md">Jenis Laporan</h2>
+      <div className="bg-surface rounded-xl border border-outline-variant p-lg">
+        <h2 className="font-headline-md text-headline-md font-bold text-primary mb-md">Jenis Laporan</h2>
 
         <div className="grid grid-cols-1 md:grid-cols-3 gap-md mb-lg">
           {REPORT_TYPES.map((item) => (
@@ -142,7 +141,7 @@ export function ReportContent({ backHref }: { backHref: string }) {
               className={`flex items-start gap-sm p-md rounded-lg border transition-colors cursor-pointer ${
                 type === item.key
                   ? 'border-secondary bg-surface-container-low'
-                  : 'border-outline hover:bg-surface-container-low'
+                  : 'border-outline-variant hover:bg-surface-container-low'
               }`}
             >
               <input
@@ -161,7 +160,7 @@ export function ReportContent({ backHref }: { backHref: string }) {
           ))}
         </div>
 
-        <h2 className="font-headline-md text-headline-md font-bold text-on-surface mb-sm">Rentang Tanggal (opsional)</h2>
+        <h2 className="font-headline-md text-headline-md font-bold text-primary mb-sm">Rentang Tanggal (opsional)</h2>
         <p className="font-body-sm text-body-sm text-on-surface-variant mb-md">
           Rentang hanya memengaruhi metrik aktivitas sistem. Kosongkan untuk seluruh periode.
         </p>
@@ -175,7 +174,7 @@ export function ReportContent({ backHref }: { backHref: string }) {
               type="date"
               value={from}
               onChange={(event) => setFrom(event.target.value)}
-              className="px-md py-sm border border-outline rounded-lg font-body-md text-on-surface bg-surface"
+              className="px-md py-sm border border-outline-variant rounded-lg font-body-md text-on-surface bg-surface"
             />
           </div>
           <div className="flex flex-col gap-xs">
@@ -187,7 +186,7 @@ export function ReportContent({ backHref }: { backHref: string }) {
               type="date"
               value={to}
               onChange={(event) => setTo(event.target.value)}
-              className="px-md py-sm border border-outline rounded-lg font-body-md text-on-surface bg-surface"
+              className="px-md py-sm border border-outline-variant rounded-lg font-body-md text-on-surface bg-surface"
             />
           </div>
         </div>
@@ -216,7 +215,7 @@ export function ReportContent({ backHref }: { backHref: string }) {
         !error && (
           <>
             {/* Report header */}
-            <div className="bg-surface rounded-lg border border-outline p-lg flex flex-wrap justify-between items-end gap-sm">
+            <div className="bg-surface rounded-xl border border-outline-variant p-lg flex flex-wrap justify-between items-end gap-sm">
               <div>
                 <h2 className="font-headline-lg text-headline-lg font-bold text-on-surface">{report.title}</h2>
                 <p className="text-on-surface-variant font-body-md mt-xs">{report.description}</p>
@@ -228,9 +227,9 @@ export function ReportContent({ backHref }: { backHref: string }) {
 
             {/* Sections */}
             {report.sections.map((section) => (
-              <div key={section.title} className="bg-surface rounded-lg border border-outline overflow-hidden">
-                <div className="p-lg border-b border-outline flex flex-wrap justify-between items-center gap-sm">
-                  <h3 className="font-headline-md text-headline-md font-bold text-on-surface">{section.title}</h3>
+              <div key={section.title} className="bg-surface rounded-xl border border-outline-variant overflow-hidden">
+                <div className="p-lg border-b border-outline-variant flex flex-wrap justify-between items-center gap-sm">
+                  <h3 className="font-headline-md text-headline-md font-bold text-primary">{section.title}</h3>
                   {section.note && (
                     <span className="font-label-md text-label-md text-on-surface-variant">{section.note}</span>
                   )}
@@ -239,9 +238,9 @@ export function ReportContent({ backHref }: { backHref: string }) {
                 {section.metrics && (
                   <div className="p-lg grid grid-cols-2 md:grid-cols-3 lg:grid-cols-4 gap-md">
                     {section.metrics.map((metric) => (
-                      <div key={metric.label} className="bg-surface-container-low rounded-lg border border-outline p-md">
+                      <div key={metric.label} className="bg-surface-container-low rounded-lg border border-outline-variant p-md">
                         <p className="font-label-md text-label-md text-on-surface-variant">{metric.label}</p>
-                        <p className="font-headline-md text-headline-md font-bold text-on-surface mt-xs">{metric.value}</p>
+                        <p className="font-headline-md text-headline-md font-bold text-primary mt-xs">{metric.value}</p>
                         {metric.hint && (
                           <p className="font-label-md text-label-md text-on-surface-variant mt-xs">{metric.hint}</p>
                         )}
@@ -291,22 +290,6 @@ export function ReportContent({ backHref }: { backHref: string }) {
               </div>
             ))}
 
-            {/* Info */}
-            <div className="bg-surface-container rounded-lg border border-outline p-lg">
-              <div className="flex items-start gap-md">
-                <span className="material-symbols-outlined text-primary">info</span>
-                <div>
-                  <h3 className="font-label-lg text-label-lg text-on-surface font-semibold mb-sm">
-                    Tentang Halaman Laporan
-                  </h3>
-                  <p className="text-on-surface-variant font-body-md">
-                    Seluruh angka pada laporan ini dihitung langsung dari basis data (dataset, record, penugasan,
-                    hasil verifikasi, pegawai, dan log audit). Metrik yang tidak dapat dihitung dari data yang ada
-                    tidak ditampilkan.
-                  </p>
-                </div>
-              </div>
-            </div>
           </>
         )
       )}

@@ -134,8 +134,8 @@ function DatasetsContent() {
           Tambah Dataset
         </Link>
         <div>
-          <h2 className="font-headline-lg-mobile md:font-headline-lg text-headline-lg-mobile md:text-headline-lg text-on-surface mb-xs">
-            Dataset Management
+          <h2 className="font-headline-lg-mobile md:font-headline-lg text-headline-lg-mobile md:text-headline-lg text-primary mb-xs">
+            Manajemen Dataset
           </h2>
           <p className="font-body-md text-body-md text-on-surface-variant">
             Kelola data master (penduduk, dtks, p3ke) untuk keperluan pencocokan.
@@ -167,7 +167,7 @@ function DatasetsContent() {
           <p className="font-label-md text-label-md text-on-surface-variant mb-sm uppercase tracking-wider relative z-10">Total Datasets</p>
           <div className="flex items-end gap-sm relative z-10">
             <span className="font-headline-lg text-headline-lg text-primary">{datasets.length}</span>
-            <span className="font-body-sm text-body-sm text-on-surface-variant mb-1">Files</span>
+            <span className="font-body-sm text-body-sm text-on-surface-variant mb-1">Dataset</span>
           </div>
         </div>
 
@@ -243,8 +243,8 @@ function DatasetsContent() {
         {/* Table Content */}
         {loading ? (
           <div className="p-xl text-center text-on-surface-variant">
-            <span className="material-symbols-outlined text-[40px] animate-spin inline-block">hourglass_empty</span>
-            <p className="font-body-md mt-sm">Memuat dataset...</p>
+            <span className="material-symbols-outlined text-[40px] text-primary animate-spin inline-block">progress_activity</span>
+            <p className="font-body-lg mt-sm">Memuat dataset...</p>
           </div>
         ) : datasets.length === 0 ? (
           <div className="p-xl text-center text-on-surface-variant">
@@ -266,14 +266,14 @@ function DatasetsContent() {
             <table className="w-full text-left border-collapse min-w-[800px]">
               <thead>
                 <tr className="bg-surface-container-highest border-b border-outline-variant">
-                  <th className="p-md font-label-md text-label-md text-on-surface sticky top-0 z-10 whitespace-nowrap">Dataset Name</th>
-                  <th className="p-md font-label-md text-label-md text-on-surface sticky top-0 z-10 whitespace-nowrap">Source</th>
+                  <th className="p-md font-label-md text-label-md text-on-surface sticky top-0 z-10 whitespace-nowrap">Nama Dataset</th>
+                  <th className="p-md font-label-md text-label-md text-on-surface sticky top-0 z-10 whitespace-nowrap">Sumber</th>
                   <th className="p-md font-label-md text-label-md text-on-surface sticky top-0 z-10 whitespace-nowrap">Format</th>
-                  <th className="p-md font-label-md text-label-md text-on-surface sticky top-0 z-10 text-right whitespace-nowrap">Records</th>
-                  <th className="p-md font-label-md text-label-md text-on-surface sticky top-0 z-10 text-center whitespace-nowrap">Cols</th>
-                  <th className="p-md font-label-md text-label-md text-on-surface sticky top-0 z-10 whitespace-nowrap">Upload Date</th>
+                  <th className="p-md font-label-md text-label-md text-on-surface sticky top-0 z-10 text-right whitespace-nowrap">Baris</th>
+                  <th className="p-md font-label-md text-label-md text-on-surface sticky top-0 z-10 text-center whitespace-nowrap">Kolom</th>
+                  <th className="p-md font-label-md text-label-md text-on-surface sticky top-0 z-10 whitespace-nowrap">Tanggal Unggah</th>
                   <th className="p-md font-label-md text-label-md text-on-surface sticky top-0 z-10 text-center whitespace-nowrap">Status</th>
-                  <th className="p-md font-label-md text-label-md text-on-surface sticky top-0 z-10 text-right whitespace-nowrap">Actions</th>
+                  <th className="p-md font-label-md text-label-md text-on-surface sticky top-0 z-10 text-right whitespace-nowrap">Aksi</th>
                 </tr>
               </thead>
               <tbody className="font-data-tabular text-data-tabular">
@@ -375,7 +375,7 @@ function DatasetsContent() {
 
 export default function DatasetsPageContent() {
   return (
-    <Suspense fallback={<div className="p-lg text-center">Loading...</div>}>
+    <Suspense fallback={<div className="p-lg text-center text-on-surface-variant">Memuat...</div>}>
       <DatasetsContent />
     </Suspense>
   );

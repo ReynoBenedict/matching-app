@@ -175,22 +175,19 @@ export default function RequestDetailPage() {
         {/* Back Button */}
         <Link
           href="/superadmin/registration-requests"
-          className="inline-flex items-center gap-2 text-secondary font-semibold text-sm mb-6 hover:underline"
+          className="inline-flex items-center gap-2 text-primary font-label-md hover:underline mb-6"
         >
-          <span className="material-symbols-outlined text-[18px]">arrow_back</span>
-          Kembali
+          <span className="material-symbols-outlined" style={{ fontSize: '20px' }}>arrow_back</span>
+          Kembali ke Manajemen Pengguna
         </Link>
 
         {/* Loading */}
         {loading && (
           <div className="text-center pt-16">
-            <span
-              className="material-symbols-outlined text-[40px] inline-block"
-              style={{ animation: 'spin 2s linear infinite' }}
-            >
-              hourglass_empty
+            <span className="material-symbols-outlined text-[40px] text-primary inline-block animate-spin">
+              progress_activity
             </span>
-            <p className="mt-4 text-on-surface-variant text-sm">Memuat...</p>
+            <p className="mt-4 text-on-surface-variant font-body-lg">Memuat...</p>
           </div>
         )}
 

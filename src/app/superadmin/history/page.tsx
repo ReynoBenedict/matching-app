@@ -1,7 +1,7 @@
 /**
  * /superadmin/history
- * Real, database-backed Riwayat Proses (audit_logs).
- * Server-side restricted to superadmin (role ADMIN).
+ * Riwayat Proses berbasis tabel audit_logs.
+ * Hanya untuk Superadmin (role ADMIN).
  */
 
 import { redirect } from 'next/navigation';
@@ -16,7 +16,7 @@ export const metadata = {
 export default async function HistoryPage() {
   const user = await getAuthenticatedUser();
 
-  // Only superadmin may access the history page.
+  // Hanya Superadmin yang boleh mengakses halaman riwayat.
   if (!user || user.role !== 'ADMIN') {
     redirect('/login');
   }

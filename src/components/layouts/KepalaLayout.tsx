@@ -1,5 +1,6 @@
 'use client';
 
+import { useEffect, useState } from 'react';
 import { usePathname, useRouter } from 'next/navigation';
 import Link from 'next/link';
 
@@ -14,12 +15,21 @@ const KEPALA_NAV_ITEMS = [
   { href: '/kepala-bps/report', icon: 'description', label: 'Laporan' },
 ];
 
-// Future-phase nav items shown visually but non-interactive
+// Menu fase berikutnya, ditampilkan tapi belum aktif
 const FUTURE_NAV_ITEMS: Array<{ icon: string; label: string }> = [];
 
 export function KepalaLayout({ children, pageTitle }: KepalaLayoutProps) {
   const router = useRouter();
   const pathname = usePathname();
+  const [sidebarOpen, setSidebarOpen] = useState(false);
+
+  // Cegah halaman di belakang drawer ikut bergulir.
+  useEffect(() => {
+    document.body.style.overflow = sidebarOpen ? 'hidden' : '';
+    return () => {
+      document.body.style.overflow = '';
+    };
+  }, [sidebarOpen]);
 
   const handleLogout = async () => {
     await fetch('/api/auth/logout', { method: 'POST' });
@@ -42,10 +52,14 @@ export function KepalaLayout({ children, pageTitle }: KepalaLayoutProps) {
 
   return (
     <div className="flex min-h-screen bg-background font-body-md text-on-background">
-      {/* -- Kepala BPS Sidebar ----------------------------------- */}
-      <aside className="w-[260px] h-screen fixed left-0 top-0 bg-primary border-r border-outline-variant shadow-sm flex flex-col py-xl z-20">
+      {/* Sidebar */}
+      <aside
+        className={`w-[260px] h-screen fixed left-0 top-0 bg-primary border-r border-outline-variant shadow-sm flex flex-col py-xl z-50 md:z-20 transition-transform duration-200 ease-in-out ${
+          sidebarOpen ? 'translate-x-0' : '-translate-x-full'
+        } md:translate-x-0`}
+      >
 
-        {/* Logo / Title */}
+        {/* Logo dan judul */}
         <div className="px-md mb-xl flex flex-col gap-sm">
           <div className="flex items-center gap-sm">
             <div className="w-8 h-8 rounded-full bg-surface-container-low flex items-center justify-center flex-shrink-0">
@@ -63,12 +77,13 @@ export function KepalaLayout({ children, pageTitle }: KepalaLayoutProps) {
           <p className="text-on-primary-fixed-variant font-label-md text-label-md">Kota Malang</p>
         </div>
 
-        {/* Kepala Navigation - EXECUTIVE-LEVEL ITEMS ONLY (read-only) */}
+        {/* Navigasi Kepala BPS */}
         <nav className="flex-1 flex flex-col gap-base mt-md overflow-y-auto">
           {KEPALA_NAV_ITEMS.map(({ href, icon, label }) => (
             <Link
               key={href}
               href={href}
+              onClick={() => setSidebarOpen(false)}
               className={`flex items-center gap-md px-md py-sm transition-all duration-200 ease-in-out ${
                 isActive(href)
                   ? 'bg-primary-container text-on-primary-container border-l-4 border-secondary-container'
@@ -80,7 +95,7 @@ export function KepalaLayout({ children, pageTitle }: KepalaLayoutProps) {
             </Link>
           ))}
 
-          {/* Future-phase nav items -- visible per Stitch for execs only, non-interactive */}
+          {/* Menu fase berikutnya (belum aktif) */}
           {FUTURE_NAV_ITEMS.map(({ icon, label }) => (
             <span
               key={label}
@@ -93,7 +108,7 @@ export function KepalaLayout({ children, pageTitle }: KepalaLayoutProps) {
           ))}
         </nav>
 
-        {/* Footer nav */}
+        {/* Navigasi bawah */}
         <div className="mt-auto px-md py-md border-t border-on-primary-fixed-variant flex flex-col gap-sm">
           <span
             title="Bantuan belum tersedia"
@@ -112,18 +127,36 @@ export function KepalaLayout({ children, pageTitle }: KepalaLayoutProps) {
         </div>
       </aside>
 
-      {/* -- Content column --------------------------------------- */}
-      <div className="ml-[260px] flex-1 flex flex-col min-h-screen">
+      {/* Latar drawer mobile */}
+      {sidebarOpen && (
+        <div
+          className="fixed inset-0 bg-black/50 z-40 md:hidden"
+          onClick={() => setSidebarOpen(false)}
+          aria-hidden="true"
+        />
+      )}
 
-        {/* Top Header */}
-        <header className="fixed top-0 left-[260px] right-0 h-16 bg-surface border-b border-outline-variant z-10 font-label-md flex justify-between items-center px-lg" style={{ width: 'calc(100% - 260px)' }}>
-          <div className="flex items-center gap-xl h-full">
-            <span className="font-headline-sm text-headline-sm font-bold text-primary">
+      {/* Kolom konten */}
+      <div className="md:ml-[260px] flex-1 flex flex-col min-h-screen">
+
+        {/* Header atas */}
+        <header className="fixed top-0 left-0 md:left-[260px] right-0 h-16 bg-surface border-b border-outline-variant z-10 font-label-md flex justify-between items-center gap-md px-4 md:px-lg">
+          <div className="flex items-center gap-md md:gap-xl h-full min-w-0">
+            <button
+              type="button"
+              onClick={() => setSidebarOpen(true)}
+              className="md:hidden p-2 -ml-2 text-primary hover:bg-surface-container-low rounded-lg transition-colors flex-shrink-0"
+              aria-label="Buka menu navigasi"
+              aria-expanded={sidebarOpen}
+            >
+              <span className="material-symbols-outlined">menu</span>
+            </button>
+            <span className="font-headline-sm text-headline-sm font-bold text-primary truncate">
               {pageTitle || 'Sistem Pencocokan Data BPS'}
             </span>
           </div>
           <div className="flex items-center gap-md">
-            <div className="flex items-center gap-sm mr-md">
+            <div className="hidden lg:flex items-center gap-sm mr-md">
               <span className="material-symbols-outlined text-outline">search</span>
               <input
                 className="bg-transparent border-none focus:ring-0 text-body-md w-48 outline-none"
@@ -133,16 +166,16 @@ export function KepalaLayout({ children, pageTitle }: KepalaLayoutProps) {
               />
             </div>
             <div className="flex items-center gap-md border-l border-outline-variant pl-md">
-              <div className="flex flex-col items-end">
-                <span className="text-on-surface font-semibold text-sm">Kepala BPS Malang</span>
-                <span className="text-on-surface-variant text-xs">Role: KEPALA_BPS</span>
+              <div className="hidden sm:flex flex-col items-end">
+                <span className="text-on-surface font-semibold text-sm whitespace-nowrap">Kepala BPS Malang</span>
+                <span className="text-on-surface-variant text-xs whitespace-nowrap">Role: KEPALA_BPS</span>
               </div>
               <div className="flex gap-sm">
-                <button className="p-1 text-on-surface-variant hover:text-primary transition-colors rounded-full hover:bg-surface-container-low relative">
+                <button className="p-2 md:p-1 text-on-surface-variant hover:text-primary transition-colors rounded-full hover:bg-surface-container-low relative">
                   <span className="material-symbols-outlined">notifications</span>
                   <span className="absolute top-1 right-1 w-2 h-2 bg-error rounded-full"></span>
                 </button>
-                <button className="p-1 text-on-surface-variant hover:text-primary transition-colors rounded-full hover:bg-surface-container-low">
+                <button className="p-2 md:p-1 text-on-surface-variant hover:text-primary transition-colors rounded-full hover:bg-surface-container-low">
                   <span className="material-symbols-outlined">account_circle</span>
                 </button>
               </div>
@@ -150,19 +183,19 @@ export function KepalaLayout({ children, pageTitle }: KepalaLayoutProps) {
           </div>
         </header>
 
-        {/* Page content */}
-        <main className="flex-1 mt-16 p-[32px] bg-background overflow-y-auto">
+        {/* Konten halaman */}
+        <main className="flex-1 mt-16 p-4 md:p-[32px] bg-background overflow-y-auto">
           <div className="w-full max-w-[1280px] mx-auto">
             {children}
           </div>
         </main>
 
         {/* Footer */}
-        <footer className="bg-surface-container-low border-t border-outline-variant flex justify-between items-center p-md font-body-sm text-body-sm">
-          <div className="text-primary font-bold">
+        <footer className="bg-surface-container-low border-t border-outline-variant flex flex-col gap-2 sm:flex-row sm:justify-between sm:items-center p-md font-body-sm text-body-sm">
+          <div className="text-primary font-bold text-center sm:text-left">
             © 2024 Badan Pusat Statistik Kota Malang - Tim IT BPS
           </div>
-          <div className="flex gap-md">
+          <div className="flex flex-wrap justify-center gap-md sm:justify-end">
             <span className="text-on-surface-variant">Kebijakan Privasi</span>
             <span className="text-on-surface-variant">Syarat &amp; Ketentuan</span>
             <span className="text-on-surface-variant">Hubungi Kami</span>

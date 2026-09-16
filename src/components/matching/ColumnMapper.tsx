@@ -148,7 +148,7 @@ export function ColumnMapper({
 
   return (
     <div className="space-y-4">
-      <h3 className="font-headline-sm text-primary">Langkah 3: Petakan Kolom</h3>
+      <h3 className="font-headline-sm text-headline-sm text-primary">Langkah 3: Petakan Kolom</h3>
 
       {mappings.length === 0 ? (
         <div className="text-on-surface-variant text-sm bg-surface-container-low p-4 rounded-lg">

@@ -1,7 +1,6 @@
 ﻿/**
- * MonitoringContent - Superadmin monitoring dashboard
- * Phase 6A: All figures are aggregated from the database via
- * /api/superadmin/monitoring. No mock or hardcoded statistics.
+ * Dasbor pemantauan Superadmin. Seluruh angka diagregasi dari basis data
+ * melalui /api/superadmin/monitoring.
  */
 
 'use client';
@@ -21,9 +20,7 @@ function formatNumber(value: number): string {
   return value.toLocaleString('id-ID');
 }
 
-// ============================================================================
-// Helper Components
-// ============================================================================
+// Komponen pembantu
 
 function StatCard({ label, value, icon, tone, subtext }: {
   label: string;
@@ -103,9 +100,7 @@ function EmployeeStatusBadge({ totalAssigned, completionRate }: {
   );
 }
 
-// ============================================================================
-// Chart Components
-// ============================================================================
+// Komponen grafik
 
 function BarChart({ data, height = 200 }: { data: { label: string; value: number }[]; height?: number }) {
   const maxValue = Math.max(...data.map((item) => item.value), 1);
@@ -181,16 +176,14 @@ function DonutChart({ data, size = 160 }: {
         className="absolute rounded-full bg-surface flex flex-col items-center justify-center"
         style={{ width: innerSize, height: innerSize }}
       >
-        <span className="font-headline-sm text-primary">{formatNumber(total)}</span>
+        <span className="font-headline-sm text-headline-sm text-primary">{formatNumber(total)}</span>
         <span className="font-label-md text-xs text-on-surface-variant">Total</span>
       </div>
     </div>
   );
 }
 
-// ============================================================================
-// Assignment Progress Tab
-// ============================================================================
+// Tab progres penugasan
 
 function AssignmentProgressSection({ stats, employees }: {
   stats: AssignmentMonitoringStats;
@@ -217,8 +210,8 @@ function AssignmentProgressSection({ stats, employees }: {
       {/* Overall Progress */}
       <div className="bg-surface border border-outline-variant rounded-xl p-6">
         <div className="flex items-center justify-between mb-3">
-          <h3 className="font-headline-sm text-primary">Progres Keseluruhan</h3>
-          <span className="font-headline-sm text-primary">{stats.overallProgress}%</span>
+          <h3 className="font-headline-sm text-headline-sm text-primary">Progres Keseluruhan</h3>
+          <span className="font-headline-sm text-headline-sm text-primary">{stats.overallProgress}%</span>
         </div>
         <div className="w-full bg-surface-container-highest rounded-full h-3">
           <div
@@ -235,7 +228,7 @@ function AssignmentProgressSection({ stats, employees }: {
       <div className="grid grid-cols-1 lg:grid-cols-2 gap-6">
         {/* Donut Chart - Assignment Distribution */}
         <div className="bg-surface border border-outline-variant rounded-xl p-6">
-          <h3 className="font-headline-sm text-primary mb-4">Distribusi Penugasan</h3>
+          <h3 className="font-headline-sm text-headline-sm text-primary mb-4">Distribusi Penugasan</h3>
           <div className="flex items-center justify-center gap-8">
             <DonutChart data={distribution} />
             <div className="flex flex-col gap-2">
@@ -254,7 +247,7 @@ function AssignmentProgressSection({ stats, employees }: {
 
         {/* Bar Chart - Employee Performance */}
         <div className="bg-surface border border-outline-variant rounded-xl p-6">
-          <h3 className="font-headline-sm text-primary mb-4">Kinerja Petugas</h3>
+          <h3 className="font-headline-sm text-headline-sm text-primary mb-4">Kinerja Petugas</h3>
           {employees.length === 0 ? (
             <div className="h-[180px] flex flex-col items-center justify-center text-on-surface-variant">
               <span className="material-symbols-outlined text-[40px] opacity-30">bar_chart</span>
@@ -280,9 +273,7 @@ function AssignmentProgressSection({ stats, employees }: {
   );
 }
 
-// ============================================================================
-// Main Content Component
-// ============================================================================
+// Komponen utama
 
 export function MonitoringContent() {
   const [data, setData] = useState<MonitoringDashboardData | null>(null);
@@ -291,7 +282,7 @@ export function MonitoringContent() {
   const [error, setError] = useState<string | null>(null);
   const [activeTab, setActiveTab] = useState<MonitoringTab>('penugasan');
 
-  // Pure fetcher — performs no state updates, so it is safe to await anywhere.
+  // Pengambil data murni tanpa perubahan state.
   const fetchMonitoringData = useCallback(async (): Promise<MonitoringDashboardData> => {
     const response = await fetch('/api/superadmin/monitoring');
     const payload = await response.json();
@@ -354,13 +345,11 @@ export function MonitoringContent() {
   if (loading) {
     return (
       <SuperadminLayout pageTitle="Monitoring Progres">
-        <div className="flex items-center justify-center min-h-[400px]">
-          <div className="text-center">
-            <span className="material-symbols-outlined text-[48px] text-primary inline-block animate-spin">
-              hourglass_empty
-            </span>
-            <p className="font-body-md text-on-surface-variant mt-4">Memuat data monitoring...</p>
-          </div>
+        <div className="flex flex-col items-center justify-center min-h-[400px] gap-4">
+          <span className="material-symbols-outlined text-[48px] text-primary inline-block animate-spin">
+            progress_activity
+          </span>
+          <p className="font-body-lg text-on-surface-variant">Memuat data monitoring...</p>
         </div>
       </SuperadminLayout>
     );
@@ -396,9 +385,9 @@ export function MonitoringContent() {
       {/* Back navigation */}
       <Link
         href="/superadmin/dashboard"
-        className="inline-flex items-center gap-2 text-secondary font-semibold text-sm mb-4 hover:underline"
+        className="inline-flex items-center gap-2 text-primary font-label-md hover:underline mb-4"
       >
-        <span className="material-symbols-outlined text-[18px]">arrow_back</span>
+        <span className="material-symbols-outlined" style={{ fontSize: '20px' }}>arrow_back</span>
         Kembali ke Dashboard
       </Link>
 
@@ -413,7 +402,7 @@ export function MonitoringContent() {
       {/* Page Header */}
       <div className="mb-6 flex flex-wrap justify-between items-end gap-3">
         <div>
-          <h2 className="font-headline-lg text-headline-lg text-primary mb-1">
+          <h2 className="font-headline-lg-mobile md:font-headline-lg text-headline-lg-mobile md:text-headline-lg text-primary mb-1">
             Monitoring Progres
           </h2>
           <p className="font-body-md text-on-surface-variant">
@@ -610,16 +599,16 @@ export function MonitoringContent() {
                           </div>
                         </td>
                         <td className="px-4 py-3 text-center">
-                          <span className="font-headline-sm text-on-surface">{formatNumber(employee.totalAssigned)}</span>
+                          <span className="font-headline-sm text-headline-sm text-on-surface">{formatNumber(employee.totalAssigned)}</span>
                         </td>
                         <td className="px-4 py-3 text-center">
-                          <span className="font-headline-sm text-primary">{formatNumber(employee.completed)}</span>
+                          <span className="font-headline-sm text-headline-sm text-primary">{formatNumber(employee.completed)}</span>
                         </td>
                         <td className="px-4 py-3 text-center">
-                          <span className="font-headline-sm text-warning">{formatNumber(employee.pending)}</span>
+                          <span className="font-headline-sm text-headline-sm text-warning">{formatNumber(employee.pending)}</span>
                         </td>
                         <td className="px-4 py-3 text-center">
-                          <span className="font-headline-sm text-secondary">{formatNumber(employee.inProgress)}</span>
+                          <span className="font-headline-sm text-headline-sm text-secondary">{formatNumber(employee.inProgress)}</span>
                         </td>
                         <td className="px-4 py-3">
                           <div className="flex flex-col gap-1">

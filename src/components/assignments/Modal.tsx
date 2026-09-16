@@ -9,22 +9,15 @@ interface ModalProps {
   onClose: () => void;
   children: React.ReactNode;
   footer?: React.ReactNode;
-  /** Explicit width class — do not use the named max-w-* scale (see note below). */
+  /** Lebar eksplisit berupa nilai arbitrary, mis. max-w-[560px]. */
   maxWidth?: string;
 }
 
 /**
- * Dialog shell for the assignment workflow.
- *
- * Rendered through a portal into document.body so that no ancestor stack
- * (table, flex/grid, overflow container) can constrain or clip the panel.
- *
- * NOTE: widths are passed as explicit arbitrary values (e.g. max-w-[560px]).
- * This project overrides `spacing` in tailwind.config.ts, which makes the
- * named scale collide with the spacing scale — `.max-w-2xl` resolves to
- * `max-width: 48px` here, collapsing the dialog into a thin column.
- *
- * Closes on backdrop click and on Escape.
+ * Dialog bersama untuk semua peran (penugasan, dataset, verifikasi).
+ * Dirender lewat portal ke document.body agar tidak terpotong oleh elemen induk.
+ * Gunakan lebar arbitrary: skala `spacing` kustom membuat `max-w-2xl` hanya 48px.
+ * Tutup lewat klik latar atau tombol Escape.
  */
 export function Modal({
   title,
@@ -42,7 +35,7 @@ export function Modal({
     return () => document.removeEventListener('keydown', handleKeyDown);
   }, [onClose]);
 
-  // Portals need a DOM; this dialog only mounts on user interaction anyway.
+  // Portal butuh DOM; dialog hanya dirender setelah interaksi pengguna.
   if (typeof document === 'undefined') return null;
 
   return createPortal(
@@ -51,8 +44,7 @@ export function Modal({
       onClick={onClose}
       role="presentation"
     >
-      {/* Centering wrapper — min-h-full keeps the panel vertically centered
-          while still allowing the overlay to scroll on short viewports. */}
+      {/* Pembungkus perataan tengah; overlay tetap bisa digulir di layar pendek. */}
       <div className="flex min-h-full items-center justify-center p-4">
         <div
           role="dialog"
@@ -76,7 +68,7 @@ export function Modal({
             </button>
           </div>
 
-          {/* Content */}
+          {/* Isi */}
           <div className="min-w-0 flex-1 overflow-y-auto p-lg">{children}</div>
 
           {/* Footer */}

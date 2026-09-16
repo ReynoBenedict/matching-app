@@ -10,9 +10,8 @@ import type { AssignmentCandidate, DatasetOption, Employee } from './types';
 const THRESHOLD_OPTIONS = [0.5, 0.6, 0.7, 0.8, 0.9];
 
 /**
- * Fetch matching candidates for a dataset pair.
- * Maps every column shared by both datasets — no hardcoded column list.
- * Pure: performs no state updates, so it is safe to await from an effect.
+ * Ambil kandidat pencocokan untuk sepasang dataset.
+ * Memetakan seluruh kolom yang sama pada kedua dataset.
  */
 async function fetchCandidates(
   datasetAId: number,
@@ -278,7 +277,7 @@ export function AssignmentContent() {
 
       {/* Page header */}
       <div className="mb-lg">
-        <h2 className="font-headline-lg text-headline-lg text-primary mb-xs">Manajemen Penugasan</h2>
+        <h2 className="font-headline-lg-mobile md:font-headline-lg text-headline-lg-mobile md:text-headline-lg text-primary mb-xs">Manajemen Penugasan</h2>
         <p className="font-body-md text-body-md text-on-surface-variant">
           Tinjau kandidat hasil pencocokan, lalu tugaskan satu pasangan record kepada pegawai untuk diverifikasi.
         </p>
@@ -413,10 +412,10 @@ export function AssignmentContent() {
 
         {loading ? (
           <div className="p-xl text-center text-on-surface-variant">
-            <span className="material-symbols-outlined text-[40px] inline-block animate-spin">
-              hourglass_empty
+            <span className="material-symbols-outlined text-[40px] text-primary inline-block animate-spin">
+              progress_activity
             </span>
-            <p className="font-body-md mt-sm">Memuat kandidat...</p>
+            <p className="font-body-lg mt-sm">Memuat kandidat...</p>
           </div>
         ) : candidates.length === 0 ? (
           <div className="p-xl text-center text-on-surface-variant">

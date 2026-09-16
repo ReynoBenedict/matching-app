@@ -1,7 +1,7 @@
 /**
  * /kepala-bps/report
- * Real, read-only reports for Kepala BPS.
- * Server-side restricted to the Kepala BPS role (HEAD).
+ * Laporan hanya-baca untuk Kepala BPS.
+ * Hanya untuk Kepala BPS (role HEAD).
  */
 
 import { redirect } from 'next/navigation';
@@ -16,7 +16,7 @@ export const metadata = {
 export default async function KepalaReportPage() {
   const user = await getAuthenticatedUser();
 
-  // Only Kepala BPS may access this page.
+  // Hanya Kepala BPS yang boleh mengakses halaman ini.
   if (!user || user.role !== 'HEAD') {
     redirect('/login');
   }

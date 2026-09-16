@@ -7,10 +7,12 @@
 - Dislikes automatic dummy/test-data seeding in the app; dev seeders that inject fake datasets/records should be removed or stopped. Confidence: 0.75
 - Prefers a single consistent column-name contract across the pipeline (snake_case for uploaded/domain columns); do not hardcode column lists or mix naming conventions. Confidence: 0.7
 - Internal DB fields (id, datasetId, createdAt, updatedAt) must be excluded wherever uploaded columns are exposed. Confidence: 0.7
-- For this internal BPS application, all UI text must be in Indonesian — replace English labels ("Assign", "Status", "Action", "Confirm Assignment") with Indonesian equivalents. Confidence: 0.85
+- For this internal BPS application, all UI text must be in Indonesian — replace English labels ("Assign", "Status", "Action", "Confirm Assignment") with Indonesian equivalents. Exception: established domain terms (e.g. MATCH, NON-MATCH, Employee) are kept as-is. Confidence: 0.85
 - Prefers compact, clean UI: show a concise summary table in main lists and move exhaustive detail (e.g., all field-level scores) into a separate detail view instead of dumping it inline. Confidence: 0.8
 - UI must stay visually consistent with the existing application and its design tokens; polish the target page without redesigning the whole app. Confidence: 0.8
-- Wants clear back navigation ("Kembali") on detail/dialog/page flows. Confidence: 0.7
+- Wants one shared design system applied uniformly across ALL roles (Superadmin, Employee, Kepala BPS): same typography/font hierarchy, colors, spacing scale, card/table/button/badge/form styles, header/footer treatment, responsive behavior and interaction patterns. Every role must feel like part of the SAME application — no role may look more polished or visually inferior than another, and no role gets its own separate visual theme. Role differences should be limited to navigation/menu items, permissions, role-specific content and appropriate actions. Confidence: 0.85
+- Wants role/title naming consistent across the app (e.g. always "Employee", never legacy labels like "Petugas Verifikasi"). Confidence: 0.7
+- Wants clear, consistent back navigation ("Kembali") on secondary/detail/dialog/page flows. Confidence: 0.8
 - Never use mock data, hardcoded IDs, or dummy datasets — use real matching results and database data. Confidence: 0.85
 - Respect scope: don't change database architecture or the matching algorithm, preserve existing backend APIs unless a change is genuinely required, and don't modify unrelated pages/features; when the same defect exists elsewhere, flag it but leave it untouched until asked. Confidence: 0.8
 - Performs browser/UI testing himself — do not install browser automation tooling (e.g., agent-browser) or run agent browser tests unless explicitly asked, and stop such work immediately when told to. Confidence: 0.9
@@ -20,3 +22,19 @@
 - Expects the exact root cause to be diagnosed from evidence (e.g., inspecting compiled/minified output) rather than guessed, and explained in the report. Confidence: 0.7
 - Modals/dialogs should render through a fixed full-screen overlay with a centered panel (~500–600px on desktop, responsive on smaller screens), portaled out of parent table/flex/grid containers so they can't be squeezed or clipped. Confidence: 0.7
 - Acceptance requires browser-testing the real end-to-end user flow, not just API/script checks. Confidence: 0.75
+- When asking for UI/UX polish, means presentation-only: do not add new features or change underlying behavior — explicitly restates "no new features, polish only". Confidence: 0.75
+- Wants a confirmation dialog before committing irreversible actions (e.g. submitting a verification result) — keep it in place rather than allowing one-click submission. Confidence: 0.6
+- Wants item states clearly differentiated in lists/details (e.g. pending vs completed) with further actions removed or disabled once an item is completed/immutable. Confidence: 0.6
+- Desktop-first: the current laptop/desktop appearance and layout must stay unchanged; responsive behavior should only adapt at smaller viewports (tablet, mobile). Never alter desktop layout just to achieve responsiveness. Confidence: 0.85
+- Mobile/tablet expectations: stack columns/cards/tables, make buttons touch-friendly, prevent horizontal scrolling, keep important information visible, keep modals/dialogs fitting small screens, and allow horizontal scrolling for tables only when necessary. Confidence: 0.8
+- Remove self-referential "Tentang Halaman/Dashboard ..." informational boxes — page meta-text describing what a page contains is unwanted clutter. Confidence: 0.8
+- Don't replace removed content with filler; keep genuinely useful operational information, but only where it actually matters. Confidence: 0.75
+- Uses subtle accent colors only for meaningful statuses and actions; wants pages that don't feel empty or overly plain, yet stay clean and professional rather than decorative. Confidence: 0.75
+- Treats the Employee pages as the visual-quality baseline ("clearest and most balanced"); other roles should be raised to match it rather than having the baseline redesigned. Confidence: 0.65
+- Comments in source must be concise and written in Indonesian; remove agent-generated/verbose docblocks and decorative banner comments (e.g. `// ===== Section =====`), keeping only comments that are genuinely necessary. Confidence: 0.8
+- Do not add unnecessary documentation or comments — no extra docs or explanatory noise beyond what the task requires. Confidence: 0.8
+- Before deleting any file, verify it is actually referenced/required; only remove what is provably unused, keeping all tracked files recoverable (git history) and preserving Next.js routing and imports. Confidence: 0.8
+- Wants a clean repository: remove generated markdown/report files, temporary artifacts, screenshots, logs and obsolete documentation; keep only tests/scripts that are genuinely useful. Confidence: 0.8
+- Do not install packages/dependencies. Confidence: 0.75
+- Only reorganize files/folders when it clearly improves structure, and never modify functionality merely to clean up code. Confidence: 0.7
+- Verification after a change should include `git status` alongside type-check and build, and confirmation that all existing routes still compile. Confidence: 0.65

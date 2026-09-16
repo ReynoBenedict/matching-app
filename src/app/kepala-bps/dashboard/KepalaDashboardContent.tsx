@@ -1,7 +1,6 @@
 /**
- * KepalaDashboardContent - read-only executive dashboard
- * Every figure, name and activity comes from the database via
- * /api/kepala-bps/dashboard. No mock or hardcoded statistics.
+ * Dasbor eksekutif hanya-baca. Seluruh angka, nama, dan aktivitas berasal
+ * dari basis data melalui /api/kepala-bps/dashboard.
  */
 
 'use client';
@@ -34,14 +33,14 @@ function StatCard({ label, value, icon, tone, subtext }: {
   subtext?: string;
 }) {
   return (
-    <div className="bg-surface-container-low p-lg rounded-xl border border-outline shadow-sm">
+    <div className="bg-surface p-lg rounded-xl border border-outline-variant shadow-sm">
       <div className="flex items-center justify-between mb-sm text-on-surface-variant">
         <span className="font-label-md text-label-md">{label}</span>
         <span className={`material-symbols-outlined ${tone || 'text-secondary'}`} style={{ fontSize: '20px' }}>
           {icon}
         </span>
       </div>
-      <div className="font-headline-lg text-headline-lg font-bold text-on-surface">{value}</div>
+      <div className="font-headline-lg text-headline-lg font-bold text-primary">{value}</div>
       {subtext && (
         <div className="font-label-md text-label-md text-on-surface-variant mt-xs">{subtext}</div>
       )}
@@ -86,7 +85,7 @@ export function KepalaDashboardContent() {
   const [refreshing, setRefreshing] = useState(false);
   const [error, setError] = useState<string | null>(null);
 
-  // Pure fetcher — performs no state updates, so it is safe to await anywhere.
+  // Pengambil data murni tanpa perubahan state.
   const fetchDashboard = useCallback(async (): Promise<KepalaDashboardData> => {
     const response = await fetch('/api/kepala-bps/dashboard');
     const payload = await response.json();
@@ -149,7 +148,7 @@ export function KepalaDashboardContent() {
   const header = (
     <div className="mb-lg flex flex-wrap justify-between items-end gap-md">
       <div className="flex flex-col gap-xs">
-        <h2 className="font-headline-lg text-headline-lg text-primary">Dashboard Kepala BPS</h2>
+        <h2 className="font-headline-lg-mobile md:font-headline-lg text-headline-lg-mobile md:text-headline-lg text-primary">Dashboard Kepala BPS</h2>
         <p className="font-body-md text-body-md text-on-surface-variant">
           Ringkasan kinerja sistem pencocokan data berdasarkan data terkini.
         </p>
@@ -157,7 +156,7 @@ export function KepalaDashboardContent() {
       <button
         onClick={handleRefresh}
         disabled={refreshing}
-        className="px-md py-sm bg-surface border border-outline text-primary rounded-lg font-label-md hover:bg-surface-container-low transition-colors flex items-center gap-sm disabled:opacity-60 disabled:cursor-not-allowed"
+        className="px-md py-sm bg-surface border border-outline-variant text-primary rounded-lg font-label-md hover:bg-surface-container-low transition-colors flex items-center gap-sm disabled:opacity-60 disabled:cursor-not-allowed"
       >
         <span className={`material-symbols-outlined ${refreshing ? 'animate-spin' : ''}`} style={{ fontSize: '20px' }}>
           refresh
@@ -278,9 +277,9 @@ export function KepalaDashboardContent() {
       </div>
 
       {/* Verification summary */}
-      <div className="bg-surface rounded-lg border border-outline p-lg">
+      <div className="bg-surface rounded-xl border border-outline-variant p-lg">
         <div className="flex items-center justify-between mb-md">
-          <h3 className="font-headline-md text-headline-md font-bold text-on-surface">Ringkasan Verifikasi</h3>
+          <h3 className="font-headline-md text-headline-md font-bold text-primary">Ringkasan Verifikasi</h3>
           <span className="font-label-md text-label-md text-on-surface-variant">
             Persentase MATCH dihitung dari kandidat terverifikasi
           </span>
@@ -325,8 +324,8 @@ export function KepalaDashboardContent() {
 
       {/* Monthly activity + data summary */}
       <div className="grid grid-cols-1 lg:grid-cols-3 gap-md">
-        <div className="lg:col-span-2 bg-surface rounded-lg border border-outline p-lg">
-          <h3 className="font-headline-md text-headline-md font-bold text-on-surface mb-md">
+        <div className="lg:col-span-2 bg-surface rounded-xl border border-outline-variant p-lg">
+          <h3 className="font-headline-md text-headline-md font-bold text-primary mb-md">
             Tren Aktivitas Bulanan
           </h3>
 
@@ -367,8 +366,8 @@ export function KepalaDashboardContent() {
           )}
         </div>
 
-        <div className="bg-surface rounded-lg border border-outline p-lg">
-          <h3 className="font-headline-md text-headline-md font-bold text-on-surface mb-md">Ringkasan Data</h3>
+        <div className="bg-surface rounded-xl border border-outline-variant p-lg">
+          <h3 className="font-headline-md text-headline-md font-bold text-primary mb-md">Ringkasan Data</h3>
           <div className="space-y-md">
             <div className="flex items-center justify-between">
               <span className="font-body-md text-body-md text-on-surface-variant">Total Dataset</span>
@@ -407,8 +406,8 @@ export function KepalaDashboardContent() {
       </div>
 
       {/* Recent activity */}
-      <div className="bg-surface rounded-lg border border-outline p-lg">
-        <h3 className="font-headline-md text-headline-md font-bold text-on-surface mb-md">Aktivitas Terbaru</h3>
+      <div className="bg-surface rounded-xl border border-outline-variant p-lg">
+        <h3 className="font-headline-md text-headline-md font-bold text-primary mb-md">Aktivitas Terbaru</h3>
 
         {recentActivities.length === 0 ? (
           <div className="py-3xl text-center">
@@ -445,9 +444,9 @@ export function KepalaDashboardContent() {
       </div>
 
       {/* Employee performance */}
-      <div className="bg-surface rounded-lg border border-outline overflow-hidden">
+      <div className="bg-surface rounded-xl border border-outline-variant overflow-hidden">
         <div className="p-lg border-b border-outline">
-          <h3 className="font-headline-md text-headline-md font-bold text-on-surface">Kinerja Pegawai</h3>
+          <h3 className="font-headline-md text-headline-md font-bold text-primary">Kinerja Pegawai</h3>
         </div>
 
         {activeEmployees.length === 0 ? (
@@ -478,13 +477,13 @@ export function KepalaDashboardContent() {
                       <p className="font-label-md text-label-md text-on-surface-variant">{employee.email}</p>
                     </td>
                     <td className="p-md text-center">
-                      <span className="font-headline-sm text-on-surface">{formatNumber(employee.totalAssigned)}</span>
+                      <span className="font-headline-sm text-headline-sm text-on-surface">{formatNumber(employee.totalAssigned)}</span>
                     </td>
                     <td className="p-md text-center">
-                      <span className="font-headline-sm text-primary">{formatNumber(employee.completed)}</span>
+                      <span className="font-headline-sm text-headline-sm text-primary">{formatNumber(employee.completed)}</span>
                     </td>
                     <td className="p-md text-center">
-                      <span className="font-headline-sm text-warning">{formatNumber(employee.pending)}</span>
+                      <span className="font-headline-sm text-headline-sm text-warning">{formatNumber(employee.pending)}</span>
                     </td>
                     <td className="p-md text-center">
                       <span className="font-label-md text-label-md text-on-surface">{employee.completionRate}%</span>
@@ -509,21 +508,6 @@ export function KepalaDashboardContent() {
         )}
       </div>
 
-      {/* Info */}
-      <div className="bg-surface-container rounded-lg border border-outline p-lg">
-        <div className="flex items-start gap-md">
-          <span className="material-symbols-outlined text-primary">info</span>
-          <div>
-            <h3 className="font-label-lg text-label-lg text-on-surface font-semibold mb-sm">
-              Tentang Dashboard Kepala BPS
-            </h3>
-            <p className="text-on-surface-variant font-body-md">
-              Seluruh angka, nama pegawai, dan aktivitas pada halaman ini diambil langsung dari basis data sistem
-              (penugasan, verifikasi, dataset, dan log audit). Halaman ini bersifat hanya-baca.
-            </p>
-          </div>
-        </div>
-      </div>
     </div>
   );
 }

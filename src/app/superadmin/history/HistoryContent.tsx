@@ -1,7 +1,6 @@
 /**
- * HistoryContent - Riwayat Proses (audit logs)
- * Every row and count comes from the `audit_logs` table via
- * /api/superadmin/history. No mock data.
+ * Riwayat Proses (log audit). Seluruh baris dan angka berasal dari tabel
+ * audit_logs melalui /api/superadmin/history.
  */
 
 'use client';
@@ -68,9 +67,9 @@ function formatDateTime(value: string): string {
 
 function SummaryCard({ label, value, tone }: { label: string; value: number; tone?: string }) {
   return (
-    <div className="bg-surface-container-low rounded-lg border border-outline p-lg">
+    <div className="bg-surface rounded-xl border border-outline-variant p-lg shadow-sm">
       <p className="text-on-surface-variant font-label-md text-label-md">{label}</p>
-      <p className={`font-headline-lg text-headline-lg font-bold mt-xs ${tone || 'text-on-surface'}`}>
+      <p className={`font-headline-lg text-headline-lg font-bold mt-xs ${tone || 'text-primary'}`}>
         {value.toLocaleString('id-ID')}
       </p>
     </div>
@@ -206,16 +205,16 @@ export function HistoryContent() {
       {/* Back navigation */}
       <Link
         href="/superadmin/dashboard"
-        className="inline-flex items-center gap-sm text-secondary font-label-md hover:underline"
+        className="inline-flex items-center gap-2 text-primary font-label-md hover:underline"
       >
-        <span className="material-symbols-outlined" style={{ fontSize: '18px' }}>arrow_back</span>
+        <span className="material-symbols-outlined" style={{ fontSize: '20px' }}>arrow_back</span>
         Kembali ke Dashboard
       </Link>
 
       {/* Page Header */}
       <div className="flex flex-wrap justify-between items-end gap-md">
         <div className="flex flex-col gap-xs">
-          <h1 className="font-headline-lg text-headline-lg font-bold text-on-surface">Riwayat Proses</h1>
+          <h1 className="font-headline-lg-mobile md:font-headline-lg text-headline-lg-mobile md:text-headline-lg font-bold text-on-surface">Riwayat Proses</h1>
           <p className="text-on-surface-variant font-body-md text-body-md">
             Log audit aktivitas sistem yang tercatat pada basis data.
           </p>
@@ -223,7 +222,7 @@ export function HistoryContent() {
         <button
           onClick={handleRefresh}
           disabled={refreshing}
-          className="px-md py-sm bg-surface border border-outline text-primary rounded-lg font-label-md hover:bg-surface-container-low transition-colors flex items-center gap-sm disabled:opacity-60 disabled:cursor-not-allowed"
+          className="px-md py-sm bg-surface border border-outline-variant text-primary rounded-lg font-label-md hover:bg-surface-container-low transition-colors flex items-center gap-sm disabled:opacity-60 disabled:cursor-not-allowed"
         >
           <span className={`material-symbols-outlined ${refreshing ? 'animate-spin' : ''}`} style={{ fontSize: '20px' }}>
             refresh
@@ -245,9 +244,9 @@ export function HistoryContent() {
       )}
 
       {/* Filters */}
-      <div className="bg-surface rounded-lg border border-outline p-lg">
+      <div className="bg-surface rounded-xl border border-outline-variant p-lg">
         <div className="flex items-center justify-between mb-lg">
-          <h2 className="font-headline-md text-headline-md font-bold text-on-surface">
+          <h2 className="font-headline-md text-headline-md font-bold text-primary">
             Filter dan Pencarian
           </h2>
           <button
@@ -269,7 +268,7 @@ export function HistoryContent() {
               id="filter-action"
               value={actionFilter}
               onChange={(event) => handleFilterChange(setActionFilter)(event.target.value)}
-              className="px-md py-sm border border-outline rounded-lg font-body-md text-on-surface bg-surface"
+              className="px-md py-sm border border-outline-variant rounded-lg font-body-md text-on-surface bg-surface"
             >
               <option value="ALL">Semua Aktivitas</option>
               {filterOptions.actions.map((action) => (
@@ -288,7 +287,7 @@ export function HistoryContent() {
               id="filter-user"
               value={userFilter}
               onChange={(event) => handleFilterChange(setUserFilter)(event.target.value)}
-              className="px-md py-sm border border-outline rounded-lg font-body-md text-on-surface bg-surface"
+              className="px-md py-sm border border-outline-variant rounded-lg font-body-md text-on-surface bg-surface"
             >
               <option value="ALL">Semua Pengguna</option>
               {filterOptions.users.map((user) => (
@@ -308,7 +307,7 @@ export function HistoryContent() {
               type="date"
               value={fromDate}
               onChange={(event) => handleFilterChange(setFromDate)(event.target.value)}
-              className="px-md py-sm border border-outline rounded-lg font-body-md text-on-surface bg-surface"
+              className="px-md py-sm border border-outline-variant rounded-lg font-body-md text-on-surface bg-surface"
             />
           </div>
 
@@ -321,7 +320,7 @@ export function HistoryContent() {
               type="date"
               value={toDate}
               onChange={(event) => handleFilterChange(setToDate)(event.target.value)}
-              className="px-md py-sm border border-outline rounded-lg font-body-md text-on-surface bg-surface"
+              className="px-md py-sm border border-outline-variant rounded-lg font-body-md text-on-surface bg-surface"
             />
           </div>
         </div>
@@ -362,7 +361,7 @@ export function HistoryContent() {
         </div>
       ) : (
         !error && (
-          <div className="bg-surface rounded-lg border border-outline overflow-hidden">
+          <div className="bg-surface rounded-xl border border-outline-variant overflow-hidden">
             {entries.length === 0 ? (
               <div className="py-3xl text-center">
                 <span className="material-symbols-outlined text-outline" style={{ fontSize: '48px' }}>
@@ -435,7 +434,7 @@ export function HistoryContent() {
             )}
 
             {/* Pagination */}
-            <div className="p-lg border-t border-outline bg-surface-container-low flex flex-wrap items-center justify-between gap-sm">
+            <div className="p-lg border-t border-outline-variant bg-surface-container-low flex flex-wrap items-center justify-between gap-sm">
               <span className="text-on-surface-variant font-body-md">
                 Menampilkan {rangeStart.toLocaleString('id-ID')}-{rangeEnd.toLocaleString('id-ID')} dari {pagination.total.toLocaleString('id-ID')} aktivitas
               </span>
@@ -443,7 +442,7 @@ export function HistoryContent() {
                 <button
                   onClick={() => handlePageChange(pagination.page - 1)}
                   disabled={pagination.page <= 1}
-                  className="px-md py-xs rounded-lg border border-outline text-on-surface font-label-md hover:bg-surface-container disabled:opacity-40 disabled:cursor-not-allowed"
+                  className="px-md py-xs rounded-lg border border-outline-variant text-on-surface font-label-md hover:bg-surface-container disabled:opacity-40 disabled:cursor-not-allowed"
                 >
                   Sebelumnya
                 </button>
@@ -453,7 +452,7 @@ export function HistoryContent() {
                 <button
                   onClick={() => handlePageChange(pagination.page + 1)}
                   disabled={pagination.page >= pagination.totalPages}
-                  className="px-md py-xs rounded-lg border border-outline text-on-surface font-label-md hover:bg-surface-container disabled:opacity-40 disabled:cursor-not-allowed"
+                  className="px-md py-xs rounded-lg border border-outline-variant text-on-surface font-label-md hover:bg-surface-container disabled:opacity-40 disabled:cursor-not-allowed"
                 >
                   Berikutnya
                 </button>
@@ -463,21 +462,6 @@ export function HistoryContent() {
         )
       )}
 
-      {/* Info Panel */}
-      <div className="bg-surface-container rounded-lg border border-outline p-lg">
-        <div className="flex items-start gap-md">
-          <span className="material-symbols-outlined text-primary">info</span>
-          <div>
-            <h3 className="font-label-lg text-label-lg text-on-surface font-semibold mb-sm">
-              Tentang Halaman Riwayat Proses
-            </h3>
-            <p className="text-on-surface-variant font-body-md">
-              Seluruh entri dan angka pada halaman ini diambil langsung dari tabel log audit sistem. Ringkasan di atas
-              mengikuti filter yang sedang aktif; aktivitas yang tidak pernah dicatat oleh backend akan bernilai 0.
-            </p>
-          </div>
-        </div>
-      </div>
     </div>
   );
 }

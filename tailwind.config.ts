@@ -36,6 +36,16 @@ const config: Config = {
         'tertiary-fixed': '#ffdbcb',
         'tertiary-fixed-dim': '#ffb693',
         
+        success: '#1e8e3e',
+        'on-success': '#ffffff',
+        'success-container': '#e6f4ea',
+        'on-success-container': '#0f5132',
+
+        warning: '#b26a00',
+        'on-warning': '#ffffff',
+        'warning-container': '#ffe0a3',
+        'on-warning-container': '#6b3f00',
+
         error: '#ba1a1a',
         'on-error': '#ffffff',
         'error-container': '#ffdad6',
@@ -44,6 +54,7 @@ const config: Config = {
         surface: '#f8f9ff',
         'on-surface': '#0b1c30',
         'on-surface-variant': '#424750',
+        'surface-variant': '#d3e4fe',
         'surface-bright': '#f8f9ff',
         'surface-dim': '#cbdbf5',
         'surface-container': '#e5eeff',
@@ -74,6 +85,7 @@ const config: Config = {
         'body-md': ['Public Sans'],
         'body-sm': ['Public Sans'],
         'label-md': ['Public Sans'],
+        'label-lg': ['Public Sans'],
         'data-tabular': ['Public Sans'],
       },
       fontSize: {
@@ -85,6 +97,7 @@ const config: Config = {
         'body-md': ['14px', { lineHeight: '20px', fontWeight: '400' }],
         'body-sm': ['13px', { lineHeight: '18px', fontWeight: '400' }],
         'label-md': ['12px', { lineHeight: '16px', letterSpacing: '0.05em', fontWeight: '600' }],
+        'label-lg': ['14px', { lineHeight: '20px', letterSpacing: '0.01em', fontWeight: '600' }],
         'data-tabular': ['13px', { lineHeight: '16px', fontWeight: '400' }],
       },
       spacing: {
@@ -95,6 +108,7 @@ const config: Config = {
         lg: '24px',
         xl: '32px',
         '2xl': '48px',
+        '3xl': '64px',
         'margin-mobile': '16px',
         'margin-desktop': '32px',
         gutter: '20px',

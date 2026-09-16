@@ -61,11 +61,7 @@ export default function LoginPage() {
 
   return (
     <div className="min-h-screen bg-[#f8f9ff] flex items-center justify-center p-4 font-sans text-[#0b1c30]">
-      <style>{`
-        ...
-      `}</style>
-      
-      .<main className="w-full max-w-[28rem]">
+      <main className="w-full max-w-[28rem]">
         <div className="mb-8 text-center">
           <div className="w-16 h-16 rounded-full bg-[#002b5a] flex items-center justify-center mx-auto mb-4 shadow-sm">
             <span className="material-symbols-outlined text-[32px] text-white">dataset_linked</span>

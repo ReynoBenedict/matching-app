@@ -1,9 +1,6 @@
 /**
- * MatchingResultsContent - Superadmin matching results (Phase 6B)
- * Shows ALL candidates produced by the matching process for a selected dataset
- * pair + threshold, merged with stored assignment/verification data.
- * No mock data: candidates come from the existing matching provider, dataset
- * names/records and assignment data come from the database.
+ * Hasil pencocokan Superadmin: seluruh kandidat untuk pasangan dataset dan
+ * threshold terpilih, digabung dengan data penugasan/verifikasi tersimpan.
  */
 
 'use client';
@@ -64,7 +61,7 @@ function formatDateTime(value: string | null): string {
   });
 }
 
-/** Pure fetchers — no state updates, safe to await anywhere. */
+/** Pengambil data murni tanpa perubahan state. */
 async function fetchReadyDatasets(): Promise<DatasetOption[]> {
   const response = await fetch('/api/datasets?status=READY&limit=100');
   const payload = await response.json();
@@ -113,14 +110,14 @@ function StatCard({ label, value, icon, tone, subtext }: {
   subtext?: string;
 }) {
   return (
-    <div className="bg-surface-container-low p-lg rounded-xl border border-outline shadow-sm">
+    <div className="bg-surface p-lg rounded-xl border border-outline-variant shadow-sm">
       <div className="flex items-center justify-between mb-sm text-on-surface-variant">
         <span className="font-label-md text-label-md">{label}</span>
         <span className={`material-symbols-outlined ${tone || 'text-secondary'}`} style={{ fontSize: '20px' }}>
           {icon}
         </span>
       </div>
-      <div className="font-headline-lg text-headline-lg font-bold text-on-surface">{value}</div>
+      <div className="font-headline-lg text-headline-lg font-bold text-primary">{value}</div>
       {subtext && (
         <div className="font-label-md text-label-md text-on-surface-variant mt-xs">{subtext}</div>
       )}
@@ -361,16 +358,16 @@ export function MatchingResultsContent() {
       {/* Back navigation */}
       <Link
         href="/superadmin/dashboard"
-        className="inline-flex items-center gap-sm text-secondary font-label-md hover:underline"
+        className="inline-flex items-center gap-2 text-primary font-label-md hover:underline"
       >
-        <span className="material-symbols-outlined" style={{ fontSize: '18px' }}>arrow_back</span>
+        <span className="material-symbols-outlined" style={{ fontSize: '20px' }}>arrow_back</span>
         Kembali ke Dashboard
       </Link>
 
       {/* Page Header */}
       <div className="flex flex-wrap justify-between items-end gap-md">
         <div className="flex flex-col gap-xs">
-          <h1 className="font-headline-lg text-headline-lg font-bold text-on-surface">Hasil Matching</h1>
+          <h1 className="font-headline-lg-mobile md:font-headline-lg text-headline-lg-mobile md:text-headline-lg font-bold text-on-surface">Hasil Matching</h1>
           <p className="text-on-surface-variant font-body-md text-body-md">
             Seluruh kandidat hasil pencocokan untuk pasangan dataset yang dipilih, beserta status penugasan dan hasil verifikasinya.
           </p>
@@ -378,7 +375,7 @@ export function MatchingResultsContent() {
         <button
           onClick={handleRefresh}
           disabled={refreshing || !hasDatasetPair}
-          className="px-md py-sm bg-surface border border-outline text-primary rounded-lg font-label-md hover:bg-surface-container-low transition-colors flex items-center gap-sm disabled:opacity-60 disabled:cursor-not-allowed"
+          className="px-md py-sm bg-surface border border-outline-variant text-primary rounded-lg font-label-md hover:bg-surface-container-low transition-colors flex items-center gap-sm disabled:opacity-60 disabled:cursor-not-allowed"
         >
           <span className={`material-symbols-outlined ${refreshing ? 'animate-spin' : ''}`} style={{ fontSize: '20px' }}>
             refresh
@@ -388,12 +385,12 @@ export function MatchingResultsContent() {
       </div>
 
       {/* Matching source */}
-      <div className="bg-surface rounded-lg border border-outline p-lg">
+      <div className="bg-surface rounded-xl border border-outline-variant p-lg">
         <div className="flex items-center gap-sm mb-md">
           <span className="material-symbols-outlined text-secondary" style={{ fontSize: '20px' }}>
             filter_alt
           </span>
-          <h3 className="font-headline-md text-headline-md font-bold text-on-surface">Sumber Pencocokan</h3>
+          <h3 className="font-headline-md text-headline-md font-bold text-primary">Sumber Pencocokan</h3>
         </div>
 
         {datasetsLoading ? (
@@ -402,7 +399,7 @@ export function MatchingResultsContent() {
             Memuat dataset...
           </div>
         ) : !hasDatasetPair ? (
-          <div className="bg-surface-container-low text-on-surface-variant p-md rounded-lg border border-outline text-body-md flex items-start gap-sm">
+          <div className="bg-surface-container-low text-on-surface-variant p-md rounded-lg border border-outline-variant text-body-md flex items-start gap-sm">
             <span className="material-symbols-outlined flex-shrink-0" style={{ fontSize: '20px' }}>info</span>
             Diperlukan minimal 2 dataset berstatus READY untuk menampilkan hasil pencocokan.
           </div>
@@ -416,7 +413,7 @@ export function MatchingResultsContent() {
                 id="dataset-a"
                 value={datasetAId ?? ''}
                 onChange={(event) => handleSelectDatasetA(Number(event.target.value))}
-                className="w-full px-md py-sm rounded-lg border border-outline bg-surface text-on-surface text-body-md focus:outline-none focus:ring-2 focus:ring-secondary-container"
+                className="w-full px-md py-sm rounded-lg border border-outline-variant bg-surface text-on-surface text-body-md focus:outline-none focus:ring-2 focus:ring-secondary-container"
               >
                 {datasets.map((dataset) => (
                   <option key={dataset.id} value={dataset.id}>
@@ -433,7 +430,7 @@ export function MatchingResultsContent() {
                 id="dataset-b"
                 value={datasetBId ?? ''}
                 onChange={(event) => handleSelectDatasetB(Number(event.target.value))}
-                className="w-full px-md py-sm rounded-lg border border-outline bg-surface text-on-surface text-body-md focus:outline-none focus:ring-2 focus:ring-secondary-container"
+                className="w-full px-md py-sm rounded-lg border border-outline-variant bg-surface text-on-surface text-body-md focus:outline-none focus:ring-2 focus:ring-secondary-container"
               >
                 {datasets.map((dataset) => (
                   <option key={dataset.id} value={dataset.id}>
@@ -450,7 +447,7 @@ export function MatchingResultsContent() {
                 id="threshold"
                 value={threshold}
                 onChange={(event) => handleSelectThreshold(Number(event.target.value))}
-                className="w-full px-md py-sm rounded-lg border border-outline bg-surface text-on-surface text-body-md focus:outline-none focus:ring-2 focus:ring-secondary-container"
+                className="w-full px-md py-sm rounded-lg border border-outline-variant bg-surface text-on-surface text-body-md focus:outline-none focus:ring-2 focus:ring-secondary-container"
               >
                 {THRESHOLD_OPTIONS.map((option) => (
                   <option key={option} value={option}>
@@ -552,9 +549,9 @@ export function MatchingResultsContent() {
             )}
 
             {/* Results Table */}
-            <div className="bg-surface rounded-lg border border-outline overflow-hidden">
-              <div className="p-lg border-b border-outline flex flex-wrap items-center justify-between gap-sm">
-                <h2 className="font-headline-md text-headline-md font-bold text-on-surface">
+            <div className="bg-surface rounded-xl border border-outline-variant overflow-hidden">
+              <div className="p-lg border-b border-outline-variant flex flex-wrap items-center justify-between gap-sm">
+                <h2 className="font-headline-md text-headline-md font-bold text-primary">
                   Daftar Kandidat Hasil Pencocokan
                 </h2>
                 <span className="text-on-surface-variant font-body-md">
@@ -628,7 +625,7 @@ export function MatchingResultsContent() {
                           <td className="p-md align-top text-right whitespace-nowrap">
                             <button
                               onClick={() => setDetailTarget(row)}
-                              className="px-md py-xs rounded-lg border border-outline text-primary font-label-md hover:bg-surface-container-low transition-colors"
+                              className="px-md py-xs rounded-lg border border-outline-variant text-primary font-label-md hover:bg-surface-container-low transition-colors"
                             >
                               Detail
                             </button>
@@ -641,7 +638,7 @@ export function MatchingResultsContent() {
               )}
 
               {/* Footer / pagination */}
-              <div className="p-lg border-t border-outline bg-surface-container-low flex flex-wrap items-center justify-between gap-sm">
+              <div className="p-lg border-t border-outline-variant bg-surface-container-low flex flex-wrap items-center justify-between gap-sm">
                 <span className="text-on-surface-variant font-body-md">
                   Menampilkan {formatNumber(rangeStart)}-{formatNumber(rangeEnd)} dari {formatNumber(pagination.total)} kandidat
                 </span>
@@ -649,7 +646,7 @@ export function MatchingResultsContent() {
                   <button
                     onClick={() => handlePageChange(pagination.page - 1)}
                     disabled={pagination.page <= 1}
-                    className="px-md py-xs rounded-lg border border-outline text-on-surface font-label-md hover:bg-surface-container disabled:opacity-40 disabled:cursor-not-allowed"
+                    className="px-md py-xs rounded-lg border border-outline-variant text-on-surface font-label-md hover:bg-surface-container disabled:opacity-40 disabled:cursor-not-allowed"
                   >
                     Sebelumnya
                   </button>
@@ -659,7 +656,7 @@ export function MatchingResultsContent() {
                   <button
                     onClick={() => handlePageChange(pagination.page + 1)}
                     disabled={pagination.page >= pagination.totalPages}
-                    className="px-md py-xs rounded-lg border border-outline text-on-surface font-label-md hover:bg-surface-container disabled:opacity-40 disabled:cursor-not-allowed"
+                    className="px-md py-xs rounded-lg border border-outline-variant text-on-surface font-label-md hover:bg-surface-container disabled:opacity-40 disabled:cursor-not-allowed"
                   >
                     Berikutnya
                   </button>
@@ -667,25 +664,6 @@ export function MatchingResultsContent() {
               </div>
             </div>
 
-            {/* Info Panel */}
-            <div className="bg-surface-container rounded-lg border border-outline p-lg">
-              <div className="flex items-start gap-md">
-                <span className="material-symbols-outlined text-primary">info</span>
-                <div>
-                  <h3 className="font-label-lg text-label-lg text-on-surface font-semibold mb-sm">
-                    Tentang Halaman Hasil Matching
-                  </h3>
-                  <p className="text-on-surface-variant font-body-md">
-                    Kandidat dihitung langsung oleh proses pencocokan untuk pasangan dataset dan threshold yang dipilih,
-                    sehingga mencakup kandidat yang belum ditugaskan. Nama dataset diambil dari Manajemen Dataset.
-                  </p>
-                  <p className="text-on-surface-variant font-body-md mt-sm">
-                    Persentase MATCH dihitung hanya dari kandidat yang sudah terverifikasi
-                    (MATCH / (MATCH + NON-MATCH)), bukan dari seluruh kandidat.
-                  </p>
-                </div>
-              </div>
-            </div>
           </>
         )
       )}

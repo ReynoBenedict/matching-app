@@ -88,7 +88,7 @@ export function MatchingResults({ results }: MatchingResultsProps) {
 
       {/* No results */}
       {results.summary.totalCandidates === 0 ? (
-        <div className="bg-surface-container-low p-8 rounded-lg border border-outline-variant text-center">
+        <div className="bg-surface border border-outline-variant rounded-xl shadow-sm p-8 text-center">
           <span className="material-symbols-outlined text-5xl text-on-surface-variant mb-2 block">
             info
           </span>

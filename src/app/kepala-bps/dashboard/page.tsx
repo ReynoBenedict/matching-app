@@ -1,7 +1,7 @@
 /**
  * /kepala-bps/dashboard
- * Real, read-only executive dashboard backed by the database.
- * Server-side restricted to the Kepala BPS role (HEAD).
+ * Dasbor eksekutif hanya-baca berbasis basis data.
+ * Hanya untuk Kepala BPS (role HEAD).
  */
 
 import { redirect } from 'next/navigation';
@@ -16,7 +16,7 @@ export const metadata = {
 export default async function KepalaDashboardPage() {
   const user = await getAuthenticatedUser();
 
-  // Only Kepala BPS may access this dashboard.
+  // Hanya Kepala BPS yang boleh mengakses dasbor ini.
   if (!user || user.role !== 'HEAD') {
     redirect('/login');
   }

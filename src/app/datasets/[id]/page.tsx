@@ -121,9 +121,9 @@ export default function DatasetDetailPage() {
       {/* Breadcrumbs */}
       <Link
         href="/datasets"
-        className="inline-flex items-center gap-xs text-primary hover:text-primary-container transition-colors font-label-md mb-md"
+        className="inline-flex items-center gap-2 text-primary font-label-md hover:underline mb-md"
       >
-        <span className="material-symbols-outlined text-[18px]">arrow_back</span>
+        <span className="material-symbols-outlined" style={{ fontSize: '20px' }}>arrow_back</span>
         Kembali ke Manajemen Dataset
       </Link>
 
@@ -147,15 +147,15 @@ export default function DatasetDetailPage() {
 
       {loading ? (
         <div className="py-xl text-center text-on-surface-variant">
-          <span className="material-symbols-outlined text-[40px] animate-spin inline-block">hourglass_empty</span>
-          <p className="font-body-md mt-sm">Memuat detail dataset...</p>
+          <span className="material-symbols-outlined text-[40px] text-primary animate-spin inline-block">progress_activity</span>
+          <p className="font-body-lg mt-sm">Memuat detail dataset...</p>
         </div>
       ) : dataset ? (
         <>
           {/* Page Header */}
-          <div className="mb-xl flex justify-between items-end border-b border-outline-variant pb-md">
+          <div className="mb-xl flex flex-wrap justify-between items-end gap-md border-b border-outline-variant pb-md">
             <div>
-              <h1 className="font-headline-lg font-bold text-on-background mb-xs">Detail Dataset</h1>
+              <h1 className="font-headline-lg-mobile md:font-headline-lg text-headline-lg-mobile md:text-headline-lg font-bold text-primary mb-xs">Detail Dataset</h1>
               <p className="text-on-surface-variant font-body-md">Menampilkan informasi metadata dan sampel pratinjau data.</p>
             </div>
             <div className="flex gap-sm">
@@ -175,7 +175,7 @@ export default function DatasetDetailPage() {
                   <span className="material-symbols-outlined text-[32px]">description</span>
                 </div>
                 <div>
-                  <h3 className="font-headline-sm font-bold text-on-background">{dataset.name}</h3>
+                  <h3 className="font-headline-sm text-headline-sm font-bold text-primary">{dataset.name}</h3>
                   <div className="flex gap-sm mt-xs">
                     <span className="inline-flex items-center px-2 py-0.5 rounded text-xs font-medium bg-surface-container-high text-primary">
                       {dataset.originalFileName?.split('.').pop()?.toUpperCase() || 'CSV'}
@@ -245,7 +245,7 @@ export default function DatasetDetailPage() {
           {/* Failure Reason */}
           {dataset.status === 'FAILED' && dataset.failureReason && (
             <div className="bg-error-container border border-error rounded-xl p-lg mb-lg">
-              <h3 className="font-headline-sm text-on-error-container mb-md">Alasan Gagal</h3>
+              <h3 className="font-headline-sm text-headline-sm text-on-error-container mb-md">Alasan Gagal</h3>
               <p className="font-body-md text-on-error-container">{dataset.failureReason}</p>
               <Link href="/datasets/upload" className="inline-block mt-md text-on-error-container hover:underline font-label-md">
                 Coba Unggah Dataset Lagi
@@ -257,7 +257,7 @@ export default function DatasetDetailPage() {
           {dataset.status === 'READY' && dataset.preview.length > 0 && (
             <div className="bg-surface border border-outline-variant rounded-xl shadow-sm overflow-hidden flex flex-col">
               <div className="p-md border-b border-outline-variant flex justify-between items-center bg-surface-bright">
-                <h3 className="font-headline-md font-semibold text-on-background">Pratinjau Data (Sampel)</h3>
+                <h3 className="font-headline-md text-headline-md font-semibold text-primary">Pratinjau Data (Sampel)</h3>
                 <span className="font-body-sm text-on-surface-variant">
                   Menampilkan {dataset.preview.length} dari {dataset.totalRecords?.toLocaleString() || 0} baris
                 </span>

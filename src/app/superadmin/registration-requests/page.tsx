@@ -224,9 +224,9 @@ export default function RegistrationRequestsPage() {
 
           {/* Loading */}
           {loading && (
-            <div style={{ textAlign: 'center', paddingTop: '64px', color: '#424750' }}>
-              <span className="material-symbols-outlined" style={{ fontSize: '40px', animation: 'spin 2s linear infinite', display: 'inline-block' }}>hourglass_empty</span>
-              <p style={{ marginTop: '16px' }}>Memuat data...</p>
+            <div className="text-center pt-3xl text-on-surface-variant">
+              <span className="material-symbols-outlined text-[40px] text-primary animate-spin inline-block">progress_activity</span>
+              <p className="font-body-lg mt-4">Memuat data...</p>
             </div>
           )}
 
@@ -498,9 +498,9 @@ export default function RegistrationRequestsPage() {
       )}
 
       {loading && (
-        <div style={{ textAlign: 'center', paddingTop: '64px', color: '#424750' }}>
-          <span className="material-symbols-outlined" style={{ fontSize: '40px', animation: 'spin 2s linear infinite', display: 'inline-block' }}>hourglass_empty</span>
-          <p style={{ marginTop: '16px' }}>Memuat data...</p>
+        <div className="text-center pt-3xl text-on-surface-variant">
+          <span className="material-symbols-outlined text-[40px] text-primary animate-spin inline-block">progress_activity</span>
+          <p className="font-body-lg mt-4">Memuat data...</p>
         </div>
       )}
 

@@ -175,22 +175,30 @@ matching-app/
 ├── src/
 │   ├── app/
 │   │   ├── api/              # API routes
-│   │   ├── dashboard/        # Dashboard pages
-│   │   ├── datasets/         # Dataset management UI
-│   │   ├── employee/         # Employee labeling UI
-│   │   └── kepala-bps/       # Admin review UI
-│   ├── components/           # Reusable React components
-│   ├── lib/
-│   │   ├── auth/            # Authentication utilities
-│   │   ├── db/              # Database schema & seed
-│   │   └── utils/           # Helper functions
-│   └── middleware.ts        # NextAuth middleware
-├── drizzle/                 # Database migrations
-├── scripts/                 # Utility scripts
-├── tests/                   # E2E tests
-├── docker-compose.yml       # Docker configuration
-├── Dockerfile              # Container build config
-└── package.json            # Dependencies & scripts
+│   │   ├── dashboard/        # Pengalihan dashboard
+│   │   ├── datasets/         # Manajemen dataset
+│   │   ├── employee/         # Halaman Employee
+│   │   ├── kepala-bps/       # Halaman Kepala BPS
+│   │   ├── superadmin/       # Halaman Superadmin
+│   │   └── matching/         # Pencocokan data
+│   ├── components/           # Komponen React
+│   │   ├── assignments/     # Alur penugasan
+│   │   ├── datasets/        # Unggah & pratinjau dataset
+│   │   ├── employee/        # Halaman Employee
+│   │   ├── layouts/         # Layout per peran
+│   │   ├── matching/        # Alur pencocokan
+│   │   └── reports/         # Laporan
+│   └── lib/
+│       ├── auth/            # Autentikasi & otorisasi
+│       ├── config/          # Konfigurasi unggah
+│       ├── constants/       # Konstanta & skema dataset
+│       ├── db/              # Skema & koneksi database
+│       └── services/        # Logika layanan
+├── drizzle/                 # Migrasi database
+├── tests/                   # Skrip pengujian
+├── docker-compose.yml       # Konfigurasi Docker
+├── Dockerfile               # Konfigurasi container
+└── package.json             # Dependensi & skrip
 ```
 
 ## Common Troubleshooting

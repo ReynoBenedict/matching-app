@@ -6,10 +6,19 @@ import { UploadForm } from '@/components/datasets/UploadForm';
 
 export default function UploadDatasetPage() {
   return (
-    <SuperadminLayout pageTitle="Upload Dataset Baru">
+    <SuperadminLayout pageTitle="Unggah Dataset Baru">
+      {/* Back navigation */}
+      <Link
+        href="/datasets"
+        className="inline-flex items-center gap-2 text-primary font-label-md hover:underline mb-md"
+      >
+        <span className="material-symbols-outlined" style={{ fontSize: '20px' }}>arrow_back</span>
+        Kembali ke Manajemen Dataset
+      </Link>
+
       {/* Page Header */}
       <div className="mb-xl">
-        <h2 className="font-headline-lg text-on-surface mb-xs">Unggah Dataset Baru</h2>
+        <h2 className="font-headline-lg-mobile md:font-headline-lg text-headline-lg-mobile md:text-headline-lg text-primary mb-xs">Unggah Dataset Baru</h2>
         <p className="font-body-md text-on-surface-variant">
           Proses unggah, validasi, dan integrasi data sensus ke dalam sistem utama BPS.
         </p>
@@ -22,25 +31,25 @@ export default function UploadDatasetPage() {
           <div className="w-8 h-8 rounded-full bg-primary text-on-primary flex items-center justify-center font-label-md shadow-sm">
             1
           </div>
-          <span className="font-label-md text-primary">Upload</span>
+          <span className="font-label-md text-primary">Unggah</span>
         </div>
         <div className="flex flex-col items-center gap-sm bg-background px-sm">
           <div className="w-8 h-8 rounded-full bg-surface-container-high text-on-surface-variant flex items-center justify-center font-label-md border border-outline-variant">
             2
           </div>
-          <span className="font-label-md text-on-surface-variant">Validation</span>
+          <span className="font-label-md text-on-surface-variant">Validasi</span>
         </div>
         <div className="flex flex-col items-center gap-sm bg-background px-sm">
           <div className="w-8 h-8 rounded-full bg-surface-container-high text-on-surface-variant flex items-center justify-center font-label-md border border-outline-variant">
             3
           </div>
-          <span className="font-label-md text-on-surface-variant">Preview</span>
+          <span className="font-label-md text-on-surface-variant">Pratinjau</span>
         </div>
         <div className="flex flex-col items-center gap-sm bg-background px-sm">
           <div className="w-8 h-8 rounded-full bg-surface-container-high text-on-surface-variant flex items-center justify-center font-label-md border border-outline-variant">
             4
           </div>
-          <span className="font-label-md text-on-surface-variant">Confirm</span>
+          <span className="font-label-md text-on-surface-variant">Konfirmasi</span>
         </div>
       </div>
 
@@ -48,14 +57,14 @@ export default function UploadDatasetPage() {
         {/* Main Upload Form Area */}
         <div className="lg:col-span-2 flex flex-col gap-lg">
           <div className="bg-surface border border-outline-variant rounded p-lg shadow-sm hover:shadow-md transition-shadow">
-            <h3 className="font-headline-sm text-on-surface mb-md">Informasi Dataset</h3>
+            <h3 className="font-headline-sm text-headline-sm text-on-surface mb-md">Informasi Dataset</h3>
             <div className="grid grid-cols-1 md:grid-cols-2 gap-md mb-md">
               <div className="flex flex-col gap-xs">
                 <label className="font-label-md text-on-surface-variant" htmlFor="dataset_name">
                   Nama Dataset
                 </label>
                 <input
-                  className="w-full border border-outline rounded bg-surface px-md py-sm font-body-md text-on-surface focus:border-secondary focus:ring-2 focus:ring-secondary/20 outline-none transition-all"
+                  className="w-full border border-outline-variant rounded bg-surface px-md py-sm font-body-md text-on-surface focus:border-secondary focus:ring-2 focus:ring-secondary/20 outline-none transition-all"
                   id="dataset_name"
                   placeholder="Misal: Sensus Penduduk Malang 2024"
                   type="text"
@@ -66,7 +75,7 @@ export default function UploadDatasetPage() {
                   Sumber Data
                 </label>
                 <select
-                  className="w-full border border-outline rounded bg-surface px-md py-sm font-body-md text-on-surface focus:border-secondary focus:ring-2 focus:ring-secondary/20 outline-none transition-all"
+                  className="w-full border border-outline-variant rounded bg-surface px-md py-sm font-body-md text-on-surface focus:border-secondary focus:ring-2 focus:ring-secondary/20 outline-none transition-all"
                   id="dataset_source"
                 >
                   <option>BPS Provinsi</option>
@@ -84,7 +93,7 @@ export default function UploadDatasetPage() {
         {/* Side Panel / Validation Feedback */}
         <div className="flex flex-col gap-lg">
           <div className="bg-surface border border-outline-variant rounded p-lg shadow-sm">
-            <h3 className="font-headline-sm text-on-surface mb-md">Status Validasi</h3>
+            <h3 className="font-headline-sm text-headline-sm text-on-surface mb-md">Status Validasi</h3>
             <div className="flex flex-col gap-md">
               <div className="flex items-start gap-sm">
                 <span className="material-symbols-outlined text-secondary text-[20px] mt-[2px]">check_circle</span>

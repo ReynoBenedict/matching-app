@@ -54,7 +54,7 @@ export function DatasetSelector({
 
   return (
     <div className="space-y-4">
-      <h2 className="font-headline-sm text-primary">{title}</h2>
+      <h2 className="font-headline-sm text-headline-sm text-primary">{title}</h2>
 
       {error && (
         <div className="text-error text-sm bg-error-container p-3 rounded-lg">

@@ -37,13 +37,10 @@ export default function DashboardPage() {
   return (
     <div className="flex min-h-screen items-center justify-center bg-background">
       <div className="text-center">
-        <span
-          className="material-symbols-outlined text-[40px] inline-block"
-          style={{ animation: 'spin 2s linear infinite' }}
-        >
-          hourglass_empty
+        <span className="material-symbols-outlined text-[40px] text-primary inline-block animate-spin">
+          progress_activity
         </span>
-        <p className="mt-4 text-on-surface-variant">Redirecting to your dashboard...</p>
+        <p className="mt-4 text-on-surface-variant font-body-lg">Mengalihkan ke dashboard Anda...</p>
       </div>
     </div>
   );
