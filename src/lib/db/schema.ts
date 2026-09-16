@@ -204,43 +204,48 @@ export const datasetRecords = pgTable(
   {
     id: integer().primaryKey().generatedAlwaysAsIdentity(),
     datasetId: integer('dataset_id').notNull(),
-    idsbr: varchar('idsbr', { length: 100 }).notNull(),
-    namaUsaha: varchar('nama_usaha', { length: 500 }).notNull(),
-    alamatUsaha: varchar('alamat_usaha', { length: 1000 }).notNull(),
-    kodeWilayah: varchar('kode_wilayah', { length: 50 }).notNull(),
-    kdprov: varchar('kdprov', { length: 50 }).notNull(),
-    kdkab: varchar('kdkab', { length: 50 }).notNull(),
-    kdkec: varchar('kdkec', { length: 50 }).notNull(),
-    kddesa: varchar('kddesa', { length: 50 }).notNull(),
-    nmprov: varchar('nmprov', { length: 255 }).notNull(),
-    nmkab: varchar('nmkab', { length: 255 }).notNull(),
-    nmkec: varchar('nmkec', { length: 255 }).notNull(),
-    nmdesa: varchar('nmdesa', { length: 255 }).notNull(),
-    perusahaanId: varchar('perusahaan_id', { length: 100 }).notNull(),
-    statusPerusahaan: varchar('status_perusahaan', { length: 50 }).notNull(),
+    // Original row preserved so flexible CSV schemas can be matched without
+    // forcing every upload into the legacy 35-column schema.
+    rawData: jsonb('raw_data').notNull().default({}),
+    // Only stable identifiers are required. Legacy fields are nullable because
+    // uploads may use arbitrary schemas; the complete source row lives in rawData.
+    idsbr: text('idsbr').notNull(),
+    namaUsaha: text('nama_usaha'),
+    alamatUsaha: text('alamat_usaha'),
+    kodeWilayah: text('kode_wilayah'),
+    kdprov: text('kdprov'),
+    kdkab: text('kdkab'),
+    kdkec: text('kdkec'),
+    kddesa: text('kddesa'),
+    nmprov: text('nmprov'),
+    nmkab: text('nmkab'),
+    nmkec: text('nmkec'),
+    nmdesa: text('nmdesa'),
+    perusahaanId: text('perusahaan_id'),
+    statusPerusahaan: text('status_perusahaan'),
     skorKalo: text('skor_kalo'),
     kegiatanUsaha: text('kegiatan_usaha'),
     rankNama: text('rank_nama'),
     rankAlamat: text('rank_alamat'),
     historyRefProfilingId: timestamp('history_ref_profiling_id', {
       withTimezone: true,
-    }).notNull(),
-    skalaUsaha: varchar('skala_usaha', { length: 100 }),
-    sumberData: varchar('sumber_data', { length: 255 }).notNull(),
-    latitude: numeric('latitude', { precision: 10, scale: 8 }).notNull(),
-    longitude: numeric('longitude', { precision: 11, scale: 8 }).notNull(),
-    latlongStatus: varchar('latlong_status', { length: 100 }).notNull(),
-    gcid: varchar('gcid', { length: 100 }).notNull(),
-    gcsResult: numeric('gcs_result', { precision: 5, scale: 2 }).notNull(),
-    allowCancel: boolean('allow_cancel').notNull(),
-    allowEdit: boolean('allow_edit').notNull(),
-    allowFlagging: boolean('allow_flagging').notNull(),
-    latitudeGc: numeric('latitude_gc', { precision: 10, scale: 8 }).notNull(),
-    longitudeGc: numeric('longitude_gc', { precision: 11, scale: 8 }).notNull(),
-    latlongStatusGc: varchar('latlong_status_gc', { length: 100 }).notNull(),
-    gcUsername: varchar('gc_username', { length: 100 }).notNull(),
-    namaUsahaGc: varchar('nama_usaha_gc', { length: 500 }),
-    alamatUsahaGc: varchar('alamat_usaha_gc', { length: 1000 }),
+    }),
+    skalaUsaha: text('skala_usaha'),
+    sumberData: text('sumber_data'),
+    latitude: numeric('latitude'),
+    longitude: numeric('longitude'),
+    latlongStatus: text('latlong_status'),
+    gcid: text('gcid'),
+    gcsResult: numeric('gcs_result'),
+    allowCancel: boolean('allow_cancel'),
+    allowEdit: boolean('allow_edit'),
+    allowFlagging: boolean('allow_flagging'),
+    latitudeGc: numeric('latitude_gc'),
+    longitudeGc: numeric('longitude_gc'),
+    latlongStatusGc: text('latlong_status_gc'),
+    gcUsername: text('gc_username'),
+    namaUsahaGc: text('nama_usaha_gc'),
+    alamatUsahaGc: text('alamat_usaha_gc'),
     createdAt: timestamp('created_at', { withTimezone: true })
       .notNull()
       .defaultNow(),
@@ -263,6 +268,64 @@ export const datasetRecords = pgTable(
   ]
 );
 
+
+/** Persisted matching runs and candidates. */
+export const matchingRuns = pgTable(
+  'matching_runs',
+  {
+    id: integer().primaryKey().generatedAlwaysAsIdentity(),
+    datasetAId: integer('dataset_a_id').notNull(),
+    datasetBId: integer('dataset_b_id').notNull(),
+    threshold: numeric('threshold', { precision: 5, scale: 4 }).notNull(),
+    columnMappings: jsonb('column_mappings').notNull(),
+    status: varchar('status', { length: 30 }).notNull().default('COMPLETED'),
+    createdBy: integer('created_by').notNull(),
+    totalCandidates: integer('total_candidates').notNull().default(0),
+    createdAt: timestamp('created_at', { withTimezone: true }).notNull().defaultNow(),
+    completedAt: timestamp('completed_at', { withTimezone: true }),
+  },
+  (table) => [
+    foreignKey({
+      columns: [table.datasetAId],
+      foreignColumns: [datasets.id],
+      name: 'matching_runs_dataset_a_fk',
+    }).onDelete('cascade'),
+    foreignKey({
+      columns: [table.datasetBId],
+      foreignColumns: [datasets.id],
+      name: 'matching_runs_dataset_b_fk',
+    }).onDelete('cascade'),
+    index('matching_runs_dataset_pair_idx').on(table.datasetAId, table.datasetBId),
+    index('matching_runs_created_at_idx').on(table.createdAt),
+  ]
+);
+
+export const matchingCandidates = pgTable(
+  'matching_candidates',
+  {
+    id: integer().primaryKey().generatedAlwaysAsIdentity(),
+    matchingRunId: integer('matching_run_id').notNull(),
+    recordAId: integer('record_a_id').notNull(),
+    recordBId: integer('record_b_id').notNull(),
+    idsbrA: text('idsbr_a').notNull(),
+    idsbrB: text('idsbr_b').notNull(),
+    overallScore: numeric('overall_score').notNull(),
+    tfidfSimilarity: numeric('tfidf_similarity'),
+    faissSimilarity: numeric('faiss_similarity'),
+    rapidfuzzSimilarity: numeric('rapidfuzz_similarity'),
+    fieldScores: jsonb('field_scores').notNull().default([]),
+    createdAt: timestamp('created_at', { withTimezone: true }).notNull().defaultNow(),
+  },
+  (table) => [
+    foreignKey({ columns: [table.matchingRunId], foreignColumns: [matchingRuns.id], name: 'matching_candidates_run_fk' }).onDelete('cascade'),
+    foreignKey({ columns: [table.recordAId], foreignColumns: [datasetRecords.id], name: 'matching_candidates_record_a_fk' }).onDelete('cascade'),
+    foreignKey({ columns: [table.recordBId], foreignColumns: [datasetRecords.id], name: 'matching_candidates_record_b_fk' }).onDelete('cascade'),
+    index('matching_candidates_run_idx').on(table.matchingRunId),
+    index('matching_candidates_pair_idx').on(table.recordAId, table.recordBId),
+    unique('matching_candidates_run_pair_unique').on(table.matchingRunId, table.recordAId, table.recordBId),
+  ]
+);
+
 /**
  * Assignment status enum
  * Represents the lifecycle of an assignment to an employee
@@ -281,6 +344,7 @@ export const assignmentStatusEnum = pgEnum('assignment_status', [
 export const verificationResultEnum = pgEnum('verification_result', [
   'MATCH',
   'NON_MATCH',
+  'REVIEW',
 ]);
 
 /**
@@ -292,6 +356,7 @@ export const assignments = pgTable(
   'assignments',
   {
     id: integer().primaryKey().generatedAlwaysAsIdentity(),
+    matchingRunId: integer('matching_run_id'),
     recordAId: integer('record_a_id').notNull(),
     recordBId: integer('record_b_id').notNull(),
     employeeId: integer('employee_id').notNull(),
@@ -300,6 +365,7 @@ export const assignments = pgTable(
     createdBy: integer('created_by').notNull(),
     // Phase 5C: Employee verification fields
     verificationResult: verificationResultEnum('verification_result'),
+    verificationNote: text('verification_note'),
     verifiedAt: timestamp('verified_at', { withTimezone: true }),
     verifiedBy: integer('verified_by'),
     createdAt: timestamp('created_at', { withTimezone: true })
@@ -310,6 +376,11 @@ export const assignments = pgTable(
       .defaultNow(),
   },
   (table) => [
+    foreignKey({
+      columns: [table.matchingRunId],
+      foreignColumns: [matchingRuns.id],
+      name: 'assignments_matching_run_id_fk',
+    }).onDelete('cascade'),
     foreignKey({
       columns: [table.recordAId],
       foreignColumns: [datasetRecords.id],
@@ -336,6 +407,7 @@ export const assignments = pgTable(
       foreignColumns: [users.id],
       name: 'assignments_verified_by_fk',
     }).onDelete('set null'),
+    index('assignments_matching_run_id_idx').on(table.matchingRunId),
     index('assignments_employee_id_idx').on(table.employeeId),
     index('assignments_status_idx').on(table.status),
     index('assignments_created_at_idx').on(table.createdAt),

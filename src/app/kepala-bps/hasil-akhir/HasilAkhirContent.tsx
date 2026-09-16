@@ -109,6 +109,14 @@ function HasilVerifikasiBadge({ result }: { result: FinalResultRow['verification
       </span>
     );
   }
+  if (result === 'REVIEW') {
+    return (
+      <span className="inline-flex items-center gap-xs px-sm py-xs rounded-lg font-label-md bg-secondary-fixed text-on-secondary-fixed">
+        <span className="material-symbols-outlined" style={{ fontSize: '16px' }}>rate_review</span>
+        PERLU REVIEW
+      </span>
+    );
+  }
   return (
     <span className="inline-flex items-center gap-xs px-sm py-xs rounded-lg font-label-md bg-surface-container-high text-on-surface-variant">
       <span className="material-symbols-outlined" style={{ fontSize: '16px' }}>help</span>
@@ -149,7 +157,7 @@ export function HasilAkhirContent() {
   const [refreshing, setRefreshing] = useState(false);
   const [error, setError] = useState<string | null>(null);
 
-  // Pengambil data murni tanpa perubahan state.
+  // Pure fetcher — performs no state updates, so it is safe to await anywhere.
   const fetchResults = useCallback(
     async (filter: VerificationFilter, pageToLoad: number): Promise<HasilAkhirResponse> => {
       const params = new URLSearchParams({
@@ -333,6 +341,7 @@ export function HasilAkhirContent() {
               <option value="ALL">Semua</option>
               <option value="MATCH">MATCH</option>
               <option value="NON_MATCH">NON-MATCH</option>
+              <option value="REVIEW">Perlu Review</option>
               <option value="UNVERIFIED">Belum Diverifikasi</option>
             </select>
           </div>
@@ -454,7 +463,7 @@ export function HasilAkhirContent() {
                 <button
                   onClick={() => handlePageChange(pagination.page - 1)}
                   disabled={pagination.page <= 1}
-                  className="px-md py-xs rounded-lg border border-outline-variant text-on-surface font-label-md hover:bg-surface-container disabled:opacity-40 disabled:cursor-not-allowed"
+                  className="px-md py-xs rounded-lg border border-outline text-on-surface font-label-md hover:bg-surface-container disabled:opacity-40 disabled:cursor-not-allowed"
                 >
                   Sebelumnya
                 </button>
@@ -464,7 +473,7 @@ export function HasilAkhirContent() {
                 <button
                   onClick={() => handlePageChange(pagination.page + 1)}
                   disabled={pagination.page >= pagination.totalPages}
-                  className="px-md py-xs rounded-lg border border-outline-variant text-on-surface font-label-md hover:bg-surface-container disabled:opacity-40 disabled:cursor-not-allowed"
+                  className="px-md py-xs rounded-lg border border-outline text-on-surface font-label-md hover:bg-surface-container disabled:opacity-40 disabled:cursor-not-allowed"
                 >
                   Berikutnya
                 </button>
@@ -474,6 +483,22 @@ export function HasilAkhirContent() {
         )
       )}
 
+      {/* Info */}
+      <div className="bg-surface-container rounded-lg border border-outline p-lg">
+        <div className="flex items-start gap-md">
+          <span className="material-symbols-outlined text-primary">info</span>
+          <div>
+            <h3 className="font-label-lg text-label-lg text-on-surface font-semibold mb-sm">
+              Tentang Halaman Hasil Akhir
+            </h3>
+            <p className="text-on-surface-variant font-body-md">
+              Halaman ini menampilkan hasil akhir verifikasi dari kandidat pencocokan yang tersimpan, beserta status
+              penugasan, petugas, dan waktu verifikasinya. Nama dataset diambil dari Manajemen Dataset. Halaman ini
+              bersifat hanya-baca.
+            </p>
+          </div>
+        </div>
+      </div>
     </div>
   );
 }

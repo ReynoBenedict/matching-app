@@ -9,6 +9,18 @@ import type { AssignmentCandidate, DatasetOption, Employee } from './types';
 
 const THRESHOLD_OPTIONS = [0.5, 0.6, 0.7, 0.8, 0.9];
 
+interface AdminAssignment {
+  id: number;
+  matchingRunId: number | null;
+  datasetA: { id: number; name: string } | null;
+  datasetB: { id: number; name: string } | null;
+  employee: { id: number; fullName: string } | null;
+  assignedAt: string;
+  status: string;
+  verificationResult: string | null;
+}
+
+
 /**
  * Ambil kandidat pencocokan untuk sepasang dataset.
  * Memetakan seluruh kolom yang sama pada kedua dataset.
@@ -117,6 +129,7 @@ export function AssignmentContent() {
   const [detailTarget, setDetailTarget] = useState<AssignmentCandidate | null>(null);
   const [assigning, setAssigning] = useState(false);
   const [assignError, setAssignError] = useState<string | null>(null);
+  const [adminAssignments, setAdminAssignments] = useState<AdminAssignment[]>([]);
 
   // Load the READY datasets — the same source used by /datasets and /matching.
   useEffect(() => {
@@ -136,6 +149,14 @@ export function AssignmentContent() {
 
         const list: DatasetOption[] = data.data || [];
         setDatasets(list);
+
+        try {
+          const assignmentResponse = await fetch('/api/assignments', { cache: 'no-store' });
+          const assignmentPayload = await assignmentResponse.json();
+          if (assignmentResponse.ok && assignmentPayload.success) setAdminAssignments(assignmentPayload.data || []);
+        } catch (assignmentError) {
+          console.warn('Gagal memuat daftar penugasan admin', assignmentError);
+        }
 
         if (list.length >= 2) {
           setDatasetAId(list[0].id);
@@ -229,6 +250,7 @@ export function AssignmentContent() {
         method: 'POST',
         headers: { 'Content-Type': 'application/json' },
         body: JSON.stringify({
+          matchingRunId: target.matchingRunId,
           recordAId: target.recordAId,
           recordBId: target.recordBId,
           employeeId,
@@ -256,6 +278,11 @@ export function AssignmentContent() {
       // Re-run the candidates effect so the row reflects its new status.
       setLoading(true);
       setRefreshToken((token) => token + 1);
+      try {
+        const assignmentResponse = await fetch('/api/assignments', { cache: 'no-store' });
+        const assignmentPayload = await assignmentResponse.json();
+        if (assignmentResponse.ok && assignmentPayload.success) setAdminAssignments(assignmentPayload.data || []);
+      } catch {}
     } catch (err) {
       setAssignError(err instanceof Error ? err.message : 'Gagal membuat penugasan');
       setAssigning(false);
@@ -403,6 +430,19 @@ export function AssignmentContent() {
           <StatCard label="Sudah Ditugaskan" value={assignedCount} icon="check_circle" tone="text-on-surface-variant" />
         </div>
       )}
+
+      {/* Assigned task log */}
+      <div className="bg-surface-container-lowest rounded-xl border border-outline-variant shadow-sm overflow-hidden">
+        <div className="px-lg py-md border-b border-outline-variant bg-surface-bright flex items-center justify-between">
+          <div><h3 className="font-headline-sm text-headline-sm text-on-surface">Daftar Penugasan</h3><p className="text-sm text-on-surface-variant mt-1">Task yang sudah diberikan kepada petugas.</p></div>
+          <span className="text-sm text-on-surface-variant">{adminAssignments.length} task</span>
+        </div>
+        {adminAssignments.length === 0 ? <div className="p-lg text-sm text-on-surface-variant">Belum ada penugasan.</div> : (
+          <div className="overflow-x-auto"><table className="w-full min-w-[850px] text-left"><thead><tr className="bg-surface-container-highest border-b border-outline-variant"><th className="px-md py-sm text-xs font-semibold">ID Matching</th><th className="px-md py-sm text-xs font-semibold">Dataset A</th><th className="px-md py-sm text-xs font-semibold">Dataset B</th><th className="px-md py-sm text-xs font-semibold">Petugas</th><th className="px-md py-sm text-xs font-semibold">Tanggal Penugasan</th><th className="px-md py-sm text-xs font-semibold">Status</th></tr></thead><tbody>
+            {adminAssignments.map((task) => <tr key={task.id} className="border-b border-outline-variant last:border-b-0"><td className="px-md py-sm font-mono text-sm">{task.matchingRunId ?? `#${task.id}`}</td><td className="px-md py-sm text-sm">{task.datasetA?.name ?? '-'}</td><td className="px-md py-sm text-sm">{task.datasetB?.name ?? '-'}</td><td className="px-md py-sm text-sm">{task.employee?.fullName ?? '-'}</td><td className="px-md py-sm text-sm">{new Date(task.assignedAt).toLocaleString('id-ID')}</td><td className="px-md py-sm text-sm font-semibold">{task.status === 'PENDING' ? 'Belum Dikerjakan' : task.status === 'IN_PROGRESS' ? 'Sedang Dikerjakan' : 'Selesai'}</td></tr>)}
+          </tbody></table></div>
+        )}
+      </div>
 
       {/* Candidate table */}
       <div className="bg-surface-container-lowest rounded-xl border border-outline-variant shadow-sm overflow-hidden">

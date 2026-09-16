@@ -12,8 +12,8 @@ import { assignments, datasetRecords, datasets, users } from '@/lib/db/schema';
 import { and, count, desc, eq, inArray, isNull, sql, type SQL } from 'drizzle-orm';
 
 export type AssignmentStatus = 'PENDING' | 'IN_PROGRESS' | 'COMPLETED';
-export type VerificationOutcome = 'MATCH' | 'NON_MATCH';
-export type VerificationFilter = 'ALL' | 'MATCH' | 'NON_MATCH' | 'UNVERIFIED';
+export type VerificationOutcome = 'MATCH' | 'NON_MATCH' | 'REVIEW';
+export type VerificationFilter = 'ALL' | 'MATCH' | 'NON_MATCH' | 'REVIEW' | 'UNVERIFIED';
 
 export interface RecordBrief {
   id: number;
@@ -38,6 +38,7 @@ export interface FinalResultSummary {
   totalCandidates: number;
   matchCount: number;
   nonMatchCount: number;
+  reviewCount: number;
   unverified: number;
   verificationRate: number;
 }
@@ -67,11 +68,13 @@ export async function getFinalResultSummary(): Promise<FinalResultSummary> {
   let totalCandidates = 0;
   let matchCount = 0;
   let nonMatchCount = 0;
+  let reviewCount = 0;
   for (const row of resultRows) {
     const value = Number(row.value);
     totalCandidates += value;
     if (row.verificationResult === 'MATCH') matchCount += value;
     else if (row.verificationResult === 'NON_MATCH') nonMatchCount += value;
+    else if (row.verificationResult === 'REVIEW') reviewCount += value;
   }
 
   const verified = matchCount + nonMatchCount;
@@ -80,6 +83,7 @@ export async function getFinalResultSummary(): Promise<FinalResultSummary> {
     totalCandidates,
     matchCount,
     nonMatchCount,
+    reviewCount,
     unverified: totalCandidates - verified,
     verificationRate: totalCandidates === 0 ? 0 : Math.round((verified / totalCandidates) * 100),
   };
@@ -102,6 +106,7 @@ export async function getFinalResults(
   const filters: SQL[] = [];
   if (verification === 'MATCH') filters.push(eq(assignments.verificationResult, 'MATCH'));
   else if (verification === 'NON_MATCH') filters.push(eq(assignments.verificationResult, 'NON_MATCH'));
+  else if (verification === 'REVIEW') filters.push(eq(assignments.verificationResult, 'REVIEW'));
   else if (verification === 'UNVERIFIED') filters.push(isNull(assignments.verificationResult));
   const whereClause = filters.length > 0 ? and(...filters) : undefined;
 
@@ -159,7 +164,7 @@ export async function getFinalResults(
         datasetId: record.datasetId,
         datasetName: datasetMap.get(record.datasetId) ?? null,
         idsbr: record.idsbr,
-        namaUsaha: record.namaUsaha,
+        namaUsaha: record.namaUsaha ?? '',
       });
     }
   }

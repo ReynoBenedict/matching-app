@@ -9,20 +9,30 @@ export interface FieldScore {
 }
 
 export interface CandidateRecord {
+  id?: number;
+  datasetId?: number;
+  datasetName?: string | null;
   idsbr: string;
-  namaUsaha: string;
-  alamatUsaha: string;
-  nmprov: string;
-  nmkab: string;
+  namaUsaha: string | null;
+  alamatUsaha: string | null;
+  nmprov: string | null;
+  nmkab: string | null;
+  nmkec?: string | null;
+  nmdesa?: string | null;
+  rawData?: Record<string, unknown>;
 }
 
 export interface AssignmentCandidate {
+  matchingRunId: number;
   recordAId: number;
   recordBId: number;
   idsbrA: string;
   idsbrB: string;
   fieldScores: FieldScore[];
   overallScore: number;
+  tfidfSimilarity?: number | null;
+  faissSimilarity?: number | null;
+  rapidfuzzSimilarity?: number | null;
   recordA: CandidateRecord | null;
   recordB: CandidateRecord | null;
   assigned: boolean;

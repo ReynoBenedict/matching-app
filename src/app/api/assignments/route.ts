@@ -15,6 +15,59 @@
 import { NextRequest, NextResponse } from 'next/server';
 import { requireSuperadmin } from '@/lib/auth/authorization';
 import { createAssignment } from '@/lib/services/assignment';
+import { getDatabase } from '@/lib/db';
+import { assignments, users, matchingRuns, datasets } from '@/lib/db/schema';
+import { desc, eq } from 'drizzle-orm';
+
+export async function GET() {
+  try {
+    await requireSuperadmin();
+    const db = getDatabase();
+    const rows = await db
+      .select({
+        id: assignments.id,
+        matchingRunId: assignments.matchingRunId,
+        employeeId: assignments.employeeId,
+        employeeName: users.fullName,
+        status: assignments.status,
+        createdAt: assignments.createdAt,
+        verificationResult: assignments.verificationResult,
+        datasetAId: matchingRuns.datasetAId,
+        datasetBId: matchingRuns.datasetBId,
+        datasetAName: datasets.name,
+      })
+      .from(assignments)
+      .leftJoin(users, eq(users.id, assignments.employeeId))
+      .leftJoin(matchingRuns, eq(matchingRuns.id, assignments.matchingRunId))
+      .leftJoin(datasets, eq(datasets.id, matchingRuns.datasetAId))
+      .orderBy(desc(assignments.createdAt))
+      .limit(500);
+
+    const datasetIds = [...new Set(rows.flatMap((row) => [row.datasetAId, row.datasetBId]).filter((id): id is number => id != null))];
+    const datasetRows = datasetIds.length ? await db.select({ id: datasets.id, name: datasets.name }).from(datasets) : [];
+    const names = new Map(datasetRows.map((d) => [d.id, d.name]));
+
+    return NextResponse.json({
+      success: true,
+      data: rows.map((row) => ({
+        id: row.id,
+        matchingRunId: row.matchingRunId,
+        datasetA: row.datasetAId ? { id: row.datasetAId, name: names.get(row.datasetAId) ?? '-' } : null,
+        datasetB: row.datasetBId ? { id: row.datasetBId, name: names.get(row.datasetBId) ?? '-' } : null,
+        employee: row.employeeId ? { id: row.employeeId, fullName: row.employeeName ?? '-' } : null,
+        assignedAt: row.createdAt.toISOString(),
+        status: row.status,
+        verificationResult: row.verificationResult,
+      })),
+    }, { headers: { 'Cache-Control': 'no-store' } });
+  } catch (error) {
+    if (error instanceof Error && (error.message.includes('Unauthorized') || error.message.includes('Forbidden'))) {
+      return NextResponse.json({ success: false, error: error.message }, { status: error.message.includes('Unauthorized') ? 401 : 403 });
+    }
+    console.error('Get assignments error:', error);
+    return NextResponse.json({ success: false, error: 'Gagal memuat daftar penugasan.' }, { status: 500 });
+  }
+}
 
 export async function POST(request: NextRequest) {
   try {
@@ -26,6 +79,7 @@ export async function POST(request: NextRequest) {
 
     // Validate required fields
     if (
+      typeof body.matchingRunId !== 'number' ||
       typeof body.recordAId !== 'number' ||
       typeof body.recordBId !== 'number' ||
       typeof body.employeeId !== 'number' ||
@@ -34,7 +88,7 @@ export async function POST(request: NextRequest) {
       return NextResponse.json(
         {
           success: false,
-          error: 'Invalid request. Required: recordAId, recordBId, employeeId, similarityScore (all numbers)',
+          error: 'Invalid request. Required: matchingRunId, recordAId, recordBId, employeeId, similarityScore (all numbers)',
         },
         { status: 400 }
       );
@@ -53,6 +107,7 @@ export async function POST(request: NextRequest) {
 
     // Create assignment with superadmin as creator
     const result = await createAssignment({
+      matchingRunId: body.matchingRunId,
       recordAId: body.recordAId,
       recordBId: body.recordBId,
       employeeId: body.employeeId,

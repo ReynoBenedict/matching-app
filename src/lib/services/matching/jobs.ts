@@ -25,6 +25,7 @@
 
 import { recordAuditLog } from '@/lib/audit';
 import { getMatchingProvider } from './factory';
+import { persistMatchingResult } from './persistence';
 import {
   isMatchingResponseData,
   type MatchingRequest,
@@ -43,6 +44,7 @@ export interface MatchingJob {
   completedAt: number | null;
   result: NonNullable<MatchingResponse['data']> | null;
   error: string | null;
+  matchingRunId: number | null;
 }
 
 /** Serializable view returned by the status endpoint (never leaks internals). */
@@ -57,6 +59,7 @@ export interface MatchingJobView {
   startedAt: string | null;
   completedAt: string | null;
   elapsedMs: number;
+  matchingRunId: number | null;
 }
 
 const COMPLETED_JOB_RETENTION_MS = 24 * 60 * 60 * 1000;
@@ -96,6 +99,7 @@ function toView(job: MatchingJob): MatchingJobView {
     completedAt:
       job.completedAt === null ? null : new Date(job.completedAt).toISOString(),
     elapsedMs: Math.max(0, ended - started),
+    matchingRunId: job.matchingRunId,
   };
 }
 
@@ -169,6 +173,10 @@ async function runMatchingJob(jobId: string): Promise<void> {
     }
 
     job.result = response.data;
+    job.matchingRunId = await persistMatchingResult(job.createdBy, job.request, response.data);
+    // Candidates are persisted in PostgreSQL; do not keep the entire result
+    // payload in the in-process job registry after completion.
+    job.result = null;
     job.state = 'COMPLETED';
     job.completedAt = Date.now();
 
@@ -255,6 +263,7 @@ export function createMatchingJob(
     completedAt: null,
     result: null,
     error: null,
+    matchingRunId: null,
   };
   jobs.set(job.id, job);
   ensureMatchingJobRunner(job.id);

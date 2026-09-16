@@ -93,14 +93,14 @@ export function AssignCandidateDialog({
             <RecordSummary
               label="Record A"
               idsbr={candidate.idsbrA}
-              namaUsaha={candidate.recordA?.namaUsaha}
-              alamatUsaha={candidate.recordA?.alamatUsaha}
+              namaUsaha={candidate.recordA?.namaUsaha ?? undefined}
+              alamatUsaha={candidate.recordA?.alamatUsaha ?? undefined}
             />
             <RecordSummary
               label="Record B"
               idsbr={candidate.idsbrB}
-              namaUsaha={candidate.recordB?.namaUsaha}
-              alamatUsaha={candidate.recordB?.alamatUsaha}
+              namaUsaha={candidate.recordB?.namaUsaha ?? undefined}
+              alamatUsaha={candidate.recordB?.alamatUsaha ?? undefined}
             />
           </div>
           <div className="mt-md flex items-center justify-between bg-surface-container-low border border-outline-variant rounded-lg px-md py-sm">

@@ -10,6 +10,7 @@ services:
       - NODE_ENV=production
       - DATABASE_URL=postgresql://bps_user:bps_password@postgres:5432/bps_data_matching
       - MODEL_SERVICE_URL=http://model:8000
+      - MATCHING_PROVIDER=model_service
     depends_on:
       postgres:
         condition: service_healthy
@@ -37,21 +38,22 @@ services:
       retries: 5
     restart: unless-stopped
 
-  # Model Service (Placeholder for Phase 2+)
-  # This service is commented out because the actual model implementation
-  # does not exist yet. It will be implemented in later phases.
-  # 
-  # model:
-  #   image: bps-matching-model:latest  # To be defined in later phases
-  #   ports:
-  #     - "8000:8000"
-  #   environment:
-  #     - MODEL_ENV=production
-  #   networks:
-  #     - bps-network
-  #   restart: unless-stopped
-  #   depends_on:
-  #     - postgres
+  # Python matching engine: TF-IDF char n-gram -> SVD -> FAISS Top-K -> RapidFuzz
+  model:
+    build:
+      context: ./model_service
+      dockerfile: Dockerfile
+    ports:
+      - "8000:8000"
+    environment:
+      - DATABASE_URL=postgresql://bps_user:bps_password@postgres:5432/bps_data_matching
+      - MATCHING_TOP_K=10
+    networks:
+      - bps-network
+    restart: unless-stopped
+    depends_on:
+      postgres:
+        condition: service_healthy
 
 volumes:
   postgres_data:

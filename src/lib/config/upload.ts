@@ -3,8 +3,8 @@
  */
 
 export const UPLOAD_CONFIG = {
-  // Maximum file size: 50MB
-  MAX_FILE_SIZE: 50 * 1024 * 1024,
+  // Maximum file size: 200MB
+  MAX_FILE_SIZE: 200 * 1024 * 1024,
 
   // Supported file extensions
   SUPPORTED_EXTENSIONS: ['csv'],
