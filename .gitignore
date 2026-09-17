@@ -63,5 +63,9 @@ Thumbs.db
 # logs
 *.log
 
+# python (model_service)
+__pycache__/
+*.py[cod]
+
 # working/build directories (nested project copies)
 bps-data-matching-system/
