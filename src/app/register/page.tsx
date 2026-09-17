@@ -2,6 +2,7 @@
 
 import { useState } from 'react';
 import Link from 'next/link';
+import Image from 'next/image';
 import { useRouter } from 'next/navigation';
 
 export default function RegisterPage() {
@@ -73,235 +74,227 @@ export default function RegisterPage() {
   };
 
   return (
-    <div className="min-h-screen bg-[#f8f9ff] flex items-center justify-center p-4 md:p-8 font-sans text-[#0b1c30]">
-      <style>{`
-        @import url('https://fonts.googleapis.com/css2?family=Material+Symbols+Outlined:wght,FILL@100..700,0..1&display=swap');
-        @import url('https://fonts.googleapis.com/css2?family=Public+Sans:wght@400;600;700&display=swap');
-        .material-symbols-outlined { font-variation-settings: 'FILL' 0, 'wght' 400, 'GRAD' 0, 'opsz' 24; }
-      `}</style>
+    <div className="flex min-h-screen flex-col bg-background font-sans text-on-background md:flex-row">
+      {/* Panel identitas dan informasi kelembagaan */}
+      <section className="relative shrink-0 bg-primary md:h-auto md:w-[40%]">
+        <div className="flex h-full flex-col p-lg lg:p-xl">
+          <Image
+            src="/bps-logo.png"
+            alt="Logo Badan Pusat Statistik Kota Malang"
+            width={332}
+            height={67}
+            priority
+            className="block h-auto w-auto max-w-full self-start"
+          />
 
-      <main className="w-full max-w-6xl">
-        <div className="bg-white border border-[#c3c6d2] rounded overflow-hidden shadow-sm flex flex-col md:flex-row">
-          {/* Branding Section - Hidden on Mobile */}
-          <div className="hidden md:flex md:w-2/5 bg-[#002b5a] p-8 text-white flex-col justify-between">
-            <div>
-              <div className="flex items-center gap-2 mb-6">
-                <span className="material-symbols-outlined text-[32px]">
-                  dataset_linked
-                </span>
-                <div>
-                  <h1 className="text-xl font-bold leading-tight">
-                    Sistem Pencocokan Data
-                  </h1>
-                  <p className="text-sm text-[#b3d9ff] font-normal">
-                    BPS Kota Malang
-                  </p>
-                </div>
-              </div>
-              <h2 className="text-2xl font-semibold mb-4 mt-8">
+          <div className="my-auto py-xl">
+            <p className="font-label-md text-label-md uppercase text-primary-fixed-dim">
+              BPS Kota Malang
+            </p>
+            <h1 className="mt-sm font-headline-md text-headline-md text-on-primary">
+              Sistem Pencocokan Data
+            </h1>
+
+            <div className="mt-2xl border-t border-on-primary-fixed-variant pt-lg">
+              <h2 className="font-headline-sm text-headline-sm text-on-primary">
                 Pengajuan Akses Sistem
               </h2>
-              <p className="text-sm text-[#e8f1ff] mb-6">
-                Pendaftaran akun ini bersifat pengajuan. Setelah Anda mengisi
-                formulir ini, tim administrator akan memverifikasi data Anda
-                sebelum akses diberikan.
+              <p className="mt-sm font-body-md text-body-md text-primary-fixed">
+                Pendaftaran akun bersifat pengajuan. Setelah Anda mengisi formulir, data akan
+                diverifikasi oleh administrator sebelum akses diberikan.
               </p>
-              <ul className="space-y-2 text-xs text-[#e8f1ff]">
-                <li className="flex items-start gap-2">
-                  <span className="material-symbols-outlined text-[16px] flex-shrink-0 mt-0.5">
+
+              <ul className="mt-xl space-y-md">
+                <li className="flex items-start gap-sm">
+                  <span className="material-symbols-outlined mt-px text-base text-primary-fixed-dim">
                     verified
                   </span>
-                  <span>Gunakan email resmi instansi jika memungkinkan.</span>
+                  <span className="font-body-md text-body-md text-primary-fixed">
+                    Gunakan email resmi instansi jika memungkinkan.
+                  </span>
                 </li>
-                <li className="flex items-start gap-2">
-                  <span className="material-symbols-outlined text-[16px] flex-shrink-0 mt-0.5">
+                <li className="flex items-start gap-sm">
+                  <span className="material-symbols-outlined mt-px text-base text-primary-fixed-dim">
                     admin_panel_settings
                   </span>
-                  <span>
+                  <span className="font-body-md text-body-md text-primary-fixed">
                     Pendaftaran hanya untuk akun Pegawai (Employee).
                   </span>
                 </li>
-                <li className="flex items-start gap-2">
-                  <span className="material-symbols-outlined text-[16px] flex-shrink-0 mt-0.5">
+                <li className="flex items-start gap-sm">
+                  <span className="material-symbols-outlined mt-px text-base text-primary-fixed-dim">
                     schedule
                   </span>
-                  <span>Proses verifikasi memakan waktu 1-2 hari kerja.</span>
+                  <span className="font-body-md text-body-md text-primary-fixed">
+                    Proses verifikasi memakan waktu 1-2 hari kerja.
+                  </span>
                 </li>
               </ul>
             </div>
-            <div className="text-xs text-[#b3d9ff] mt-8">
-              © 2024 Badan Pusat Statistik Kota Malang
-            </div>
           </div>
+        </div>
+      </section>
 
-          {/* Form Section */}
-          <div className="w-full md:w-3/5 p-6 md:p-8 bg-white">
-            {/* Mobile Header */}
-            <div className="md:hidden mb-6">
-              <h1 className="text-2xl font-bold text-[#002b5a] mb-2">
-                Sistem Pencocokan Data
-              </h1>
-              <p className="text-sm text-[#424750]">
-                Pendaftaran akun bersifat pengajuan dan membutuhkan verifikasi
-                administrator.
-              </p>
-            </div>
+      {/* Panel formulir registrasi */}
+      <section className="flex flex-1 items-center justify-center px-4 py-10 sm:px-6 lg:px-10">
+        <div className="w-full max-w-[32rem] lg:max-w-[38rem]">
+          <div className="overflow-hidden rounded-lg border border-outline-variant bg-surface-container-lowest shadow-sm">
+            <div className="h-1 bg-primary" />
 
-            <h2 className="text-lg font-semibold text-[#002b5a] mb-4 border-b border-[#c3c6d2] pb-2">
-              Formulir Registrasi
-            </h2>
+            <div className="p-6 sm:p-8">
+              <h2 className="font-headline-sm text-headline-sm font-bold text-primary">
+                Formulir Registrasi
+              </h2>
+              <div className="mt-sm border-t border-outline-variant" />
 
-            <p className="text-xs text-[#424750] mb-4 bg-[#f8f9ff] border border-[#c3c6d2] rounded px-3 py-2">
-              Akun yang diajukan akan memiliki peran Pegawai (Employee) dan perlu
-              disetujui oleh administrator.
-            </p>
-
-            {error && (
-              <div className="bg-[#ffdad6] border border-[#ba1a1a] rounded p-4 mb-4">
-                <p className="text-[#93000a] text-sm">{error}</p>
+              <div className="mt-md flex items-start gap-sm rounded border border-outline-variant bg-surface px-md py-sm">
+                <span className="material-symbols-outlined mt-px text-base text-secondary">
+                  info
+                </span>
+                <p className="font-body-sm text-body-sm text-on-surface-variant">
+                  Akun yang diajukan akan memiliki peran Pegawai (Employee) dan perlu disetujui
+                  oleh administrator.
+                </p>
               </div>
-            )}
 
-            <form onSubmit={handleSubmit} className="space-y-4">
-              <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
-                {/* Nama Lengkap */}
-                <div>
+              {error && (
+                <div role="alert" className="mt-md rounded border border-error bg-error-container p-md">
+                  <p className="font-body-md text-body-md text-on-error-container">{error}</p>
+                </div>
+              )}
+
+              <form onSubmit={handleSubmit} className="mt-lg">
+                {/* Data identitas */}
+                <div className="grid grid-cols-1 gap-md lg:grid-cols-2">
+                  <div>
+                    <label
+                      className="mb-sm block font-label-md text-label-md text-on-surface"
+                      htmlFor="fullName"
+                    >
+                      Nama Lengkap
+                    </label>
+                    <input
+                      type="text"
+                      id="fullName"
+                      name="fullName"
+                      placeholder="Sesuai KTP/SK"
+                      value={formData.fullName}
+                      onChange={handleChange}
+                      disabled={loading}
+                      required
+                      className="w-full rounded border border-outline-variant bg-surface px-md py-2.5 font-body-md text-body-md text-on-surface transition-colors focus:border-secondary focus:outline-none focus:ring-2 focus:ring-[rgba(0,100,147,0.2)] disabled:cursor-not-allowed disabled:opacity-50"
+                    />
+                  </div>
+
+                  <div>
+                    <label
+                      className="mb-sm block font-label-md text-label-md text-on-surface"
+                      htmlFor="email"
+                    >
+                      Email
+                    </label>
+                    <input
+                      type="email"
+                      id="email"
+                      name="email"
+                      placeholder="nama@bps.go.id"
+                      value={formData.email}
+                      onChange={handleChange}
+                      disabled={loading}
+                      required
+                      className="w-full rounded border border-outline-variant bg-surface px-md py-2.5 font-body-md text-body-md text-on-surface transition-colors focus:border-secondary focus:outline-none focus:ring-2 focus:ring-[rgba(0,100,147,0.2)] disabled:cursor-not-allowed disabled:opacity-50"
+                    />
+                  </div>
+                </div>
+
+                <div className="mt-md">
                   <label
-                    className="block text-xs font-semibold text-[#0b1c30] mb-1 tracking-wide"
-                    htmlFor="fullName"
+                    className="mb-sm block font-label-md text-label-md text-on-surface"
+                    htmlFor="username"
                   >
-                    Nama Lengkap
+                    Username / NIP
                   </label>
                   <input
                     type="text"
-                    id="fullName"
-                    name="fullName"
-                    placeholder="Sesuai KTP/SK"
-                    value={formData.fullName}
+                    id="username"
+                    name="username"
+                    placeholder="Username atau NIP"
+                    value={formData.username}
                     onChange={handleChange}
                     disabled={loading}
                     required
-                    className="w-full border border-[#c3c6d2] rounded px-3 py-2 text-sm text-[#0b1c30] bg-[#f8f9ff] focus:border-[#006493] focus:ring-2 focus:ring-[rgba(0,100,147,0.2)] focus:outline-none disabled:opacity-50 disabled:cursor-not-allowed"
+                    className="w-full rounded border border-outline-variant bg-surface px-md py-2.5 font-body-md text-body-md text-on-surface transition-colors focus:border-secondary focus:outline-none focus:ring-2 focus:ring-[rgba(0,100,147,0.2)] disabled:cursor-not-allowed disabled:opacity-50"
                   />
                 </div>
 
-                {/* Email */}
-                <div>
-                  <label
-                    className="block text-xs font-semibold text-[#0b1c30] mb-1 tracking-wide"
-                    htmlFor="email"
+                {/* Kredensial akun */}
+                <div className="mt-lg border-t border-outline-variant pt-md">
+                  <div className="grid grid-cols-1 gap-md lg:grid-cols-2">
+                    <div>
+                      <label
+                        className="mb-sm block font-label-md text-label-md text-on-surface"
+                        htmlFor="password"
+                      >
+                        Password
+                      </label>
+                      <input
+                        type="password"
+                        id="password"
+                        name="password"
+                        placeholder="Minimal 8 karakter"
+                        value={formData.password}
+                        onChange={handleChange}
+                        disabled={loading}
+                        required
+                        className="w-full rounded border border-outline-variant bg-surface px-md py-2.5 font-body-md text-body-md text-on-surface transition-colors focus:border-secondary focus:outline-none focus:ring-2 focus:ring-[rgba(0,100,147,0.2)] disabled:cursor-not-allowed disabled:opacity-50"
+                      />
+                    </div>
+
+                    <div>
+                      <label
+                        className="mb-sm block font-label-md text-label-md text-on-surface"
+                        htmlFor="confirmPassword"
+                      >
+                        Konfirmasi Password
+                      </label>
+                      <input
+                        type="password"
+                        id="confirmPassword"
+                        name="confirmPassword"
+                        placeholder="Ketik ulang password"
+                        value={formData.confirmPassword}
+                        onChange={handleChange}
+                        disabled={loading}
+                        required
+                        className="w-full rounded border border-outline-variant bg-surface px-md py-2.5 font-body-md text-body-md text-on-surface transition-colors focus:border-secondary focus:outline-none focus:ring-2 focus:ring-[rgba(0,100,147,0.2)] disabled:cursor-not-allowed disabled:opacity-50"
+                      />
+                    </div>
+                  </div>
+                </div>
+
+                {/* Area aksi */}
+                <div className="mt-xl flex flex-col-reverse gap-sm sm:flex-row sm:items-center sm:justify-between">
+                  <Link
+                    href="/login"
+                    className="flex w-full items-center justify-center gap-sm rounded border border-outline-variant bg-transparent px-md py-3 font-label-md text-label-md text-primary transition-colors hover:bg-surface-container-low sm:w-auto"
                   >
-                    Email
-                  </label>
-                  <input
-                    type="email"
-                    id="email"
-                    name="email"
-                    placeholder="nama@bps.go.id"
-                    value={formData.email}
-                    onChange={handleChange}
+                    <span className="material-symbols-outlined text-lg">arrow_back</span>
+                    Kembali ke Login
+                  </Link>
+                  <button
+                    type="submit"
                     disabled={loading}
-                    required
-                    className="w-full border border-[#c3c6d2] rounded px-3 py-2 text-sm text-[#0b1c30] bg-[#f8f9ff] focus:border-[#006493] focus:ring-2 focus:ring-[rgba(0,100,147,0.2)] focus:outline-none disabled:opacity-50 disabled:cursor-not-allowed"
-                  />
-                </div>
-              </div>
-
-              {/* Username / NIP */}
-              <div>
-                <label
-                  className="block text-xs font-semibold text-[#0b1c30] mb-1 tracking-wide"
-                  htmlFor="username"
-                >
-                  Username / NIP
-                </label>
-                <input
-                  type="text"
-                  id="username"
-                  name="username"
-                  placeholder="Username atau NIP"
-                  value={formData.username}
-                  onChange={handleChange}
-                  disabled={loading}
-                  required
-                  className="w-full border border-[#c3c6d2] rounded px-3 py-2 text-sm text-[#0b1c30] bg-[#f8f9ff] focus:border-[#006493] focus:ring-2 focus:ring-[rgba(0,100,147,0.2)] focus:outline-none disabled:opacity-50 disabled:cursor-not-allowed"
-                />
-              </div>
-
-              <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
-                {/* Password */}
-                <div>
-                  <label
-                    className="block text-xs font-semibold text-[#0b1c30] mb-1 tracking-wide"
-                    htmlFor="password"
+                    className="flex w-full cursor-pointer items-center justify-center gap-sm rounded bg-primary px-md py-3 font-label-md text-label-md text-on-primary shadow-sm transition-colors hover:bg-primary-container disabled:opacity-70 sm:w-auto"
                   >
-                    Password
-                  </label>
-                  <input
-                    type="password"
-                    id="password"
-                    name="password"
-                    placeholder="Minimal 8 karakter"
-                    value={formData.password}
-                    onChange={handleChange}
-                    disabled={loading}
-                    required
-                    className="w-full border border-[#c3c6d2] rounded px-3 py-2 text-sm text-[#0b1c30] bg-[#f8f9ff] focus:border-[#006493] focus:ring-2 focus:ring-[rgba(0,100,147,0.2)] focus:outline-none disabled:opacity-50 disabled:cursor-not-allowed"
-                  />
+                    <span className="material-symbols-outlined text-lg">send</span>
+                    {loading ? 'Mengirim...' : 'Kirim Pengajuan'}
+                  </button>
                 </div>
-
-                {/* Konfirmasi Password */}
-                <div>
-                  <label
-                    className="block text-xs font-semibold text-[#0b1c30] mb-1 tracking-wide"
-                    htmlFor="confirmPassword"
-                  >
-                    Konfirmasi Password
-                  </label>
-                  <input
-                    type="password"
-                    id="confirmPassword"
-                    name="confirmPassword"
-                    placeholder="Ketik ulang password"
-                    value={formData.confirmPassword}
-                    onChange={handleChange}
-                    disabled={loading}
-                    required
-                    className="w-full border border-[#c3c6d2] rounded px-3 py-2 text-sm text-[#0b1c30] bg-[#f8f9ff] focus:border-[#006493] focus:ring-2 focus:ring-[rgba(0,100,147,0.2)] focus:outline-none disabled:opacity-50 disabled:cursor-not-allowed"
-                  />
-                </div>
-              </div>
-
-              <div className="pt-4 flex items-center justify-between">
-                <Link
-                  href="/login"
-                  className="text-xs font-semibold text-[#006493] hover:text-[#002b5a] hover:underline flex items-center gap-1"
-                >
-                  <span className="material-symbols-outlined text-[16px]">
-                    arrow_back
-                  </span>
-                  Kembali ke Login
-                </Link>
-                <button
-                  type="submit"
-                  disabled={loading}
-                  className="flex justify-center items-center py-2 px-4 border-none rounded shadow-sm text-xs font-semibold text-white bg-[#002b5a] hover:bg-[#0c4687] disabled:opacity-70 cursor-pointer"
-                >
-                  <span className="material-symbols-outlined mr-2 text-sm">
-                    send
-                  </span>
-                  {loading ? 'Mengirim...' : 'Kirim Pengajuan'}
-                </button>
-              </div>
-            </form>
+              </form>
+            </div>
           </div>
         </div>
-
-        <div className="mt-8 text-center">
-          <p className="text-xs text-[#737781]">© 2024 Badan Pusat Statistik Kota Malang - Tim IT BPS</p>
-          <p className="text-xs text-[#737781] mt-1">Akses terbatas hanya untuk pegawai berwenang.</p>
-        </div>
-      </main>
+      </section>
     </div>
   );
 }
