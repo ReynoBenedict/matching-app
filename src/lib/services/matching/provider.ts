@@ -30,6 +30,10 @@ export interface FieldScore {
 }
 
 export interface CandidatePair {
+  /** Similarity metrics are optional for legacy/fallback providers. */
+  tfidfSimilarity?: number;
+  faissSimilarity?: number;
+  rapidfuzzSimilarity?: number;
   recordAId: number;
   recordBId: number;
   idsbrA: string;

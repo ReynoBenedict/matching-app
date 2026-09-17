@@ -61,7 +61,7 @@ function formatDateTime(value: string | null): string {
   });
 }
 
-/** Pengambil data murni tanpa perubahan state. */
+/** Pure fetchers — no state updates, safe to await anywhere. */
 async function fetchReadyDatasets(): Promise<DatasetOption[]> {
   const response = await fetch('/api/datasets?status=READY&limit=100');
   const payload = await response.json();
@@ -156,6 +156,14 @@ function HasilVerifikasiBadge({ result }: { result: MatchingCandidateRow['verifi
       <span className="inline-flex items-center gap-xs px-sm py-xs rounded-lg font-label-md bg-error-container text-on-error-container">
         <span className="material-symbols-outlined" style={{ fontSize: '16px' }}>close</span>
         NON-MATCH
+      </span>
+    );
+  }
+  if (result === 'REVIEW') {
+    return (
+      <span className="inline-flex items-center gap-xs px-sm py-xs rounded-lg font-label-md bg-secondary-fixed text-on-secondary-fixed">
+        <span className="material-symbols-outlined" style={{ fontSize: '16px' }}>rate_review</span>
+        PERLU REVIEW
       </span>
     );
   }
@@ -625,7 +633,7 @@ export function MatchingResultsContent() {
                           <td className="p-md align-top text-right whitespace-nowrap">
                             <button
                               onClick={() => setDetailTarget(row)}
-                              className="px-md py-xs rounded-lg border border-outline-variant text-primary font-label-md hover:bg-surface-container-low transition-colors"
+                              className="px-md py-xs rounded-lg border border-outline text-primary font-label-md hover:bg-surface-container-low transition-colors"
                             >
                               Detail
                             </button>
@@ -638,7 +646,7 @@ export function MatchingResultsContent() {
               )}
 
               {/* Footer / pagination */}
-              <div className="p-lg border-t border-outline-variant bg-surface-container-low flex flex-wrap items-center justify-between gap-sm">
+              <div className="p-lg border-t border-outline bg-surface-container-low flex flex-wrap items-center justify-between gap-sm">
                 <span className="text-on-surface-variant font-body-md">
                   Menampilkan {formatNumber(rangeStart)}-{formatNumber(rangeEnd)} dari {formatNumber(pagination.total)} kandidat
                 </span>
@@ -646,7 +654,7 @@ export function MatchingResultsContent() {
                   <button
                     onClick={() => handlePageChange(pagination.page - 1)}
                     disabled={pagination.page <= 1}
-                    className="px-md py-xs rounded-lg border border-outline-variant text-on-surface font-label-md hover:bg-surface-container disabled:opacity-40 disabled:cursor-not-allowed"
+                    className="px-md py-xs rounded-lg border border-outline text-on-surface font-label-md hover:bg-surface-container disabled:opacity-40 disabled:cursor-not-allowed"
                   >
                     Sebelumnya
                   </button>
@@ -656,7 +664,7 @@ export function MatchingResultsContent() {
                   <button
                     onClick={() => handlePageChange(pagination.page + 1)}
                     disabled={pagination.page >= pagination.totalPages}
-                    className="px-md py-xs rounded-lg border border-outline-variant text-on-surface font-label-md hover:bg-surface-container disabled:opacity-40 disabled:cursor-not-allowed"
+                    className="px-md py-xs rounded-lg border border-outline text-on-surface font-label-md hover:bg-surface-container disabled:opacity-40 disabled:cursor-not-allowed"
                   >
                     Berikutnya
                   </button>
@@ -664,6 +672,25 @@ export function MatchingResultsContent() {
               </div>
             </div>
 
+            {/* Info Panel */}
+            <div className="bg-surface-container rounded-lg border border-outline p-lg">
+              <div className="flex items-start gap-md">
+                <span className="material-symbols-outlined text-primary">info</span>
+                <div>
+                  <h3 className="font-label-lg text-label-lg text-on-surface font-semibold mb-sm">
+                    Tentang Halaman Hasil Matching
+                  </h3>
+                  <p className="text-on-surface-variant font-body-md">
+                    Kandidat dihitung langsung oleh proses pencocokan untuk pasangan dataset dan threshold yang dipilih,
+                    sehingga mencakup kandidat yang belum ditugaskan. Nama dataset diambil dari Manajemen Dataset.
+                  </p>
+                  <p className="text-on-surface-variant font-body-md mt-sm">
+                    Persentase MATCH dihitung hanya dari kandidat yang sudah terverifikasi
+                    (MATCH / (MATCH + NON-MATCH)), bukan dari seluruh kandidat.
+                  </p>
+                </div>
+              </div>
+            </div>
           </>
         )
       )}

@@ -4,7 +4,7 @@
  */
 
 import { getDatabase } from '@/lib/db';
-import { assignments, datasetRecords, users } from '@/lib/db/schema';
+import { assignments, datasetRecords, users, matchingCandidates, matchingRuns } from '@/lib/db/schema';
 import { eq, and } from 'drizzle-orm';
 import { recordAuditLog } from '@/lib/audit';
 
@@ -17,12 +17,14 @@ import { recordAuditLog } from '@/lib/audit';
  * - Superadmin verification
  */
 export async function createAssignment({
+  matchingRunId,
   recordAId,
   recordBId,
   employeeId,
   similarityScore,
   createdBy,
 }: {
+  matchingRunId?: number;
   recordAId: number;
   recordBId: number;
   employeeId: number;
@@ -48,6 +50,30 @@ export async function createAssignment({
         success: false,
         error: 'Creator must be a superadmin',
       };
+    }
+
+    // The assignment must refer to a candidate produced by a persisted
+    // matching run. This prevents arbitrary record pairs/scores from being
+    // assigned outside the actual matching result.
+    if (matchingRunId != null) {
+      const [candidate] = await db
+        .select({ id: matchingCandidates.id, overallScore: matchingCandidates.overallScore })
+        .from(matchingCandidates)
+        .where(and(
+          eq(matchingCandidates.matchingRunId, matchingRunId),
+          eq(matchingCandidates.recordAId, recordAId),
+          eq(matchingCandidates.recordBId, recordBId),
+        ))
+        .limit(1);
+      if (!candidate) return { success: false, error: 'Pasangan record bukan bagian dari hasil matching yang dipilih.' };
+      if (Math.abs(Number(candidate.overallScore) - similarityScore) > 0.0001) return { success: false, error: 'Skor kandidat tidak sesuai dengan hasil matching tersimpan.' };
+
+      const [run] = await db
+        .select({ id: matchingRuns.id })
+        .from(matchingRuns)
+        .where(eq(matchingRuns.id, matchingRunId))
+        .limit(1);
+      if (!run) return { success: false, error: 'Matching run tidak ditemukan.' };
     }
 
     // Validate that both records exist
@@ -130,6 +156,7 @@ export async function createAssignment({
     const result = await db
       .insert(assignments)
       .values({
+        matchingRunId,
         recordAId,
         recordBId,
         employeeId,
@@ -147,6 +174,7 @@ export async function createAssignment({
       entityType: 'ASSIGNMENT',
       entityId: assignmentId,
       metadata: {
+        matchingRunId,
         recordAId,
         recordBId,
         employeeId,
@@ -174,12 +202,14 @@ export async function createAssignment({
 export async function getEmployeeAssignments(employeeId: number): Promise<
   Array<{
     id: number;
+    matchingRunId: number | null;
     recordAId: number;
     recordBId: number;
     employeeId: number;
     similarityScore: string; // numeric stored as string in Drizzle
     status: string;
     verificationResult: string | null;
+    verificationNote: string | null;
     verifiedAt: Date | null;
     createdAt: Date;
     createdBy: number;
@@ -190,12 +220,14 @@ export async function getEmployeeAssignments(employeeId: number): Promise<
   const result = await db
     .select({
       id: assignments.id,
+      matchingRunId: assignments.matchingRunId,
       recordAId: assignments.recordAId,
       recordBId: assignments.recordBId,
       employeeId: assignments.employeeId,
       similarityScore: assignments.similarityScore,
       status: assignments.status,
       verificationResult: assignments.verificationResult,
+      verificationNote: assignments.verificationNote,
       verifiedAt: assignments.verifiedAt,
       createdAt: assignments.createdAt,
       createdBy: assignments.createdBy,
@@ -216,14 +248,21 @@ export async function getAssignmentDetail(assignmentId: number, employeeId: numb
   error?: string;
   data?: {
     id: number;
+    matchingRunId: number | null;
     recordAId: number;
     recordBId: number;
     employeeId: number;
     similarityScore: string;
     status: string;
     verificationResult: string | null;
+    verificationNote: string | null;
     verifiedAt: Date | null;
     createdAt: Date;
+    threshold: string | null;
+    tfidfSimilarity: string | null;
+    faissSimilarity: string | null;
+    rapidfuzzSimilarity: string | null;
+    fieldScores: unknown[];
     recordA: any;
     recordB: any;
   };
@@ -247,6 +286,30 @@ export async function getAssignmentDetail(assignmentId: number, employeeId: numb
 
     const assign = assignment[0];
 
+    if (assign.status === 'PENDING') {
+      await db.update(assignments).set({ status: 'IN_PROGRESS', updatedAt: new Date() }).where(eq(assignments.id, assignmentId));
+      assign.status = 'IN_PROGRESS';
+    }
+
+    const [matchingCandidate] = assign.matchingRunId
+      ? await db
+          .select({
+            threshold: matchingRuns.threshold,
+            tfidfSimilarity: matchingCandidates.tfidfSimilarity,
+            faissSimilarity: matchingCandidates.faissSimilarity,
+            rapidfuzzSimilarity: matchingCandidates.rapidfuzzSimilarity,
+            fieldScores: matchingCandidates.fieldScores,
+          })
+          .from(matchingCandidates)
+          .innerJoin(matchingRuns, eq(matchingCandidates.matchingRunId, matchingRuns.id))
+          .where(and(
+            eq(matchingCandidates.matchingRunId, assign.matchingRunId),
+            eq(matchingCandidates.recordAId, assign.recordAId),
+            eq(matchingCandidates.recordBId, assign.recordBId),
+          ))
+          .limit(1)
+      : [undefined];
+
     // Get both records
     const [recordA, recordB] = await Promise.all([
       db
@@ -265,14 +328,21 @@ export async function getAssignmentDetail(assignmentId: number, employeeId: numb
       success: true,
       data: {
         id: assign.id,
+        matchingRunId: assign.matchingRunId,
         recordAId: assign.recordAId,
         recordBId: assign.recordBId,
         employeeId: assign.employeeId,
         similarityScore: assign.similarityScore,
         status: assign.status,
         verificationResult: assign.verificationResult,
+        verificationNote: assign.verificationNote,
         verifiedAt: assign.verifiedAt,
         createdAt: assign.createdAt,
+        threshold: matchingCandidate?.threshold ?? null,
+        tfidfSimilarity: matchingCandidate?.tfidfSimilarity ?? null,
+        faissSimilarity: matchingCandidate?.faissSimilarity ?? null,
+        rapidfuzzSimilarity: matchingCandidate?.rapidfuzzSimilarity ?? null,
+        fieldScores: Array.isArray(matchingCandidate?.fieldScores) ? matchingCandidate.fieldScores as unknown[] : [],
         recordA: recordA[0],
         recordB: recordB[0],
       },
@@ -329,7 +399,8 @@ export async function getEmployeeProgress(employeeId: number): Promise<{
 export async function saveVerificationResult(
   assignmentId: number,
   employeeId: number,
-  verificationResult: 'MATCH' | 'NON_MATCH'
+  verificationResult: 'MATCH' | 'NON_MATCH' | 'REVIEW',
+  verificationNote?: string | null,
 ): Promise<{
   success: boolean;
   error?: string;
@@ -338,10 +409,10 @@ export async function saveVerificationResult(
     const db = getDatabase();
 
     // Validate result value
-    if (!['MATCH', 'NON_MATCH'].includes(verificationResult)) {
+    if (!['MATCH', 'NON_MATCH', 'REVIEW'].includes(verificationResult)) {
       return {
         success: false,
-        error: 'Invalid verification result. Must be MATCH or NON_MATCH',
+        error: 'Invalid verification result. Must be MATCH, NON_MATCH, or REVIEW',
       };
     }
 
@@ -364,6 +435,7 @@ export async function saveVerificationResult(
       .update(assignments)
       .set({
         verificationResult,
+        verificationNote: verificationNote?.trim() || null,
         status: 'COMPLETED',
         verifiedAt: new Date(),
         verifiedBy: employeeId,
@@ -379,6 +451,7 @@ export async function saveVerificationResult(
       entityId: assignmentId,
       metadata: {
         verificationResult,
+        verificationNote: verificationNote?.trim() || null,
         previousStatus: 'PENDING',
         newStatus: 'COMPLETED',
       },

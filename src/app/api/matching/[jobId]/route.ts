@@ -1,25 +1,33 @@
+import { NextResponse } from 'next/server';
+import { requireAuth } from '@/lib/auth/authorization';
+import {
+  getMatchingJob,
+  getMatchingJobView,
+} from '@/lib/services/matching';
+
+export const dynamic = 'force-dynamic';
+export const revalidate = 0;
+
 /**
  * GET /api/matching/[jobId]
  *
- * Returns the current status of a matching job so the UI can poll it without
- * being tied to the request that started the run.
+ * Endpoint ini KHUSUS untuk membaca status job.
  *
- * Responses:
- * - 200 { success: true, job, data? }  → data is present only when COMPLETED
- * - 200 { success: true, job, error }  → job FAILED (message shown to the user)
- * - 404 { success: false, error }      → unknown job id
+ * Jangan masukkan pagination/results di sini.
  *
- * Requires authentication; a job is visible to its owner or to an ADMIN.
+ * Contract:
+ * PENDING/RUNNING
+ *   -> 200 { success: true, job }
+ *
+ * COMPLETED
+ *   -> 200 { success: true, job }
+ *      job.matchingRunId berisi ID persisted matching_runs
+ *
+ * FAILED
+ *   -> 200 { success: true, job, error }
  */
-
-import { NextRequest, NextResponse } from 'next/server';
-import { requireAuth } from '@/lib/auth/authorization';
-import { getMatchingJob, getMatchingJobView } from '@/lib/services/matching';
-
-export const dynamic = 'force-dynamic';
-
 export async function GET(
-  request: NextRequest,
+  _request: Request,
   { params }: { params: Promise<{ jobId: string }> }
 ) {
   try {
@@ -27,56 +35,66 @@ export async function GET(
     const { jobId } = await params;
 
     const job = getMatchingJob(jobId);
+
     if (!job) {
       return NextResponse.json(
-        { success: false, error: 'Job pencocokan tidak ditemukan.' },
+        {
+          success: false,
+          error: 'Job pencocokan tidak ditemukan atau sudah tidak tersedia.',
+        },
         { status: 404 }
       );
     }
 
+    // User hanya boleh melihat job miliknya,
+    // kecuali ADMIN.
     if (job.createdBy !== user.id && user.role !== 'ADMIN') {
       return NextResponse.json(
-        { success: false, error: 'Forbidden: bukan pemilik job pencocokan.' },
+        {
+          success: false,
+          error: 'Tidak berhak melihat status pencocokan ini.',
+        },
         { status: 403 }
       );
     }
 
     const view = getMatchingJobView(job);
 
-    if (job.state === 'COMPLETED') {
-      return NextResponse.json(
-        { success: true, job: view, data: job.result },
-        { status: 200, headers: { 'Cache-Control': 'no-store' } }
-      );
-    }
-
-    if (job.state === 'FAILED') {
-      return NextResponse.json(
-        {
-          success: true,
-          job: view,
-          error: job.error ?? 'Proses pencocokan gagal.',
-        },
-        { status: 200, headers: { 'Cache-Control': 'no-store' } }
-      );
-    }
-
     return NextResponse.json(
-      { success: true, job: view },
-      { status: 200, headers: { 'Cache-Control': 'no-store' } }
+      {
+        success: true,
+        job: view,
+        ...(job.state === 'FAILED' && job.error
+          ? { error: job.error }
+          : {}),
+      },
+      {
+        headers: {
+          'Cache-Control': 'no-store, no-cache, must-revalidate',
+        },
+      }
     );
   } catch (error) {
     console.error('Matching job status error:', error);
 
-    if (error instanceof Error && error.message.includes('Unauthorized')) {
+    if (
+      error instanceof Error &&
+      error.message.toLowerCase().includes('unauthorized')
+    ) {
       return NextResponse.json(
-        { success: false, error: 'Unauthorized' },
+        {
+          success: false,
+          error: 'Unauthorized',
+        },
         { status: 401 }
       );
     }
 
     return NextResponse.json(
-      { success: false, error: 'Gagal memuat status pencocokan.' },
+      {
+        success: false,
+        error: 'Gagal memuat status pencocokan.',
+      },
       { status: 500 }
     );
   }

@@ -7,7 +7,6 @@ import { UploadForm } from '@/components/datasets/UploadForm';
 export default function UploadDatasetPage() {
   return (
     <SuperadminLayout pageTitle="Unggah Dataset Baru">
-      {/* Back navigation */}
       <Link
         href="/datasets"
         className="inline-flex items-center gap-2 text-primary font-label-md hover:underline mb-md"
@@ -15,7 +14,6 @@ export default function UploadDatasetPage() {
         <span className="material-symbols-outlined" style={{ fontSize: '20px' }}>arrow_back</span>
         Kembali ke Manajemen Dataset
       </Link>
-
       {/* Page Header */}
       <div className="mb-xl">
         <h2 className="font-headline-lg-mobile md:font-headline-lg text-headline-lg-mobile md:text-headline-lg text-primary mb-xs">Unggah Dataset Baru</h2>
@@ -107,7 +105,7 @@ export default function UploadDatasetPage() {
                 <div>
                   <p className="font-label-md text-on-surface">Ringkasan Data</p>
                   <ul className="font-body-sm text-on-surface-variant list-disc pl-md mt-xs">
-                    <li>Format: CSV atau XLSX</li>
+                    <li>Format: CSV</li>
                     <li>Maksimal: 500MB</li>
                     <li>Encoding: UTF-8</li>
                   </ul>

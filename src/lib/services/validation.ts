@@ -18,31 +18,27 @@ export interface ValidationError {
  */
 export function validateHeaders(headers: string[]): ValidationError[] {
   const errors: ValidationError[] = [];
-  const allContractFields = [
-    ...DATASET_CONTRACT.REQUIRED_FIELDS,
-    ...DATASET_CONTRACT.OPTIONAL_FIELDS,
-  ];
 
-  // Check for unknown columns
-  for (const header of headers) {
-    if (!allContractFields.includes(header)) {
-      errors.push({
-        type: 'UNKNOWN_COLUMN',
-        message: `Unknown column: ${header}`,
-        columnName: header,
-      });
-    }
+  if (headers.length === 0) {
+    errors.push({ type: 'EMPTY_HEADER', message: 'CSV header line is empty' });
+    return errors;
   }
 
-  // Check for missing required fields
-  for (const field of DATASET_CONTRACT.REQUIRED_FIELDS) {
-    if (!headers.includes(field)) {
-      errors.push({
-        type: 'MISSING_REQUIRED_FIELD',
-        message: `Missing required field: ${field}`,
-        columnName: field,
-      });
+  // Upload validation is intentionally permissive. Unknown columns are allowed
+  // because matching datasets can have different schemas. We only reject
+  // duplicate/blank headers here; field-level validation is applied only to
+  // columns that are present and known to the legacy contract.
+  const seen = new Set<string>();
+  for (const rawHeader of headers) {
+    const header = rawHeader.trim();
+    if (!header) {
+      errors.push({ type: 'EMPTY_COLUMN_NAME', message: 'CSV contains an empty column name' });
+      continue;
     }
+    if (seen.has(header)) {
+      errors.push({ type: 'DUPLICATE_COLUMN', message: `Duplicate column: ${header}`, columnName: header });
+    }
+    seen.add(header);
   }
 
   return errors;
@@ -58,50 +54,19 @@ export function validateRecord(
   const errors: ValidationError[] = [];
   const fieldTypes = DATASET_CONTRACT.FIELD_TYPES as Record<string, string>;
 
-  // Validate required fields
-  for (const field of DATASET_CONTRACT.REQUIRED_FIELDS) {
+  // Only validate known fields when they are actually present and non-empty.
+  // This lets arbitrary CSV schemas be uploaded while retaining useful type
+  // checks for the legacy BPS columns.
+  for (const [field, fieldType] of Object.entries(fieldTypes)) {
     const value = record[field];
-
-    if (value === undefined || value === null || value.trim() === '') {
-      errors.push({
-        type: 'MISSING_REQUIRED_VALUE',
-        message: `Required field is empty: ${field}`,
-        rowNumber,
-        columnName: field,
-      });
-      continue;
-    }
-
-    // Validate by type
-    const fieldType = (fieldTypes as Record<string, string>)[field];
+    if (value === undefined || value === null || value.trim() === '') continue;
     const typeError = validateFieldType(field, value, fieldType, rowNumber);
-    if (typeError) {
-      errors.push(typeError);
-    }
-  }
-
-  // Validate optional fields (only if present and non-empty)
-  for (const field of DATASET_CONTRACT.OPTIONAL_FIELDS) {
-    const value = record[field];
-
-    // Optional fields can be empty
-    if (!value || value.trim() === '') {
-      continue;
-    }
-
-    const fieldType = (fieldTypes as Record<string, string>)[field];
-    const typeError = validateFieldType(field, value, fieldType, rowNumber);
-    if (typeError) {
-      errors.push(typeError);
-    }
+    if (typeError) errors.push(typeError);
   }
 
   return errors;
 }
 
-/**
- * Validate field type
- */
 function validateFieldType(
   field: string,
   value: string,
@@ -117,29 +82,33 @@ function validateFieldType(
 
   switch (actualType) {
     case 'float': {
-      if (!/^-?\d+(\.\d+)?$/.test(value.trim())) {
-        return {
-          type: 'INVALID_FLOAT',
-          message: `Invalid numeric value for ${field}: ${value}`,
-          rowNumber,
-          columnName: field,
-        };
+      // Accept normal decimals and scientific notation (e.g. -7.98e+0).
+      // JavaScript Number() also lets us reject NaN/Infinity explicitly.
+      const numericValue = Number(value.trim());
+      if (!Number.isFinite(numericValue)) {
+        // Numeric fields are quality attributes during ingestion. Keep the raw
+        // value in raw_data and let transformRowToRecord() persist NULL in the
+        // typed column instead of rejecting the entire heterogeneous dataset.
+        return null;
+      }
+
+      // Coordinates are optional quality attributes. An out-of-range
+      // coordinate is normalized to NULL during persistence; rawData always
+      // retains the original source value.
+      if (field === 'latitude' || field === 'latitude_gc') {
+        if (numericValue < -90 || numericValue > 90) return null;
+      }
+      if (field === 'longitude' || field === 'longitude_gc') {
+        if (numericValue < -180 || numericValue > 180) return null;
       }
       break;
     }
 
     case 'boolean': {
       const normalized = value.trim().toLowerCase();
-      if (
-        !['true', 'false', '1', '0', 'yes', 'no'].includes(normalized)
-      ) {
-        return {
-          type: 'INVALID_BOOLEAN',
-          message: `Invalid boolean value for ${field}: ${value}`,
-          rowNumber,
-          columnName: field,
-        };
-      }
+      // Boolean fields are optional quality attributes during ingestion.
+      // Unknown representations are retained in raw_data and become NULL.
+      if (!['true', 'false', '1', '0', 'yes', 'no', 'y', 'n'].includes(normalized)) return null;
       break;
     }
 
@@ -147,14 +116,7 @@ function validateFieldType(
       // Try to parse as ISO date or common formats
       const dateStr = value.trim();
       const date = new Date(dateStr);
-      if (isNaN(date.getTime())) {
-        return {
-          type: 'INVALID_DATE',
-          message: `Invalid date value for ${field}: ${value}`,
-          rowNumber,
-          columnName: field,
-        };
-      }
+      if (isNaN(date.getTime())) return null;
       break;
     }
 

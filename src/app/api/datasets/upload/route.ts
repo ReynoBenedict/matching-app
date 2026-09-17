@@ -59,13 +59,13 @@ export async function POST(request: NextRequest) {
       );
     }
 
-    // Validate MIME type (secondary check)
-    if (
-      file.type &&
-      !UPLOAD_CONFIG.SUPPORTED_MIME_TYPES.includes(file.type)
-    ) {
+    // MIME types reported by browsers vary widely for CSV files. The file
+    // extension is the primary check; only reject a MIME type when it is
+    // explicitly present and clearly unrelated to text/CSV.
+    if (file.type && !UPLOAD_CONFIG.SUPPORTED_MIME_TYPES.includes(file.type) &&
+        !file.type.startsWith('text/') && file.type !== 'application/octet-stream') {
       return NextResponse.json(
-        { error: 'Invalid file MIME type' },
+        { error: `Invalid CSV MIME type: ${file.type}` },
         { status: 400 }
       );
     }

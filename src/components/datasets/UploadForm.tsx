@@ -30,8 +30,8 @@ export function UploadForm() {
         return;
       }
 
-      if (selectedFile.size > 50 * 1024 * 1024) {
-        setError('Ukuran file tidak boleh melebihi 50MB');
+      if (selectedFile.size > 200 * 1024 * 1024) {
+        setError('Ukuran file tidak boleh melebihi 200MB');
         setFile(null);
         return;
       }
@@ -208,7 +208,7 @@ export function UploadForm() {
                   Klik atau drag file CSV ke sini
                 </p>
                 <p className="font-body-sm text-body-sm text-on-surface-variant">
-                  Format: CSV | Ukuran maksimal: 50MB
+                  Format: CSV | Ukuran maksimal: 200MB
                 </p>
               </div>
             )}
@@ -274,7 +274,7 @@ export function UploadForm() {
         {/* Info */}
         <div className="bg-surface-container rounded p-md">
           <p className="font-body-sm text-body-sm text-on-surface-variant">
-            <strong>Informasi:</strong> File CSV harus memiliki header yang sesuai dengan skema dataset. Ukuran maksimal file adalah 50MB.
+            <strong>Informasi:</strong> File CSV harus memiliki header yang valid. Kolom tambahan diperbolehkan dan ukuran maksimal file adalah 200MB.
           </p>
         </div>
       </form>

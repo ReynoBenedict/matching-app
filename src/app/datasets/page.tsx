@@ -40,6 +40,7 @@ function DatasetsContent() {
   const [statusFilter, setStatusFilter] = useState(searchParams.get('status') || '');
   const [searchQuery, setSearchQuery] = useState('');
   const [schemaInfoOpen, setSchemaInfoOpen] = useState(false);
+  const [deletingId, setDeletingId] = useState<number | null>(null);
 
   useEffect(() => {
     const fetchDatasets = async () => {
@@ -82,6 +83,33 @@ function DatasetsContent() {
 
     fetchDatasets();
   }, [page, statusFilter, searchQuery, router]);
+
+  const handleDelete = async (dataset: Dataset) => {
+    const confirmed = window.confirm(
+      `Hapus dataset "${dataset.name}" secara permanen?\n\nSemua record, metadata kolom, hasil matching yang terkait, dan penugasan yang bergantung pada record dataset ini akan ikut dihapus. Tindakan ini tidak dapat dibatalkan.`
+    );
+    if (!confirmed) return;
+
+    try {
+      setDeletingId(dataset.id);
+      setError('');
+
+      const response = await fetch(`/api/datasets/${dataset.id}`, { method: 'DELETE' });
+      const payload = await response.json().catch(() => ({}));
+
+      if (!response.ok || !payload.success) {
+        throw new Error(payload.error || 'Dataset gagal dihapus');
+      }
+
+      setDatasets((current) => current.filter((item) => item.id !== dataset.id));
+      router.refresh();
+    } catch (err) {
+      console.error('Delete dataset error:', err);
+      setError(err instanceof Error ? err.message : 'Dataset gagal dihapus');
+    } finally {
+      setDeletingId(null);
+    }
+  };
 
   const getStatusBadge = (status: string) => {
     const badges = {
@@ -322,12 +350,16 @@ function DatasetsContent() {
                           </button>
                         )}
                         <button
-                          disabled
-                          title="Feature coming soon"
-                          aria-label="Delete"
-                          className="text-error/50 cursor-not-allowed disabled:opacity-50"
+                          type="button"
+                          onClick={() => handleDelete(dataset)}
+                          disabled={deletingId === dataset.id}
+                          title="Hapus dataset secara permanen"
+                          aria-label={`Hapus ${dataset.name}`}
+                          className="text-error hover:text-error/70 transition-colors disabled:opacity-50 disabled:cursor-wait"
                         >
-                          <span className="material-symbols-outlined text-[20px]">delete</span>
+                          <span className="material-symbols-outlined text-[20px]">
+                            {deletingId === dataset.id ? 'progress_activity' : 'delete'}
+                          </span>
                         </button>
                       </div>
                     </td>

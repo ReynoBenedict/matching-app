@@ -37,6 +37,7 @@ interface MatchingJobView {
   startedAt: string | null;
   completedAt: string | null;
   elapsedMs: number;
+  matchingRunId: number | null;
 }
 
 const JOB_STORAGE_KEY = 'bps:matchingJobId';
@@ -146,7 +147,12 @@ export function MatchingContent() {
             ...prev,
             loading: false,
             error: null,
-            results: payload.data,
+            results: {
+              datasetA: { id: view.datasetAId, name: `Dataset #${view.datasetAId}` },
+              datasetB: { id: view.datasetBId, name: `Dataset #${view.datasetBId}` },
+              config: { columnMappings: state.columnMappings, threshold: view.threshold },
+              summary: { totalCandidates: 0 },
+            },
             step: 'results',
           }));
           return;
@@ -307,6 +313,7 @@ export function MatchingContent() {
         startedAt: null,
         completedAt: null,
         elapsedMs: 0,
+        matchingRunId: payload.data?.matchingRunId ?? null,
       });
       setActiveJobId(jobId);
       setState((prev) => ({ ...prev, loading: true, error: null }));
@@ -487,7 +494,11 @@ export function MatchingContent() {
         {/* Step 5: Results */}
         {state.step === 'results' && state.results && (
           <>
-            <MatchingResults results={state.results} />
+            {job?.matchingRunId ? (
+              <MatchingResults matchingRunId={job.matchingRunId} results={state.results} />
+            ) : (
+              <div className="bg-error-container text-on-error-container p-4 rounded-lg">Hasil matching tidak memiliki ID run yang dapat ditampilkan.</div>
+            )}
             <button
               onClick={handleReset}
               className="w-full bg-tertiary text-on-tertiary py-3 rounded-lg font-label-md hover:bg-tertiary-container transition-colors"

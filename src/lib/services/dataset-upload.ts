@@ -12,8 +12,8 @@ import {
   validateAllRecords,
   ValidationError,
 } from '@/lib/services/validation';
-import { DATASET_CONTRACT } from '@/lib/config/upload';
-import { sql } from 'drizzle-orm';
+import { DATASET_CONTRACT, UPLOAD_CONFIG } from '@/lib/config/upload';
+import { eq, sql } from 'drizzle-orm';
 
 export interface UploadResult {
   success: boolean;
@@ -73,7 +73,11 @@ export async function uploadDataset(
       // Step 3: Parse CSV
       const parseResult = parseCSV(csvContent);
 
-      // Step 4: Validate headers against contract
+      // Step 4: Validate CSV structure. Unknown/missing legacy columns are allowed.
+      if (parseResult.rows.length > UPLOAD_CONFIG.MAX_RECORDS_PER_DATASET) {
+        await markDatasetFailed(datasetId, `Dataset exceeds maximum of ${UPLOAD_CONFIG.MAX_RECORDS_PER_DATASET.toLocaleString()} records`);
+        return { success: false, datasetId, status: 'FAILED', message: `Maximum ${UPLOAD_CONFIG.MAX_RECORDS_PER_DATASET.toLocaleString()} records allowed` };
+      }
       const headerErrors = validateHeaders(parseResult.headers);
       if (headerErrors.length > 0) {
         await markDatasetFailed(
@@ -85,7 +89,7 @@ export async function uploadDataset(
           datasetId,
           status: 'FAILED',
           errors: headerErrors,
-          message: 'CSV headers do not match dataset contract',
+          message: 'CSV headers are invalid',
         };
       }
 
@@ -114,18 +118,24 @@ export async function uploadDataset(
           datasetId,
           status: 'FAILED',
           errors: recordErrors,
-          message: 'CSV records do not conform to dataset contract',
+          message: 'CSV records contain invalid values',
         };
       }
 
       // Step 7: Transform and persist records
-      const transformedRecords = parseResult.rows.map((row) =>
-        transformRowToRecord(row, datasetId)
+      const transformedRecords = parseResult.rows.map((row, index) =>
+        transformRowToRecord(row, datasetId, index)
       );
 
-      // Batch insert for efficiency
-      if (transformedRecords.length > 0) {
-        await db.insert(datasetRecords).values(transformedRecords);
+      // Insert in bounded batches. A 200MB CSV can contain hundreds of
+      // thousands of rows; inserting the entire file in one SQL statement can
+      // exceed PostgreSQL parameter/query limits.
+      const batchSize = 1000;
+      for (let i = 0; i < transformedRecords.length; i += batchSize) {
+        const batch = transformedRecords.slice(i, i + batchSize);
+        if (batch.length > 0) {
+          await db.insert(datasetRecords).values(batch);
+        }
       }
 
       // Step 8: Update dataset status to READY
@@ -148,8 +158,15 @@ export async function uploadDataset(
       };
     } catch (error) {
       // If any persistence error occurs, mark as FAILED
-      const errorMessage =
-        error instanceof Error ? error.message : 'Unknown error';
+      const errorMessage = describePersistenceError(error);
+      // Remove any partially persisted rows/column metadata. Keep the dataset
+      // metadata as FAILED so the user can see why the upload failed.
+      try {
+        await db.delete(datasetRecords).where(eq(datasetRecords.datasetId, datasetId));
+        await db.delete(datasetColumns).where(eq(datasetColumns.datasetId, datasetId));
+      } catch (cleanupError) {
+        console.error(`Failed to clean up failed dataset ${datasetId}`, cleanupError);
+      }
       await markDatasetFailed(datasetId, `Persistence error: ${errorMessage}`);
 
       return {
@@ -165,6 +182,18 @@ export async function uploadDataset(
       message: error instanceof Error ? error.message : 'Upload failed',
     };
   }
+}
+
+function describePersistenceError(error: unknown): string {
+  if (!(error instanceof Error)) return 'Unknown database error';
+  const cause = (error as Error & { cause?: unknown }).cause;
+  if (cause instanceof Error && cause.message) {
+    return `${error.message}; cause: ${cause.message}`;
+  }
+  if (cause && typeof cause === 'object' && 'message' in cause) {
+    return `${error.message}; cause: ${String((cause as { message?: unknown }).message)}`;
+  }
+  return error.message || 'Unknown database error';
 }
 
 /**
@@ -219,55 +248,82 @@ function createColumnMetadata(
  */
 function transformRowToRecord(
   row: { [key: string]: string },
-  datasetId: number
+  datasetId: number,
+  rowIndex: number
 ) {
+  const value = (key: string) => {
+    const v = row[key];
+    return v === undefined || v === null || v.trim() === '' ? null : v.trim();
+  };
+  const num = (key: string) => {
+    const v = value(key);
+    if (v === null) return null;
+    const n = Number(v);
+    return Number.isFinite(n) ? n.toString() : null;
+  };
+
+  const coordinate = (key: 'latitude' | 'longitude' | 'latitude_gc' | 'longitude_gc') => {
+    const raw = value(key);
+    if (raw === null) return null;
+    const n = Number(raw);
+    if (!Number.isFinite(n)) return null;
+    if ((key === 'latitude' || key === 'latitude_gc') && (n < -90 || n > 90)) return null;
+    if ((key === 'longitude' || key === 'longitude_gc') && (n < -180 || n > 180)) return null;
+    return n.toString();
+  };
+  const date = value('history_ref_profiling_id');
+  const parsedDate = date ? new Date(date) : new Date();
+
   return {
     datasetId,
-    idsbr: row.idsbr,
-    namaUsaha: row.nama_usaha,
-    alamatUsaha: row.alamat_usaha,
-    kodeWilayah: row.kode_wilayah,
-    kdprov: row.kdprov,
-    kdkab: row.kdkab,
-    kdkec: row.kdkec,
-    kddesa: row.kddesa,
-    nmprov: row.nmprov,
-    nmkab: row.nmkab,
-    nmkec: row.nmkec,
-    nmdesa: row.nmdesa,
-    perusahaanId: row.perusahaan_id,
-    statusPerusahaan: row.status_perusahaan,
-    skorKalo: row.skor_kalo || null,
-    kegiatanUsaha: row.kegiatan_usaha || null,
-    rankNama: row.rank_nama || null,
-    rankAlamat: row.rank_alamat || null,
-    historyRefProfilingId: new Date(row.history_ref_profiling_id),
-    skalaUsaha: row.skala_usaha || null,
-    sumberData: row.sumber_data,
-    latitude: row.latitude,
-    longitude: row.longitude,
-    latlongStatus: row.latlong_status,
-    gcid: row.gcid,
-    gcsResult: row.gcs_result,
-    allowCancel: parseBooleanValue(row.allow_cancel),
-    allowEdit: parseBooleanValue(row.allow_edit),
-    allowFlagging: parseBooleanValue(row.allow_flagging),
-    latitudeGc: row.latitude_gc,
-    longitudeGc: row.longitude_gc,
-    latlongStatusGc: row.latlong_status_gc,
-    gcUsername: row.gc_username,
-    namaUsahaGc: row.nama_usaha_gc || null,
-    alamatUsahaGc: row.alamat_usaha_gc || null,
+    rawData: row,
+    // Keep legacy columns populated for backwards compatibility. The complete
+    // original row is always available in rawData for flexible schemas.
+    idsbr: value('idsbr') || `row-${datasetId}-${rowIndex + 1}`,
+    namaUsaha: value('nama_usaha') || value('nama') || '',
+    alamatUsaha: value('alamat_usaha') || value('alamat') || '',
+    kodeWilayah: value('kode_wilayah') || '',
+    kdprov: value('kdprov') || '',
+    kdkab: value('kdkab') || '',
+    kdkec: value('kdkec') || '',
+    kddesa: value('kddesa') || '',
+    nmprov: value('nmprov') || '',
+    nmkab: value('nmkab') || '',
+    nmkec: value('nmkec') || '',
+    nmdesa: value('nmdesa') || '',
+    perusahaanId: value('perusahaan_id') || '',
+    statusPerusahaan: value('status_perusahaan') || '',
+    skorKalo: value('skor_kalo'),
+    kegiatanUsaha: value('kegiatan_usaha'),
+    rankNama: value('rank_nama'),
+    rankAlamat: value('rank_alamat'),
+    historyRefProfilingId: parsedDate && !Number.isNaN(parsedDate.getTime()) ? parsedDate : null,
+    skalaUsaha: value('skala_usaha'),
+    sumberData: value('sumber_data') || '',
+    latitude: coordinate('latitude'),
+    longitude: coordinate('longitude'),
+    latlongStatus: value('latlong_status') || '',
+    gcid: value('gcid') || '',
+    gcsResult: num('gcs_result'),
+    allowCancel: parseBooleanValue(value('allow_cancel') || ''),
+    allowEdit: parseBooleanValue(value('allow_edit') || ''),
+    allowFlagging: parseBooleanValue(value('allow_flagging') || ''),
+    latitudeGc: coordinate('latitude_gc'),
+    longitudeGc: coordinate('longitude_gc'),
+    latlongStatusGc: value('latlong_status_gc') || '',
+    gcUsername: value('gc_username') || '',
+    namaUsahaGc: value('nama_usaha_gc'),
+    alamatUsahaGc: value('alamat_usaha_gc'),
   };
 }
 
 /**
  * Parse boolean value from CSV string
  */
-function parseBooleanValue(value: string): boolean {
-  if (!value) {
-    return false;
-  }
+function parseBooleanValue(value: string): boolean | null {
+  if (!value) return null;
   const normalized = value.trim().toLowerCase();
-  return ['true', '1', 'yes'].includes(normalized);
+  if (['true', '1', 'yes', 'y'].includes(normalized)) return true;
+  if (['false', '0', 'no', 'n'].includes(normalized)) return false;
+  return null;
 }

@@ -9,11 +9,20 @@ interface CandidateDetailDialogProps {
   onClose: () => void;
 }
 
-function RecordField({ label, value }: { label: string; value?: string | null }) {
+function RecordField({ label, value }: { label: string; value?: string | number | null }) {
   return (
     <div className="py-2 border-b border-outline-variant last:border-b-0">
       <p className="text-label-md text-on-surface-variant uppercase">{label}</p>
       <p className="text-body-sm text-on-surface mt-xs">{value || '-'}</p>
+    </div>
+  );
+}
+
+function Metric({ label, value }: { label: string; value: number }) {
+  return (
+    <div className="bg-surface-container-low border border-outline-variant rounded-lg p-3">
+      <p className="text-xs text-on-surface-variant">{label}</p>
+      <p className="text-base font-bold text-primary mt-1">{formatPercent(value)}</p>
     </div>
   );
 }
@@ -66,7 +75,9 @@ export function CandidateDetailDialog({ candidate, onClose }: CandidateDetailDia
               <RecordField label="Nama Usaha" value={candidate.recordA?.namaUsaha} />
               <RecordField label="Alamat Usaha" value={candidate.recordA?.alamatUsaha} />
               <RecordField label="Provinsi" value={candidate.recordA?.nmprov} />
-              <RecordField label="Kabupaten" value={candidate.recordA?.nmkab} />
+              <RecordField label="Kabupaten/Kota" value={candidate.recordA?.nmkab} />
+              <RecordField label="Kecamatan" value={candidate.recordA?.nmkec} />
+              <RecordField label="Desa/Kelurahan" value={candidate.recordA?.nmdesa} />
             </div>
           </div>
           <div>
@@ -76,8 +87,36 @@ export function CandidateDetailDialog({ candidate, onClose }: CandidateDetailDia
               <RecordField label="Nama Usaha" value={candidate.recordB?.namaUsaha} />
               <RecordField label="Alamat Usaha" value={candidate.recordB?.alamatUsaha} />
               <RecordField label="Provinsi" value={candidate.recordB?.nmprov} />
-              <RecordField label="Kabupaten" value={candidate.recordB?.nmkab} />
+              <RecordField label="Kabupaten/Kota" value={candidate.recordB?.nmkab} />
+              <RecordField label="Kecamatan" value={candidate.recordB?.nmkec} />
+              <RecordField label="Desa/Kelurahan" value={candidate.recordB?.nmdesa} />
             </div>
+          </div>
+        </div>
+
+        {(candidate.recordA?.rawData || candidate.recordB?.rawData) && (
+          <div>
+            <h3 className="font-label-md text-on-surface-variant uppercase mb-sm">Field Lain dari Data Asli</h3>
+            <div className="grid grid-cols-1 md:grid-cols-2 gap-3">
+              {[['Dataset A', candidate.recordA?.rawData], ['Dataset B', candidate.recordB?.rawData]].map(([label, raw]) => (
+                <div key={String(label)} className="bg-surface-container-low border border-outline-variant rounded-lg p-3 max-h-56 overflow-auto">
+                  <p className="font-semibold text-sm mb-2">{String(label)}</p>
+                  {Object.entries((raw as Record<string, unknown>) || {}).map(([key, value]) => (
+                    <div key={key} className="flex justify-between gap-3 py-1 border-b border-outline-variant last:border-0 text-xs"><span className="text-on-surface-variant">{key}</span><span className="text-on-surface text-right break-all">{value == null || value === '' ? '-' : String(value)}</span></div>
+                  ))}
+                </div>
+              ))}
+            </div>
+          </div>
+        )}
+
+        <div>
+          <h3 className="font-label-md text-on-surface-variant uppercase mb-sm">Detail Similarity</h3>
+          <div className="grid grid-cols-2 md:grid-cols-4 gap-3">
+            {candidate.tfidfSimilarity != null && <Metric label="TF-IDF Cosine" value={candidate.tfidfSimilarity} />}
+            {candidate.faissSimilarity != null && <Metric label="FAISS Similarity" value={candidate.faissSimilarity} />}
+            {candidate.rapidfuzzSimilarity != null && <Metric label="RapidFuzz" value={candidate.rapidfuzzSimilarity} />}
+            <Metric label="Final Score" value={candidate.overallScore} />
           </div>
         </div>
 

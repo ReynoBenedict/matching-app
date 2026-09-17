@@ -7,7 +7,7 @@
  * Request body:
  * {
  *   assignmentId: number,
- *   verificationResult: 'MATCH' | 'NON_MATCH'
+ *   verificationResult: 'MATCH' | 'NON_MATCH' | 'REVIEW'
  * }
  */
 
@@ -26,12 +26,12 @@ export async function POST(request: NextRequest) {
     // Validate required fields
     if (
       typeof body.assignmentId !== 'number' ||
-      !['MATCH', 'NON_MATCH'].includes(body.verificationResult)
+      !['MATCH', 'NON_MATCH', 'REVIEW'].includes(body.verificationResult)
     ) {
       return NextResponse.json(
         {
           success: false,
-          error: 'Invalid request. Required: assignmentId (number), verificationResult (MATCH|NON_MATCH)',
+          error: 'Invalid request. Required: assignmentId (number), verificationResult (MATCH|NON_MATCH|REVIEW), verificationNote (optional)',
         },
         { status: 400 }
       );
@@ -41,7 +41,8 @@ export async function POST(request: NextRequest) {
     const result = await saveVerificationResult(
       body.assignmentId,
       employee.id,
-      body.verificationResult
+      body.verificationResult,
+      typeof body.verificationNote === 'string' ? body.verificationNote : null,
     );
 
     if (!result.success) {
