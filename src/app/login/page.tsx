@@ -2,6 +2,7 @@
 
 import { useState } from 'react';
 import Link from 'next/link';
+import Image from 'next/image';
 import { useRouter } from 'next/navigation';
 
 export default function LoginPage() {
@@ -60,91 +61,138 @@ export default function LoginPage() {
   };
 
   return (
-    <div className="min-h-screen bg-[#f8f9ff] flex items-center justify-center p-4 font-sans text-[#0b1c30]">
-      <main className="w-full max-w-[28rem]">
-        <div className="mb-8 text-center">
-          <div className="w-16 h-16 rounded-full bg-[#002b5a] flex items-center justify-center mx-auto mb-4 shadow-sm">
-            <span className="material-symbols-outlined text-[32px] text-white">dataset_linked</span>
-          </div>
-          <h1 className="text-3xl font-bold text-[#002b5a] mb-1">BPS Kota Malang</h1>
-          <h2 className="text-xl font-semibold text-[#424750]">Sistem Pencocokan Data</h2>
-        </div>
+    <div className="flex min-h-screen flex-col bg-background font-sans text-on-background md:flex-row">
+      {/* Hero: foto gedung sebagai latar, 40% di desktop */}
+      <section className="relative h-64 shrink-0 overflow-hidden bg-primary sm:h-72 md:h-auto md:w-[38%] lg:w-[40%]">
+        <Image
+          src="/bps-building.jpg"
+          alt=""
+          fill
+          priority
+          sizes="(max-width: 768px) 100vw, (max-width: 1024px) 38vw, 40vw"
+          className="object-cover object-center"
+        />
+        <div className="absolute inset-0 bg-gradient-to-t from-primary/95 via-primary/80 to-primary/65" />
 
-        <div className="bg-white border border-[#c3c6d2] rounded shadow-sm overflow-hidden relative">
-          <div className="absolute top-0 left-0 w-full h-1 bg-[#002b5a]"></div>
+        <div className="relative z-10 flex h-full flex-col justify-between gap-lg p-lg lg:p-xl">
+          <Image
+            src="/bps-logo.png"
+            alt="Logo Badan Pusat Statistik Kota Malang"
+            width={332}
+            height={67}
+            priority
+            className="block h-auto w-auto max-w-[10rem] self-start lg:max-w-[13rem]"
+          />
 
-          <form onSubmit={handleSubmit} className="p-8 pt-12">
-            {error && (
-              <div className="bg-[#ffdad6] border border-[#ba1a1a] rounded p-4 mb-6">
-                <p className="text-[#93000a] text-sm">{error}</p>
-              </div>
-            )}
-
-            <div className="mb-6">
-              <label className="block text-xs font-semibold text-[#0b1c30] mb-1 tracking-wide">Username / NIP</label>
-              <div className="relative">
-                <span className="material-symbols-outlined absolute left-3 top-2 text-[#737781] text-xl pointer-events-none">person</span>
-                <input
-                  type="text"
-                  placeholder="Masukkan Username atau NIP Anda"
-                  value={username}
-                  onChange={(e) => setUsername(e.target.value)}
-                  disabled={loading}
-                  required
-                  className="w-full pl-10 pr-2 py-2 border border-[#c3c6d2] rounded bg-[#f8f9ff] text-[#0b1c30] text-sm focus:border-[#006493] focus:ring-2 focus:ring-[rgba(0,100,147,0.2)] focus:outline-none disabled:opacity-50"
-                />
-              </div>
-            </div>
-
-            <div className="mb-6">
-              <label className="block text-xs font-semibold text-[#0b1c30] mb-1 tracking-wide">Kata Sandi</label>
-              <div className="relative">
-                <span className="material-symbols-outlined absolute left-3 top-2 text-[#737781] text-xl pointer-events-none">lock</span>
-                <input
-                  type={showPassword ? 'text' : 'password'}
-                  placeholder="Masukkan Kata Sandi Anda"
-                  value={password}
-                  onChange={(e) => setPassword(e.target.value)}
-                  disabled={loading}
-                  required
-                  className="w-full pl-10 pr-10 py-2 border border-[#c3c6d2] rounded bg-[#f8f9ff] text-[#0b1c30] text-sm focus:border-[#006493] focus:ring-2 focus:ring-[rgba(0,100,147,0.2)] focus:outline-none disabled:opacity-50"
-                />
-                <button
-                  type="button"
-                  onClick={() => setShowPassword(!showPassword)}
-                  disabled={loading}
-                  className="material-symbols-outlined absolute right-3 top-2 text-[#737781] text-xl hover:text-[#002b5a] disabled:opacity-50 bg-none border-none p-0 cursor-pointer"
-                >
-                  {showPassword ? 'visibility_off' : 'visibility'}
-                </button>
-              </div>
-              <div className="mt-2 flex justify-end">
-                <a href="#" className="text-xs text-[#006493] hover:text-[#002b5a] hover:underline">Lupa kata sandi?</a>
-              </div>
-            </div>
-
-            <button
-              type="submit"
-              disabled={loading}
-              className="w-full flex justify-center items-center py-3 px-4 border-none rounded shadow-sm text-xs font-semibold text-white bg-[#002b5a] hover:bg-[#0c4687] disabled:opacity-70 cursor-pointer mt-6"
-            >
-              <span className="material-symbols-outlined mr-2 text-lg">login</span>
-              {loading ? 'Memproses...' : 'Masuk'}
-            </button>
-          </form>
-
-          <div className="border-t border-[#c3c6d2] p-6 text-center">
-            <p className="text-xs text-[#424750]">
-              Belum memiliki akun? <Link href="/register" className="font-semibold text-[#002b5a] hover:underline ml-1">Daftar di sini</Link>
+          <div>
+            <p className="font-label-md text-label-md uppercase text-primary-fixed-dim">
+              BPS Kota Malang
+            </p>
+            <h1 className="mt-sm font-headline-md text-headline-md text-on-primary">
+              Sistem Pencocokan Data
+            </h1>
+            <p className="mt-sm max-w-[20rem] font-body-md text-body-md text-primary-fixed">
+              Sistem internal untuk pencocokan dan verifikasi data.
             </p>
           </div>
         </div>
+      </section>
 
-        <div className="mt-8 text-center">
-          <p className="text-xs text-[#737781]"> 2024 Badan Pusat Statistik Kota Malang - Tim IT BPS</p>
-          <p className="text-xs text-[#737781] mt-1">Akses terbatas hanya untuk pegawai berwenang.</p>
+      {/* Panel formulir login, 60% di desktop */}
+      <section className="flex flex-1 items-center justify-center px-4 py-10 sm:px-6 md:px-5 lg:px-10">
+        <div className="w-full max-w-[28rem]">
+          <div className="overflow-hidden rounded-lg border border-outline-variant bg-surface-container-lowest shadow-sm">
+            <div className="h-1 bg-primary" />
+
+            <form onSubmit={handleSubmit} className="p-7 sm:p-9">
+              <h2 className="font-headline-sm text-headline-sm font-bold text-primary">Masuk ke Akun</h2>
+              <p className="mt-xs font-body-md text-body-md text-on-surface-variant">
+                Silakan masuk untuk melanjutkan.
+              </p>
+
+              {error && (
+                <div role="alert" className="mt-md rounded border border-error bg-error-container p-md">
+                  <p className="font-body-md text-body-md text-on-error-container">{error}</p>
+                </div>
+              )}
+
+              <div className="mt-xl">
+                <label htmlFor="username" className="mb-sm block font-label-md text-label-md text-on-surface">
+                  Username / NIP
+                </label>
+                <div className="relative">
+                  <span className="material-symbols-outlined pointer-events-none absolute left-md top-1/2 -translate-y-1/2 text-xl text-outline">person</span>
+                  <input
+                    id="username"
+                    name="username"
+                    type="text"
+                    autoComplete="username"
+                    placeholder="Masukkan Username atau NIP Anda"
+                    value={username}
+                    onChange={(e) => setUsername(e.target.value)}
+                    disabled={loading}
+                    required
+                    className="w-full rounded border border-outline-variant bg-surface py-2.5 pl-11 pr-md font-body-md text-body-md text-on-surface transition-colors focus:border-secondary focus:outline-none focus:ring-2 focus:ring-[rgba(0,100,147,0.2)] disabled:opacity-50"
+                  />
+                </div>
+              </div>
+
+              <div className="mt-xl">
+                <label htmlFor="password" className="mb-sm block font-label-md text-label-md text-on-surface">
+                  Kata Sandi
+                </label>
+                <div className="relative">
+                  <span className="material-symbols-outlined pointer-events-none absolute left-md top-1/2 -translate-y-1/2 text-xl text-outline">lock</span>
+                  <input
+                    id="password"
+                    name="password"
+                    type={showPassword ? 'text' : 'password'}
+                    autoComplete="current-password"
+                    placeholder="Masukkan Kata Sandi Anda"
+                    value={password}
+                    onChange={(e) => setPassword(e.target.value)}
+                    disabled={loading}
+                    required
+                    className="w-full rounded border border-outline-variant bg-surface py-2.5 pl-11 pr-11 font-body-md text-body-md text-on-surface transition-colors focus:border-secondary focus:outline-none focus:ring-2 focus:ring-[rgba(0,100,147,0.2)] disabled:opacity-50"
+                  />
+                  <button
+                    type="button"
+                    onClick={() => setShowPassword(!showPassword)}
+                    disabled={loading}
+                    aria-label={showPassword ? 'Sembunyikan kata sandi' : 'Tampilkan kata sandi'}
+                    className="material-symbols-outlined absolute right-md top-1/2 -translate-y-1/2 cursor-pointer border-none bg-none p-0 text-xl text-outline hover:text-primary disabled:opacity-50"
+                  >
+                    {showPassword ? 'visibility_off' : 'visibility'}
+                  </button>
+                </div>
+                <div className="mt-sm flex justify-end">
+                  <a href="#" className="font-label-md text-label-md text-secondary hover:text-primary hover:underline">
+                    Lupa kata sandi?
+                  </a>
+                </div>
+              </div>
+
+              <button
+                type="submit"
+                disabled={loading}
+                className="mt-xl flex w-full cursor-pointer items-center justify-center rounded bg-primary px-md py-3 font-label-md text-label-md text-on-primary shadow-sm transition-colors hover:bg-primary-container disabled:opacity-70"
+              >
+                <span className="material-symbols-outlined mr-2 text-lg">login</span>
+                {loading ? 'Memproses...' : 'Masuk'}
+              </button>
+            </form>
+
+            <div className="border-t border-outline-variant bg-surface-container-low px-6 py-md text-center">
+              <p className="font-body-sm text-body-sm text-on-surface-variant">
+                Belum memiliki akun?{' '}
+                <Link href="/register" className="font-label-md text-label-md text-primary hover:underline">
+                  Daftar di sini
+                </Link>
+              </p>
+            </div>
+          </div>
         </div>
-      </main>
+      </section>
     </div>
   );
 }

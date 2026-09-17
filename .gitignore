@@ -54,6 +54,9 @@ drizzle.config.js
 *.swp
 *.swo
 
+# Command Code local session state (machine-specific, not part of the app)
+.commandcode/
+
 # OS files
 Thumbs.db
 
