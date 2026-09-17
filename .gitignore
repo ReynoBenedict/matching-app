@@ -42,7 +42,7 @@ yarn-error.log*
 next-env.d.ts
 
 # drizzle
-/drizzle
+# NOTE: /drizzle (migration files) is committed on purpose - it is the schema source of truth.
 drizzle.config.js
 
 # docker
