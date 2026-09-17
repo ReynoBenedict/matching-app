@@ -27,8 +27,8 @@ cp .env.example .env
 # 3. Start PostgreSQL
 docker-compose up -d postgres
 
-# 4. Run migrations
-npm run db:push
+# 4. Apply database migrations
+npm run db:migrate
 
 # 5. Seed test data
 npm run db:seed
@@ -37,14 +37,16 @@ npm run db:seed
 npm run dev
 ```
 
+> Migrations are committed in `drizzle/` and are the schema source of truth. If your local database was created earlier with `db:push`, it has no migration history — reset it with `docker-compose down -v && docker-compose up -d postgres` before running `db:migrate`.
+
 ### After Pulling Changes
 
 ```bash
 # Install new dependencies
 npm install
 
-# Run any new migrations
-npm run db:push
+# Apply any new migrations
+npm run db:migrate
 
 # Start dev server
 npm run dev
@@ -166,16 +168,16 @@ docker-compose exec postgres psql -U bps_user -d bps_data_matching
 When modifying `src/lib/db/schema.ts`:
 
 ```bash
-# Generate migration file
+# 1. Generate a migration file (diffs schema.ts against the latest snapshot)
 npm run db:generate
 
-# Review the generated SQL in drizzle/
-# Then push to database
-npm run db:push
+# 2. Review the generated SQL in drizzle/ and fix anything ambiguous by hand
 
-# Or rollback last migration
-npm run db:migrate -- --revert
+# 3. Apply it to your database
+npm run db:migrate
 ```
+
+Commit the generated `.sql` file **and** `drizzle/meta/` together. To undo a migration, write a new migration that reverts it — drizzle-kit has no automatic rollback.
 
 ### Resetting Database
 
@@ -185,13 +187,13 @@ npm run db:migrate -- --revert
 # Option 1: Drop volume and restart
 docker-compose down -v
 docker-compose up -d postgres
-npm run db:push
+npm run db:migrate
 npm run db:seed
 
 # Option 2: Clean SQL
 docker-compose exec postgres psql -U bps_user -d bps_data_matching
 # Then: DROP SCHEMA public CASCADE; CREATE SCHEMA public;
-npm run db:push
+npm run db:migrate
 npm run db:seed
 ```
 
@@ -432,7 +434,7 @@ export default ExpensiveComponent;
 1. Update schema in `src/lib/db/schema.ts`
 2. Generate migration: `npm run db:generate`
 3. Review generated SQL in `drizzle/`
-4. Push to database: `npm run db:push`
+4. Apply migration: `npm run db:migrate`
 5. Update API handlers to use new field
 6. Add tests
 

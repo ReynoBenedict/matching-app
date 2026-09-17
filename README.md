@@ -66,8 +66,16 @@ docker-compose logs postgres
 ### 5. Run Database Migrations
 
 ```bash
-npm run db:push
+npm run db:migrate
 ```
+
+Migration files live in `drizzle/` and are committed to git — they are the source of truth for the schema. Never edit them by hand; generate new ones with `npm run db:generate`.
+
+> **Existing database?** If your database was created with `npm run db:push` before migrations were introduced, it already has all tables but no migration history. Running the baseline migration will fail with `relation "users" already exists`. Reset it first:
+> ```bash
+> docker-compose down -v && docker-compose up -d postgres
+> npm run db:migrate && npm run db:seed
+> ```
 
 ### 6. Seed Test Data (Development Only)
 

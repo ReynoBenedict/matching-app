@@ -39,7 +39,7 @@ The superadmin matching-results service reads the latest persisted run for the r
 Apply migrations before using the new features:
 
 ```bash
-npm run db:push
+npm run db:migrate
 ```
 
 or apply the SQL files in `drizzle/` using your migration process.

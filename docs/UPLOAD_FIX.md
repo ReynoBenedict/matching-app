@@ -7,7 +7,7 @@ The schema now keeps only `dataset_id`, `raw_data`, and `idsbr` required. Legacy
 After updating the code on a fresh development database:
 
 ```powershell
-npm run db:push
+npm run db:migrate
 npm run db:seed
 ```
 
