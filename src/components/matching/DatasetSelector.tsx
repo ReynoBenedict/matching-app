@@ -87,7 +87,7 @@ export function DatasetSelector({
                 <div>
                   <p className="font-semibold text-on-surface">{dataset.name}</p>
                   <p className="text-sm text-on-surface-variant mt-1">
-                    Tipe: {dataset.datasetType} • {dataset.totalRecords} records
+                    Tipe: {dataset.datasetType} • {dataset.totalRecords} record
                   </p>
                 </div>
                 {selectedId === dataset.id && (

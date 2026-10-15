@@ -10,7 +10,7 @@ import { getAssignmentDetail } from '@/lib/services/assignment';
 
 export async function GET(
   request: NextRequest,
-  context: any
+  context: { params: Promise<{ id: string }> }
 ) {
   try {
     // Authenticate user and enforce employee role

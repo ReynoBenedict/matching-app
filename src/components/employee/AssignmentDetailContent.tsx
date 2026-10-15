@@ -22,6 +22,8 @@ interface DatasetRecord {
   nmkab?: string | null;
   nmkec?: string | null;
   nmdesa?: string | null;
+  // Baris sumber lengkap sesuai header CSV yang diunggah.
+  rawData?: Record<string, unknown> | null;
 }
 
 interface AssignmentDetail {
@@ -45,8 +47,8 @@ interface AssignmentDetail {
   recordB: DatasetRecord | null;
 }
 
+// Kolom utama yang selalu ditampilkan lebih dulu (dari kolom tabel dataset_records).
 const RECORD_FIELDS: Array<{ key: keyof DatasetRecord; label: string }> = [
-  { key: 'idsbr', label: 'IDSBR' },
   { key: 'namaUsaha', label: 'Nama Usaha' },
   { key: 'alamatUsaha', label: 'Alamat Usaha' },
   { key: 'kodeWilayah', label: 'Kode Wilayah' },
@@ -55,6 +57,47 @@ const RECORD_FIELDS: Array<{ key: keyof DatasetRecord; label: string }> = [
   { key: 'nmkec', label: 'Kecamatan' },
   { key: 'nmdesa', label: 'Desa/Kelurahan' },
 ];
+
+// Kunci rawData yang sudah terwakili oleh RECORD_FIELDS, atau identitas unik per
+// sumber (idsbr) yang hampir selalu berbeda sehingga tidak perlu ditandai.
+const RAW_KEYS_COVERED = new Set([
+  'idsbr', 'nama_usaha', 'alamat_usaha', 'kode_wilayah', 'nmprov', 'nmkab', 'nmkec', 'nmdesa',
+]);
+
+interface ComparisonField {
+  id: string;
+  label: string;
+  valueOf: (record: DatasetRecord | null) => string;
+}
+
+function cellText(value: unknown): string {
+  if (value === null || value === undefined) return '-';
+  const text = typeof value === 'object' ? JSON.stringify(value) : String(value);
+  return text.trim() || '-';
+}
+
+/**
+ * Susun daftar kolom pembanding: kolom utama lebih dulu, lalu gabungan (union)
+ * kolom rawData dari kedua record agar atribut tambahan hasil unggahan ikut
+ * terlihat oleh pegawai saat verifikasi.
+ */
+function buildComparisonFields(recordA: DatasetRecord | null, recordB: DatasetRecord | null): ComparisonField[] {
+  const fields: ComparisonField[] = RECORD_FIELDS.map((field) => ({
+    id: String(field.key),
+    label: field.label,
+    valueOf: (record) => cellText(record?.[field.key]),
+  }));
+  const rawKeys = new Set<string>();
+  for (const record of [recordA, recordB]) {
+    for (const key of Object.keys(record?.rawData ?? {})) {
+      if (!RAW_KEYS_COVERED.has(key)) rawKeys.add(key);
+    }
+  }
+  for (const key of rawKeys) {
+    fields.push({ id: `raw:${key}`, label: key, valueOf: (record) => cellText(record?.rawData?.[key]) });
+  }
+  return fields;
+}
 
 // Helper component to render a single record field
 function RecordField({ label, value }: { label: string; value: string | null | undefined }) {
@@ -66,26 +109,28 @@ function RecordField({ label, value }: { label: string; value: string | null | u
   );
 }
 
-function RecordColumn({ title, record, counterpart }: {
+function RecordColumn({ title, record, counterpart, fields }: {
   title: string;
   record: DatasetRecord | null;
   counterpart: DatasetRecord | null;
+  fields: ComparisonField[];
 }) {
-  const valueOf = (key: keyof DatasetRecord) => String(record?.[key] ?? '').trim() || '-';
-  const counterpartValueOf = (key: keyof DatasetRecord) => String(counterpart?.[key] ?? '').trim() || '-';
-
   return (
     <div className="border border-outline-variant rounded-xl overflow-hidden bg-surface-container-lowest">
       <div className="px-4 py-3 bg-primary text-on-primary font-body-md font-bold">{title}</div>
+      <div className="px-4 py-2 border-b border-outline-variant grid grid-cols-1 sm:grid-cols-[130px_1fr] gap-1 sm:gap-3">
+        <span className="font-label-md text-on-surface-variant">IDSBR</span>
+        <span className="font-body-md break-words [overflow-wrap:anywhere] text-on-surface">{cellText(record?.idsbr)}</span>
+      </div>
       <div>
-        {RECORD_FIELDS.map((field) => {
-          const value = valueOf(field.key);
-          const differs = value.toLowerCase() !== counterpartValueOf(field.key).toLowerCase();
+        {fields.map((field) => {
+          const value = field.valueOf(record);
+          const differs = value.toLowerCase() !== field.valueOf(counterpart).toLowerCase();
           return (
-            <div key={field.key} className="px-4 py-3 border-b border-outline-variant last:border-b-0 grid grid-cols-1 sm:grid-cols-[130px_1fr] gap-1 sm:gap-3">
-              <span className="font-label-md text-on-surface-variant">{field.label}</span>
+            <div key={field.id} className="px-4 py-3 border-b border-outline-variant last:border-b-0 grid grid-cols-1 sm:grid-cols-[130px_1fr] gap-1 sm:gap-3">
+              <span className="font-label-md text-on-surface-variant break-words">{field.label}</span>
               <span className="flex items-start gap-2 flex-wrap">
-                <span className={`font-body-md break-words text-on-surface ${differs ? 'font-semibold' : ''}`}>{value}</span>
+                <span className={`font-body-md break-words [overflow-wrap:anywhere] text-on-surface ${differs ? 'font-semibold' : ''}`}>{value}</span>
                 {differs && <span className="inline-flex items-center px-2 py-0.5 rounded bg-warning-container text-on-warning-container font-label-md">Berbeda</span>}
               </span>
             </div>
@@ -269,6 +314,7 @@ export function AssignmentDetailContent() {
 
   const score = (parseFloat(assignment.similarityScore) * 100).toFixed(1);
   const isVerified = assignment.verificationResult !== null;
+  const comparisonFields = buildComparisonFields(assignment.recordA, assignment.recordB);
   const metricPercent = (value: string | null) => value == null ? '-' : `${(parseFloat(value) * 100).toFixed(2)}%`;
 
   return (
@@ -373,8 +419,8 @@ export function AssignmentDetailContent() {
             <p className="font-body-sm text-on-surface-variant mt-1">Nilai yang berbeda ditandai untuk membantu verifikasi manual.</p>
           </div>
           <div className="p-6 grid grid-cols-1 lg:grid-cols-2 gap-6">
-            <RecordColumn title="Record A" record={assignment.recordA} counterpart={assignment.recordB} />
-            <RecordColumn title="Record B" record={assignment.recordB} counterpart={assignment.recordA} />
+            <RecordColumn title="Record A" record={assignment.recordA} counterpart={assignment.recordB} fields={comparisonFields} />
+            <RecordColumn title="Record B" record={assignment.recordB} counterpart={assignment.recordA} fields={comparisonFields} />
           </div>
         </div>
 

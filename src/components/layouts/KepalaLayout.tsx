@@ -3,6 +3,7 @@
 import { useEffect, useState } from 'react';
 import { usePathname, useRouter } from 'next/navigation';
 import Link from 'next/link';
+import { AccessCheckPlaceholder, useRequireRole } from '@/lib/auth/useRequireRole';
 
 interface KepalaLayoutProps {
   children: React.ReactNode;
@@ -22,6 +23,8 @@ export function KepalaLayout({ children, pageTitle }: KepalaLayoutProps) {
   const router = useRouter();
   const pathname = usePathname();
   const [sidebarOpen, setSidebarOpen] = useState(false);
+  // Hanya Kepala BPS (role HEAD) yang boleh melihat halaman di bawah layout ini.
+  const access = useRequireRole(['HEAD']);
 
   // Cegah halaman di belakang drawer ikut bergulir.
   useEffect(() => {
@@ -137,7 +140,7 @@ export function KepalaLayout({ children, pageTitle }: KepalaLayoutProps) {
       )}
 
       {/* Kolom konten */}
-      <div className="md:ml-[260px] flex-1 flex flex-col min-h-screen">
+      <div className="md:ml-[260px] flex-1 flex flex-col min-h-screen min-w-0 max-w-full">
 
         {/* Header atas */}
         <header className="fixed top-0 left-0 md:left-[260px] right-0 h-16 bg-surface border-b border-outline-variant z-10 font-label-md flex justify-between items-center gap-md px-4 md:px-lg">
@@ -186,7 +189,7 @@ export function KepalaLayout({ children, pageTitle }: KepalaLayoutProps) {
         {/* Konten halaman */}
         <main className="flex-1 mt-16 p-4 md:p-[32px] bg-background overflow-y-auto">
           <div className="w-full max-w-[1280px] mx-auto">
-            {children}
+            {access === 'ok' ? children : <AccessCheckPlaceholder state={access} />}
           </div>
         </main>
 

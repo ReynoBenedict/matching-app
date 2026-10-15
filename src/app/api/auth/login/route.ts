@@ -44,8 +44,20 @@ export async function POST(request: NextRequest) {
       .where(eq(users.username, trimmedUsername))
       .limit(1);
 
+    // SRS SMD-F-02-05: every login attempt, successful or failed, is recorded
+    // with a timestamp (audit_logs.created_at). The password is never logged.
+    const recordFailedLogin = (reason: string, userId: number | null = null) =>
+      recordAuditLog({
+        userId,
+        action: 'LOGIN_FAILED',
+        entityType: 'user',
+        entityId: userId ?? undefined,
+        metadata: { username: trimmedUsername, reason },
+      });
+
     // User not found or not ACTIVE
     if (userQuery.length === 0) {
+      await recordFailedLogin('USER_NOT_FOUND');
       return NextResponse.json(
         { error: 'Username atau kata sandi salah' },
         { status: 401 }
@@ -56,6 +68,7 @@ export async function POST(request: NextRequest) {
 
     // Check if user is ACTIVE
     if (user.status !== 'ACTIVE') {
+      await recordFailedLogin('ACCOUNT_INACTIVE', user.id);
       return NextResponse.json(
         { error: 'Akun Anda tidak aktif. Hubungi administrator.' },
         { status: 403 }
@@ -69,6 +82,7 @@ export async function POST(request: NextRequest) {
     );
 
     if (!isPasswordValid) {
+      await recordFailedLogin('INVALID_PASSWORD', user.id);
       return NextResponse.json(
         { error: 'Username atau kata sandi salah' },
         { status: 401 }

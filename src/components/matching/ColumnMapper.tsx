@@ -109,9 +109,18 @@ export function ColumnMapper({
   }, [datasetAId, datasetBId]);
 
   const handleAddMapping = () => {
+    // Usulkan atribut yang belum dipetakan; kolom nama/alamat didahulukan.
+    const used = new Set(mappings.map((m) => m.columnA));
+    const preferred = ['nama_usaha', 'alamat_usaha'];
+    const pick = (cols: Column[]) =>
+      cols.find((c) => preferred.includes(c.columnName) && !used.has(c.columnName)) ??
+      cols.find((c) => !used.has(c.columnName)) ??
+      cols[0];
+    const chosenA = pick(columnsA);
+    const chosenB = columnsB.find((c) => c.columnName === chosenA?.columnName) ?? columnsB[0];
     const newMapping = {
-      columnA: columnsA[0]?.columnName || '',
-      columnB: columnsB[0]?.columnName || '',
+      columnA: chosenA?.columnName || '',
+      columnB: chosenB?.columnName || '',
     };
     onUpdateMappings([...mappings, newMapping]);
   };

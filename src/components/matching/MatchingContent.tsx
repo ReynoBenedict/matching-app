@@ -12,6 +12,14 @@ import {
   thresholdToPercent,
 } from '@/lib/services/matching/threshold';
 
+/** Ringkasan run yang ditampilkan pada langkah hasil (kandidat dibaca per halaman dari API). */
+export interface MatchingRunSummary {
+  datasetA: { id: number; name: string };
+  datasetB: { id: number; name: string };
+  config: { columnMappings: Array<{ columnA: string; columnB: string }>; threshold: number };
+  summary: { totalCandidates: number };
+}
+
 export interface MatchingState {
   datasetAId: number | null;
   datasetBId: number | null;
@@ -20,7 +28,7 @@ export interface MatchingState {
   threshold: number;
   loading: boolean;
   error: string | null;
-  results: any | null;
+  results: MatchingRunSummary | null;
   step: 'dataset-a' | 'dataset-b' | 'column-mapping' | 'threshold' | 'results';
 }
 
@@ -73,6 +81,21 @@ export function MatchingContent() {
   const [job, setJob] = useState<MatchingJobView | null>(null);
   const [elapsedMs, setElapsedMs] = useState(0);
   const [refreshNonce, setRefreshNonce] = useState(0);
+  // Nama dataset untuk label langkah (API status job hanya mengembalikan ID).
+  const [datasetNames, setDatasetNames] = useState<Record<number, string>>({});
+  useEffect(() => {
+    fetch('/api/datasets?status=READY&limit=100')
+      .then((r) => r.json())
+      .then((d) => {
+        if (d?.success && Array.isArray(d.data)) {
+          const names: Record<number, string> = {};
+          for (const item of d.data) names[item.id] = item.name;
+          setDatasetNames(names);
+        }
+      })
+      .catch(() => {});
+  }, []);
+  const datasetLabel = (id: number | null) => (id ? datasetNames[id] ?? `Dataset #${id}` : '-');
 
   const isJobActive =
     activeJobId !== null &&
@@ -148,8 +171,8 @@ export function MatchingContent() {
             loading: false,
             error: null,
             results: {
-              datasetA: { id: view.datasetAId, name: `Dataset #${view.datasetAId}` },
-              datasetB: { id: view.datasetBId, name: `Dataset #${view.datasetBId}` },
+              datasetA: { id: view.datasetAId, name: datasetLabel(view.datasetAId) },
+              datasetB: { id: view.datasetBId, name: datasetLabel(view.datasetBId) },
               config: { columnMappings: state.columnMappings, threshold: view.threshold },
               summary: { totalCandidates: 0 },
             },
@@ -231,7 +254,7 @@ export function MatchingContent() {
     if (state.columnMappings.length === 0) {
       setState((prev) => ({
         ...prev,
-        error: 'At least one column mapping is required',
+        error: 'Pilih minimal satu pasangan atribut yang akan dibandingkan.',
       }));
       return;
     }
@@ -256,7 +279,7 @@ export function MatchingContent() {
     if (!state.datasetAId || !state.datasetBId || state.columnMappings.length === 0) {
       setState((prev) => ({
         ...prev,
-        error: 'Missing configuration for matching',
+        error: 'Konfigurasi pencocokan belum lengkap.',
       }));
       return;
     }
@@ -285,7 +308,7 @@ export function MatchingContent() {
         setState((prev) => ({
           ...prev,
           loading: false,
-          error: payload.error || 'Failed to run matching',
+          error: payload.error || 'Gagal menjalankan pencocokan.',
         }));
         return;
       }
@@ -322,8 +345,8 @@ export function MatchingContent() {
         ...prev,
         loading: false,
         error:
-          'Failed to run matching: ' +
-          (error instanceof Error ? error.message : 'Unknown error'),
+          'Gagal menjalankan pencocokan: ' +
+          (error instanceof Error ? error.message : 'kesalahan tidak diketahui'),
       }));
     }
   };
@@ -377,7 +400,7 @@ export function MatchingContent() {
           <>
             <div className="bg-surface-container-low p-4 rounded-lg border border-outline-variant">
               <p className="text-sm font-semibold text-on-surface">Dataset Pertama</p>
-              <p className="text-sm text-on-surface-variant mt-1">ID: {state.datasetAId}</p>
+              <p className="text-sm text-on-surface-variant mt-1">{datasetLabel(state.datasetAId)}</p>
             </div>
             <DatasetSelector
               title="Langkah 2: Pilih Dataset Kedua"
@@ -395,11 +418,11 @@ export function MatchingContent() {
             <div className="grid grid-cols-2 gap-4">
               <div className="bg-surface-container-low p-4 rounded-lg border border-outline-variant">
                 <p className="text-sm font-semibold text-on-surface">Dataset Pertama</p>
-                <p className="text-sm text-on-surface-variant mt-1">ID: {state.datasetAId}</p>
+                <p className="text-sm text-on-surface-variant mt-1">{datasetLabel(state.datasetAId)}</p>
               </div>
               <div className="bg-surface-container-low p-4 rounded-lg border border-outline-variant">
                 <p className="text-sm font-semibold text-on-surface">Dataset Kedua</p>
-                <p className="text-sm text-on-surface-variant mt-1">ID: {state.datasetBId}</p>
+                <p className="text-sm text-on-surface-variant mt-1">{datasetLabel(state.datasetBId)}</p>
               </div>
             </div>
             <ColumnMapper
@@ -455,8 +478,8 @@ export function MatchingContent() {
 
                 <div className="text-sm text-on-surface-variant space-y-1">
                   <p>
-                    Dataset #{job?.datasetAId ?? state.datasetAId} ↔ #
-                    {job?.datasetBId ?? state.datasetBId} · Threshold{' '}
+                    {datasetLabel(job?.datasetAId ?? state.datasetAId)} ↔{' '}
+                    {datasetLabel(job?.datasetBId ?? state.datasetBId)} · Threshold{' '}
                     {thresholdToPercent(job?.threshold ?? state.threshold)}%
                   </p>
                   <p>

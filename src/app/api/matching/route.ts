@@ -21,7 +21,7 @@
  */
 
 import { NextRequest, NextResponse } from 'next/server';
-import { requireAuth } from '@/lib/auth/authorization';
+import { requireSuperadmin } from '@/lib/auth/authorization';
 import { createMatchingJob, getMatchingProvider } from '@/lib/services/matching';
 import type { MatchingRequest } from '@/lib/services/matching/provider';
 import { recordAuditLog } from '@/lib/audit';
@@ -29,7 +29,7 @@ import { recordAuditLog } from '@/lib/audit';
 export async function POST(request: NextRequest) {
   try {
     // Authenticate user
-    const user = await requireAuth();
+    const user = await requireSuperadmin();
 
     // Parse request body
     const body = await request.json();
@@ -114,6 +114,13 @@ export async function POST(request: NextRequest) {
       return NextResponse.json(
         { success: false, error: 'Unauthorized' },
         { status: 401 }
+      );
+    }
+
+    if (error instanceof Error && error.message.includes('Forbidden')) {
+      return NextResponse.json(
+        { success: false, error: 'Forbidden: Superadmin access required' },
+        { status: 403 }
       );
     }
 

@@ -17,6 +17,29 @@ import type {
 const PAGE_SIZE = 20;
 const THRESHOLD_OPTIONS = [0.5, 0.6, 0.7, 0.8, 0.9];
 
+/** Run tersimpan untuk pasangan dataset (urutan A/B bebas): threshold unik + urutan run terbaru. */
+async function fetchRunThresholds(
+  datasetAId: number,
+  datasetBId: number
+): Promise<{ thresholds: number[]; swapped: boolean }> {
+  const params = new URLSearchParams({ datasetAId: String(datasetAId), datasetBId: String(datasetBId), anyOrder: '1', limit: '200' });
+  const response = await fetch(`/api/matching/runs?${params}`, { cache: 'no-store' });
+  const payload = await response.json();
+  if (!response.ok || !payload.success) return { thresholds: [], swapped: false };
+  const runs = (payload.data as Array<{ threshold: number; status: string; datasetA: { id: number } }>).filter((r) => r.status === 'COMPLETED');
+  if (runs.length === 0) return { thresholds: [], swapped: false };
+  // Ikuti urutan A/B pada run terbaru agar pencarian kandidat menemukan run tersebut.
+  const swapped = runs[0].datasetA.id !== datasetAId;
+  const seen = new Set<number>();
+  const thresholds: number[] = [];
+  for (const run of runs) {
+    if (run.datasetA.id !== runs[0].datasetA.id) continue;
+    const t = Math.round(Number(run.threshold) * 10000) / 10000;
+    if (!seen.has(t)) { seen.add(t); thresholds.push(t); }
+  }
+  return { thresholds, swapped };
+}
+
 interface DatasetOption {
   id: number;
   name: string;
@@ -201,6 +224,26 @@ export function MatchingResultsContent() {
   const [datasetBId, setDatasetBId] = useState<number | null>(null);
   const [threshold, setThreshold] = useState(0.7);
   const [page, setPage] = useState(1);
+  // Threshold yang pernah dipakai pada run tersimpan untuk pasangan terpilih.
+  const [runThresholds, setRunThresholds] = useState<number[]>([]);
+  useEffect(() => {
+    if (!datasetAId || !datasetBId) return;
+    let cancelled = false;
+    fetchRunThresholds(datasetAId, datasetBId)
+      .then((list) => {
+        if (cancelled) return;
+        if (list.swapped) { setDatasetAId(datasetBId); setDatasetBId(datasetAId); return; }
+        setRunThresholds(list.thresholds);
+        if (list.thresholds.length > 0 && !list.thresholds.includes(threshold)) {
+          setPage(1);
+          setThreshold(list.thresholds[0]);
+        }
+      })
+      .catch(() => { if (!cancelled) setRunThresholds([]); });
+    return () => { cancelled = true; };
+    // threshold sengaja tidak menjadi dependensi: hanya pasangan dataset yang memicu pemuatan ulang.
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, [datasetAId, datasetBId]);
 
   const [rows, setRows] = useState<MatchingCandidateRow[]>([]);
   const [summary, setSummary] = useState<MatchingCandidateSummary | null>(null);
@@ -457,12 +500,17 @@ export function MatchingResultsContent() {
                 onChange={(event) => handleSelectThreshold(Number(event.target.value))}
                 className="w-full px-md py-sm rounded-lg border border-outline-variant bg-surface text-on-surface text-body-md focus:outline-none focus:ring-2 focus:ring-secondary-container"
               >
-                {THRESHOLD_OPTIONS.map((option) => (
+                {(runThresholds.length > 0 ? runThresholds : THRESHOLD_OPTIONS).map((option) => (
                   <option key={option} value={option}>
                     {Math.round(option * 100)}%
                   </option>
                 ))}
               </select>
+              <p className="font-label-md text-label-md text-on-surface-variant mt-xs">
+                {runThresholds.length > 0
+                  ? `${runThresholds.length} threshold dari proses tersimpan untuk pasangan ini`
+                  : 'Belum ada proses tersimpan untuk pasangan ini'}
+              </p>
             </div>
           </div>
         )}

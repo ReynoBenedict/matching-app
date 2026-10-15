@@ -69,3 +69,9 @@ __pycache__/
 
 # working/build directories (nested project copies)
 bps-data-matching-system/
+
+# Data BPS bersifat terbatas (restricted) - jangan pernah di-commit
+datasets/
+# Dokumen referensi pihak ketiga dan workspace laporan PKL (repo terpisah)
+Referensi_Skripsi_UB_Pak_Tri/
+skripsi-latex-workflow/

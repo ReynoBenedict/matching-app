@@ -115,7 +115,7 @@ function DatasetsContent() {
     const badges = {
       READY: (
         <span className="inline-flex items-center gap-1 bg-[#d4edda] text-[#155724] px-sm py-[2px] rounded-full text-[11px] font-bold">
-          <span className="w-1.5 h-1.5 bg-[#28a745] rounded-full"></span> Ready
+          <span className="w-1.5 h-1.5 bg-[#28a745] rounded-full"></span> Siap
         </span>
       ),
       UPLOADING: (
@@ -125,7 +125,7 @@ function DatasetsContent() {
       ),
       VALIDATING: (
         <span className="inline-flex items-center gap-1 bg-surface-container-highest text-on-surface-variant px-sm py-[2px] rounded-full text-[11px] font-bold">
-          <span className="w-1.5 h-1.5 bg-outline rounded-full animate-pulse"></span> Processing
+          <span className="w-1.5 h-1.5 bg-outline rounded-full animate-pulse"></span> Diproses
         </span>
       ),
       FAILED: (
@@ -166,17 +166,17 @@ function DatasetsContent() {
             Manajemen Dataset
           </h2>
           <p className="font-body-md text-body-md text-on-surface-variant">
-            Kelola data master (penduduk, dtks, p3ke) untuk keperluan pencocokan.
+            Kelola dataset usaha (DB Kendedes, Direktori Pajak, OSS) yang akan dicocokkan.
           </p>
         </div>
         <div className="flex gap-sm md:flex-col items-stretch">
           <button
             onClick={() => setSchemaInfoOpen(true)}
             className="bg-surface-container text-on-surface border border-outline-variant px-lg py-sm rounded-xl font-label-md text-label-md flex items-center gap-sm hover:bg-surface-container-highest transition-colors shadow-sm"
-            title="View required dataset schema fields"
+            title="Lihat kontrak kolom dataset"
           >
             <span className="material-symbols-outlined text-[18px]">info</span>
-            <span className="hidden sm:inline">Schema</span>
+            <span className="hidden sm:inline">Kontrak Kolom</span>
           </button>
           <Link
             href="/datasets/upload"
@@ -192,7 +192,7 @@ function DatasetsContent() {
       <div className="grid grid-cols-1 md:grid-cols-3 gap-md mb-xl">
         <div className="bg-surface-container-lowest p-lg rounded-xl border border-outline-variant shadow-sm hover:shadow-md transition-shadow relative overflow-hidden group">
           <div className="absolute -right-6 -top-6 w-24 h-24 bg-primary-fixed opacity-50 rounded-full group-hover:scale-150 transition-transform duration-500 ease-out"></div>
-          <p className="font-label-md text-label-md text-on-surface-variant mb-sm uppercase tracking-wider relative z-10">Total Datasets</p>
+          <p className="font-label-md text-label-md text-on-surface-variant mb-sm uppercase tracking-wider relative z-10">Total Dataset</p>
           <div className="flex items-end gap-sm relative z-10">
             <span className="font-headline-lg text-headline-lg text-primary">{datasets.length}</span>
             <span className="font-body-sm text-body-sm text-on-surface-variant mb-1">Dataset</span>
@@ -201,10 +201,10 @@ function DatasetsContent() {
 
         <div className="bg-surface-container-lowest p-lg rounded-xl border border-outline-variant shadow-sm hover:shadow-md transition-shadow relative overflow-hidden group">
           <div className="absolute -right-6 -top-6 w-24 h-24 bg-secondary-fixed opacity-50 rounded-full group-hover:scale-150 transition-transform duration-500 ease-out"></div>
-          <p className="font-label-md text-label-md text-on-surface-variant mb-sm uppercase tracking-wider relative z-10">Total Records</p>
+          <p className="font-label-md text-label-md text-on-surface-variant mb-sm uppercase tracking-wider relative z-10">Total Record</p>
           <div className="flex items-end gap-sm relative z-10">
             <span className="font-headline-lg text-headline-lg text-secondary">
-              {datasets.reduce((sum, d) => sum + (d.totalRecords || 0), 0).toLocaleString()}
+              {datasets.reduce((sum, d) => sum + (d.totalRecords || 0), 0).toLocaleString('id-ID')}
             </span>
             <span className="font-body-sm text-body-sm text-on-surface-variant mb-1">Baris Data</span>
           </div>
@@ -212,10 +212,10 @@ function DatasetsContent() {
 
         <div className="bg-surface-container-lowest p-lg rounded-xl border border-outline-variant shadow-sm hover:shadow-md transition-shadow relative overflow-hidden group">
           <div className="absolute -right-6 -top-6 w-24 h-24 bg-tertiary-fixed opacity-50 rounded-full group-hover:scale-150 transition-transform duration-500 ease-out"></div>
-          <p className="font-label-md text-label-md text-on-surface-variant mb-sm uppercase tracking-wider relative z-10">Storage Used</p>
+          <p className="font-label-md text-label-md text-on-surface-variant mb-sm uppercase tracking-wider relative z-10">Siap Dicocokkan</p>
           <div className="flex items-end gap-sm relative z-10">
-            <span className="font-headline-lg text-headline-lg text-tertiary">4.5</span>
-            <span className="font-body-sm text-body-sm text-on-surface-variant mb-1">GB</span>
+            <span className="font-headline-lg text-headline-lg text-tertiary">{datasets.filter((d) => d.status === 'READY').length}</span>
+            <span className="font-body-sm text-body-sm text-on-surface-variant mb-1">Dataset berstatus READY</span>
           </div>
         </div>
       </div>
@@ -242,7 +242,7 @@ function DatasetsContent() {
                 setPage(1);
               }}
               className="w-full pl-xl pr-sm py-[6px] rounded-lg border border-outline-variant bg-surface focus:outline-none focus:ring-2 focus:ring-secondary-container focus:border-secondary-container font-body-sm text-on-surface"
-              placeholder="Filter dataset..."
+              placeholder="Cari nama dataset..."
               type="text"
             />
           </div>
@@ -255,16 +255,12 @@ function DatasetsContent() {
               }}
               className="px-md py-xs rounded-lg border border-outline-variant bg-surface hover:bg-surface-container-highest transition-colors font-label-md text-on-surface"
             >
-              <option value="">All Status</option>
-              <option value="UPLOADING">Uploading</option>
-              <option value="VALIDATING">Validating</option>
-              <option value="READY">Ready</option>
-              <option value="FAILED">Failed</option>
+              <option value="">Semua Status</option>
+              <option value="UPLOADING">Mengunggah</option>
+              <option value="VALIDATING">Memvalidasi</option>
+              <option value="READY">Siap</option>
+              <option value="FAILED">Gagal</option>
             </select>
-            <button className="px-md py-xs rounded-lg border border-outline-variant bg-surface hover:bg-surface-container-highest transition-colors font-label-md text-on-surface flex items-center gap-xs">
-              <span className="material-symbols-outlined text-[16px]">sort</span>
-              Sort
-            </button>
           </div>
         </div>
 
@@ -323,10 +319,10 @@ function DatasetsContent() {
                       </span>
                     </td>
                     <td className="p-md text-on-surface-variant text-right">
-                      {dataset.totalRecords?.toLocaleString() || '—'}
+                      {dataset.totalRecords?.toLocaleString('id-ID') || '—'}
                     </td>
                     <td className="p-md text-on-surface-variant text-center">
-                      {dataset.columnCount?.toLocaleString() || '—'}
+                      {dataset.columnCount?.toLocaleString('id-ID') || '—'}
                     </td>
                     <td className="p-md text-on-surface-variant">{formatDate(dataset.createdAt)}</td>
                     <td className="p-md text-center">{getStatusBadge(dataset.status)}</td>
@@ -334,20 +330,20 @@ function DatasetsContent() {
                       <div className="flex items-center justify-end gap-sm opacity-0 group-hover:opacity-100 transition-opacity">
                         <Link
                           href={`/datasets/${dataset.id}`}
-                          aria-label="Preview"
+                          aria-label="Lihat detail"
                           className="text-on-surface-variant hover:text-primary transition-colors"
                         >
                           <span className="material-symbols-outlined text-[20px]">visibility</span>
                         </Link>
                         {dataset.status === 'READY' && (
-                          <button
-                            disabled
-                            title="Feature coming soon"
-                            aria-label="Use for Matching"
-                            className="text-secondary/50 cursor-not-allowed disabled:opacity-50"
+                          <Link
+                            href="/matching"
+                            title="Gunakan pada pencocokan data"
+                            aria-label="Gunakan pada pencocokan data"
+                            className="text-secondary hover:text-primary transition-colors"
                           >
                             <span className="material-symbols-outlined text-[20px]">play_circle</span>
-                          </button>
+                          </Link>
                         )}
                         <button
                           type="button"
@@ -374,7 +370,7 @@ function DatasetsContent() {
         {datasets.length > 0 && (
           <div className="p-sm border-t border-outline-variant bg-surface-bright flex justify-between items-center">
             <span className="font-body-sm text-body-sm text-on-surface-variant ml-sm">
-              Showing 1 to {datasets.length} of {datasets.length} dataset{datasets.length !== 1 ? 's' : ''}
+              Menampilkan {datasets.length} dataset
             </span>
             <div className="flex gap-xs">
               <button

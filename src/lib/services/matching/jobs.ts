@@ -271,6 +271,15 @@ export function createMatchingJob(
   return { job, reused: false };
 }
 
+/** Jumlah job yang masih PENDING/RUNNING di proses ini (untuk metrik monitoring). */
+export function countActiveMatchingJobs(): number {
+  let active = 0;
+  for (const job of registry().jobs.values()) {
+    if (job.state === 'PENDING' || job.state === 'RUNNING') active += 1;
+  }
+  return active;
+}
+
 export function getMatchingJob(jobId: string): MatchingJob | null {
   const job = registry().jobs.get(jobId);
   if (!job) return null;

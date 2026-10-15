@@ -116,6 +116,14 @@ export default function DatasetDetailPage() {
     return badges[status as keyof typeof badges] || badges.READY;
   };
 
+  // Pratinjau menampilkan kolom asli berkas unggahan (raw_data), bukan kolom internal basis data.
+  const previewRows: Record<string, unknown>[] = (dataset?.preview ?? []).map((row) => {
+    const raw = (row as { rawData?: unknown }).rawData;
+    return raw && typeof raw === 'object' && Object.keys(raw as object).length > 0
+      ? (raw as Record<string, unknown>)
+      : row;
+  });
+
   return (
     <SuperadminLayout pageTitle="Detail Dataset">
       {/* Breadcrumbs */}
@@ -158,12 +166,6 @@ export default function DatasetDetailPage() {
               <h1 className="font-headline-lg-mobile md:font-headline-lg text-headline-lg-mobile md:text-headline-lg font-bold text-primary mb-xs">Detail Dataset</h1>
               <p className="text-on-surface-variant font-body-md">Menampilkan informasi metadata dan sampel pratinjau data.</p>
             </div>
-            <div className="flex gap-sm">
-              <button className="bg-surface text-primary border border-primary px-md py-sm rounded font-label-md hover:bg-surface-container-low transition-colors flex items-center gap-xs">
-                <span className="material-symbols-outlined text-[18px]">download</span>
-                Unduh Asli
-              </button>
-            </div>
           </div>
 
           {/* Bento Grid Layout for Metadata */}
@@ -191,7 +193,7 @@ export default function DatasetDetailPage() {
                 </div>
                 <div>
                   <p className="text-on-surface-variant font-label-md mb-xs">Jumlah Baris</p>
-                  <p className="font-body-md font-semibold">{dataset.totalRecords?.toLocaleString() || '—'}</p>
+                  <p className="font-body-md font-semibold">{dataset.totalRecords?.toLocaleString('id-ID') || '—'}</p>
                 </div>
                 <div>
                   <p className="text-on-surface-variant font-label-md mb-xs">Tipe Dataset</p>
@@ -255,19 +257,19 @@ export default function DatasetDetailPage() {
 
           {/* Data Preview */}
           {dataset.status === 'READY' && dataset.preview.length > 0 && (
-            <div className="bg-surface border border-outline-variant rounded-xl shadow-sm overflow-hidden flex flex-col">
+            <div className="bg-surface border border-outline-variant rounded-xl shadow-sm overflow-hidden flex flex-col min-w-0 max-w-full">
               <div className="p-md border-b border-outline-variant flex justify-between items-center bg-surface-bright">
                 <h3 className="font-headline-md text-headline-md font-semibold text-primary">Pratinjau Data (Sampel)</h3>
                 <span className="font-body-sm text-on-surface-variant">
-                  Menampilkan {dataset.preview.length} dari {dataset.totalRecords?.toLocaleString() || 0} baris
+                  Menampilkan {dataset.preview.length} dari {dataset.totalRecords?.toLocaleString('id-ID') || 0} baris · {Object.keys(previewRows[0] ?? {}).length} kolom unggahan
                 </span>
               </div>
               <div className="overflow-x-auto">
                 <table className="w-full text-left font-data-tabular">
                   <thead className="bg-surface-container-low border-b border-outline-variant">
                     <tr>
-                      {dataset.preview.length > 0 &&
-                        Object.keys(dataset.preview[0]).map((key) => (
+                      {previewRows.length > 0 &&
+                        Object.keys(previewRows[0]).map((key) => (
                           <th key={key} className="p-md font-label-md text-on-surface-variant whitespace-nowrap border-r border-outline-variant/30">
                             {key}
                           </th>
@@ -275,7 +277,7 @@ export default function DatasetDetailPage() {
                     </tr>
                   </thead>
                   <tbody className="divide-y divide-outline-variant/50">
-                    {dataset.preview.map((row, idx) => (
+                    {previewRows.map((row, idx) => (
                       <tr key={idx} className="hover:bg-surface-container-lowest transition-colors group">
                         {Object.values(row).map((value, colIdx) => (
                           <td

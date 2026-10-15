@@ -9,6 +9,7 @@ export function UploadForm() {
 
   const [file, setFile] = useState<File | null>(null);
   const [datasetType, setDatasetType] = useState('DB_KENDEDES');
+  const [datasetName, setDatasetName] = useState('');
   const [loading, setLoading] = useState(false);
   const [error, setError] = useState('');
   const [success, setSuccess] = useState('');
@@ -58,6 +59,7 @@ export function UploadForm() {
       const formData = new FormData();
       formData.append('file', file);
       formData.append('datasetType', datasetType);
+      if (datasetName.trim()) formData.append('datasetName', datasetName.trim());
 
       const xhr = new XMLHttpRequest();
 
@@ -143,6 +145,26 @@ export function UploadForm() {
             </p>
           </div>
         )}
+
+        {/* Nama dataset (opsional, bawaan: nama berkas) */}
+        <div>
+          <label htmlFor="dataset_name" className="block font-label-md text-label-md text-on-surface mb-md">
+            Nama Dataset
+          </label>
+          <input
+            id="dataset_name"
+            type="text"
+            value={datasetName}
+            onChange={(e) => setDatasetName(e.target.value)}
+            disabled={loading}
+            maxLength={255}
+            placeholder="Kosongkan untuk memakai nama berkas"
+            className="w-full px-md py-md border border-outline-variant rounded bg-surface-container-lowest font-body-md text-body-md text-on-surface focus:outline-none focus:ring-2 focus:ring-primary focus:border-transparent disabled:opacity-50"
+          />
+          <p className="font-body-sm text-body-sm text-on-surface-variant mt-sm">
+            Nama ini ditampilkan pada daftar dataset, pencocokan, dan laporan.
+          </p>
+        </div>
 
         {/* Dataset Type Selection */}
         <div>

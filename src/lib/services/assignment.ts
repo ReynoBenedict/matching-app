@@ -263,8 +263,8 @@ export async function getAssignmentDetail(assignmentId: number, employeeId: numb
     faissSimilarity: string | null;
     rapidfuzzSimilarity: string | null;
     fieldScores: unknown[];
-    recordA: any;
-    recordB: any;
+    recordA: typeof datasetRecords.$inferSelect | undefined;
+    recordB: typeof datasetRecords.$inferSelect | undefined;
   };
 }> {
   try {

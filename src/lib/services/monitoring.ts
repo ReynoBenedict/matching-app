@@ -9,8 +9,9 @@
  */
 
 import { getDatabase } from '@/lib/db';
-import { assignments, users } from '@/lib/db/schema';
+import { assignments, auditLogs, matchingRuns, users } from '@/lib/db/schema';
 import { count, eq } from 'drizzle-orm';
+import { countActiveMatchingJobs } from '@/lib/services/matching/jobs';
 
 export interface AssignmentMonitoringStats {
   total: number;
@@ -162,12 +163,17 @@ export async function getMonitoringDashboard(): Promise<MonitoringDashboardData>
             employeesWithWork.length
         );
 
+  // Proses pencocokan: run yang selesai tersimpan di matching_runs, kegagalan
+  // tercatat di audit_logs (MATCHING_FAIL), dan proses berjalan ada di registri job.
+  const [completedRuns, failedRuns] = await Promise.all([
+    db.select({ value: count() }).from(matchingRuns).where(eq(matchingRuns.status, 'COMPLETED')),
+    db.select({ value: count() }).from(auditLogs).where(eq(auditLogs.action, 'MATCHING_FAIL')),
+  ]);
+
   const summary: MonitoringSummary = {
-    // No persistent matching-process table exists yet, so there are genuinely
-    // no stored running/completed/failed processes to report.
-    runningProcesses: 0,
-    completedProcesses: 0,
-    failedProcesses: 0,
+    runningProcesses: countActiveMatchingJobs(),
+    completedProcesses: Number(completedRuns[0]?.value ?? 0),
+    failedProcesses: Number(failedRuns[0]?.value ?? 0),
     totalEmployees: employees.length,
     averageCompletionRate,
   };

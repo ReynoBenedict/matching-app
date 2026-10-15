@@ -271,16 +271,26 @@ export function HasilAkhirContent() {
             Hasil akhir verifikasi kandidat pencocokan data yang tersimpan di basis data.
           </p>
         </div>
-        <button
-          onClick={handleRefresh}
-          disabled={refreshing}
-          className="px-md py-sm bg-surface border border-outline-variant text-primary rounded-lg font-label-md hover:bg-surface-container-low transition-colors flex items-center gap-sm disabled:opacity-60 disabled:cursor-not-allowed"
-        >
-          <span className={`material-symbols-outlined ${refreshing ? 'animate-spin' : ''}`} style={{ fontSize: '20px' }}>
-            refresh
-          </span>
-          {refreshing ? 'Memperbarui...' : 'Perbarui'}
-        </button>
+        <div className="flex flex-wrap gap-sm">
+          <a
+            href={`/api/exports/hasil-akhir?verification=${verification}`}
+            className="px-md py-sm bg-primary text-on-primary rounded-lg font-label-md hover:bg-primary-container hover:text-on-primary-container transition-colors flex items-center gap-sm"
+            title="Unduh hasil akhir sesuai filter saat ini sebagai CSV"
+          >
+            <span className="material-symbols-outlined" style={{ fontSize: '20px' }}>download</span>
+            Unduh CSV
+          </a>
+          <button
+            onClick={handleRefresh}
+            disabled={refreshing}
+            className="px-md py-sm bg-surface border border-outline-variant text-primary rounded-lg font-label-md hover:bg-surface-container-low transition-colors flex items-center gap-sm disabled:opacity-60 disabled:cursor-not-allowed"
+          >
+            <span className={`material-symbols-outlined ${refreshing ? 'animate-spin' : ''}`} style={{ fontSize: '20px' }}>
+              refresh
+            </span>
+            {refreshing ? 'Memperbarui...' : 'Perbarui'}
+          </button>
+        </div>
       </div>
 
       {/* Summary Cards */}
