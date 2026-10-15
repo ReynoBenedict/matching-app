@@ -1,357 +1,153 @@
-# BPS Data Matching System
+# Sistem Pencocokan Data BPS Kota Malang
 
-A modern web-based data matching and linkage system for the Indonesian Central Bureau of Statistics (BPS - Badan Pusat Statistik). This system enables efficient matching and verification of business registry records through a collaborative employee verification workflow.
+Aplikasi web internal untuk mencocokkan record usaha antar dataset secara dinamis berbasis multi-atribut. Superadmin mengunggah dataset CSV, memilih atribut dan threshold, lalu menjalankan pencocokan; kandidat pasangan hasil pencocokan ditugaskan kepada Employee untuk diverifikasi (MATCH / NON-MATCH / REVIEW); Kepala BPS memantau ringkasan dan hasil akhir.
 
-## Status
+> Skor kemiripan **bukan** keputusan akhir dan **bukan** ukuran akurasi. Setiap kandidat tetap diverifikasi manusia. Belum ada *ground truth*, sehingga precision/recall belum pernah diukur.
 
-**Phases 0-6E Complete** ✅
+## Fitur yang tersedia
 
-This project has completed all planned phases including:
-- Phase 0: Project Setup & Database Schema
-- Phase 1: Authentication & Role-Based Access
-- Phase 2: Dataset Management & Upload
-- Phase 3: Data Matching Algorithm Integration
-- Phase 4: Employee Assignment & Labeling UI
-- Phase 5: Admin Dashboard & Reporting
-- Phase 6: API Testing & Validation
-- Phase 6E: End-to-End Testing & Documentation
+| Area | Fitur |
+|---|---|
+| Akun | Registrasi mandiri (selalu sebagai Employee; role dari klien diabaikan) → menunggu persetujuan Superadmin → login. Setujui/tolak permohonan. Login gagal dicatat di `audit_logs`. |
+| Sesi & akses | Cookie sesi `httpOnly` bertanda tangan HMAC-SHA256; otorisasi per peran di setiap route API (Superadmin = `ADMIN`, `EMPLOYEE`, Kepala BPS = `HEAD`) dan penjaga peran di layout. |
+| Dataset | Unggah CSV (≤ 200 MB, header unik), validasi, pratinjau kolom/baris asli, hapus (berjenjang ke record, run, kandidat, penugasan). Tipe sumber generik `DATASET_A`–`DATASET_D`. |
+| Pencocokan | Dua dataset per proses, satu atau lebih pasangan atribut, threshold 0–100 %. Dijalankan asinkron (job) melalui Model Service; *run* dan kandidat disimpan. |
+| Penugasan | Superadmin menugaskan kandidat (satu pasangan per penugasan) ke Employee; pasangan yang sama tidak bisa ditugaskan dua kali. |
+| Verifikasi | Employee memverifikasi penugasan miliknya; Superadmin dapat memverifikasi/mengubah penugasan mana pun (diperiksa di server). Perubahan menimpa nilai lama dan dicatat di `audit_logs` (tanpa tabel riwayat versi). |
+| Pemantauan | Dasbor Superadmin, monitoring progres per Employee, hasil matching, riwayat proses, ringkasan laporan; dasbor dan hasil akhir Kepala BPS; ekspor hasil akhir ke CSV. |
 
-## Quick Start
+**Belum tersedia** (dibandingkan SRS): kelola akun oleh Superadmin (tambah/ubah/nonaktifkan), unggah Excel, pembaruan dataset, lebih dari dua dataset per proses, distribusi tugas otomatis dan pemindahan alokasi, laporan PDF/Excel, UI khusus verifikasi langsung oleh Superadmin (API sudah ada), proteksi *lost update* saat dua pengguna mengubah hasil bersamaan, registri job persisten (job yang sedang berjalan hilang bila server restart; hasil yang selesai tetap tersimpan).
 
-### Prerequisites
+## Arsitektur
 
-- **Node.js 20+** (LTS recommended)
-- **Docker & Docker Compose** (for database setup)
-- **npm** (comes with Node.js)
+```
+Browser ──> Next.js (UI + route handler REST API + Drizzle ORM) ──> PostgreSQL 16
+                 │  POST /match                                        ▲
+                 └──────────> Model Service (FastAPI) ─────────────────┘ (membaca record)
+```
 
-### 1. Clone the Repository
+Model Service: normalisasi (NFKC, huruf kecil, tanda baca → spasi) → TF-IDF karakter 3–5 gram → Truncated SVD (≤ 128 komponen) → FAISS `IndexFlatIP` Top-K (`MATCHING_TOP_K`, bawaan 10) → skor per atribut `rapidfuzz.fuzz.ratio / 100` → rata-rata → saring dengan threshold. Pasangan di luar Top-K per record dataset A tidak pernah dinilai.
+
+## Teknologi
+
+Next.js 16 (App Router), React 19, TypeScript 5, Tailwind CSS 4, Drizzle ORM 0.45 + drizzle-kit, PostgreSQL 16, bcryptjs; Python 3.12, FastAPI, scikit-learn, faiss-cpu, RapidFuzz, psycopg; Docker Compose; tsx dan Playwright untuk pengujian.
+
+## Struktur direktori
+
+```
+src/
+  app/            halaman (login, register, pending, superadmin/*, employee/*, kepala-bps/*, datasets, matching)
+  app/api/        route handler REST (auth, datasets, matching, assignments, superadmin, kepala-bps, reports, exports, health)
+  components/     komponen UI per domain (layouts, datasets, matching, assignments, employee, reports)
+  lib/auth/       sesi, otorisasi, penjaga peran
+  lib/db/         schema Drizzle, koneksi, seed
+  lib/services/   logika bisnis (upload, matching/*, assignment, monitoring, report)
+  lib/config/, lib/constants/
+drizzle/          migrasi SQL (sumber kebenaran skema; jangan diedit manual)
+model_service/    Model Service FastAPI (app.py, requirements.txt, Dockerfile)
+tests/            uji threshold, uji matching, fixtures/ (CSV sintetis)
+docs/             catatan teknis (upload, integrasi)
+```
+
+Uji integrasi per fitur berada di `src/**/__tests__/`.
+
+## Prasyarat
+
+Node.js ≥ 20 dan npm; Docker + Docker Compose; (opsional, untuk menjalankan Model Service tanpa Docker) Python 3.12.
+
+## Menjalankan untuk development
 
 ```bash
-git clone <repository-url>
-cd matching-app
+npm ci
+cp .env.example .env.local
+#   ubah: DATABASE_URL=postgresql://bps_user:bps_password@localhost:5432/bps_data_matching
+#         MODEL_SERVICE_URL=http://localhost:8000
+#         NEXTAUTH_SECRET=<string acak>
+docker compose up -d postgres     # basis data
+npm run db:migrate                # terapkan migrasi drizzle/
+npm run db:seed                   # 7 akun demo (idempoten)
+
+# Model Service — pilih salah satu:
+docker compose up -d model
+# atau tanpa Docker:
+cd model_service
+python -m venv .venv
+.venv/Scripts/pip install -r requirements.txt        # Linux/macOS: .venv/bin/pip
+DATABASE_URL=postgresql://bps_user:bps_password@localhost:5432/bps_data_matching .venv/Scripts/uvicorn app:app --port 8000
+cd ..
+
+npm run dev                       # http://localhost:3000
 ```
 
-### 2. Install Dependencies
+Production build lokal: `npm run build && npm start` (port 3000; port lain: `npm start -- -p 3100`).
+
+## Menjalankan seluruh stack dengan Docker Compose
 
 ```bash
-npm install
+cp .env.example .env              # ganti NEXTAUTH_SECRET
+docker compose up -d --build      # app :3000, postgres :5432, model :8000
+# Image app tidak menjalankan migrasi/seed otomatis; jalankan dari host:
+DATABASE_URL=postgresql://bps_user:bps_password@localhost:5432/bps_data_matching npm run db:migrate
+DATABASE_URL=postgresql://bps_user:bps_password@localhost:5432/bps_data_matching npm run db:seed
 ```
 
-### 3. Set Up Environment Variables
+### Port dan URL
+
+| Service | Port | Variabel |
+|---|---|---|
+| App (Next.js) | 3000 | `NEXTAUTH_URL` |
+| PostgreSQL | 5432 | `DATABASE_URL` |
+| Model Service | 8000 (`GET /health`, `POST /match`) | `MODEL_SERVICE_URL` |
+
+### Variabel lingkungan
+
+Lihat `.env.example`. Penting: `NEXTAUTH_SECRET` (wajib; tanpa nilai ini dipakai rahasia acak per proses sehingga semua sesi berakhir saat restart), `SESSION_COOKIE_SECURE` (cookie `Secure` hanya pada HTTPS — biarkan kosong untuk akses HTTP di LAN; jika tidak, browser membuang cookie dan login tampak gagal), `MATCHING_PROVIDER=model_service`, `MATCHING_TOP_K` (dibaca Model Service).
+
+## Akun demo (hanya development lokal)
+
+Dibuat oleh `npm run db:seed`. **Ganti atau hapus sebelum deployment.**
+
+| Peran | Username | Password |
+|---|---|---|
+| Superadmin (`ADMIN`) | `admin`, `superadmin` | `admin123`, `superadmin123` |
+| Kepala BPS (`HEAD`) | `kepala` | `kepala123` |
+| Employee | `karyawan1`, `karyawan2`, `karyawan3` | `karyawan123` |
+| Employee nonaktif | `karyawan_nonaktif` | `karyawan123` |
+
+## Data contoh
+
+`tests/fixtures/sintetis_A.csv` dan `sintetis_B.csv` berisi data **fiktif** (12 record, kolom `idsbr,nama_usaha,alamat_usaha,kdkec`) untuk mencoba unggah → pencocokan (atribut `nama_usaha` + `alamat_usaha`, threshold 70 %) → penugasan → verifikasi.
+
+## Pengujian
 
 ```bash
-cp .env.example .env
+npm run type-check          # TypeScript
+npm run lint                # ESLint
+npm run test:threshold      # uji murni konversi threshold
+# Uji integrasi berikut menulis ke basis data pada DATABASE_URL — gunakan DB development/uji, bukan produksi:
+npm test                    # layanan penugasan
+npm run test:ui             # alur penugasan Superadmin
+npm run test:labeling       # alur pelabelan Employee
+npm run build               # production build
 ```
 
-Update `.env` with your configuration (defaults work for local development):
+`npm run test:e2e` (Playwright) dan `tests/matching.test.ts` mengasumsikan server di `localhost:3001`/`3000` dengan data awal tertentu dan belum menjadi bagian pengujian rutin.
 
-```env
-DATABASE_URL=postgresql://bps_user:bps_password@localhost:5432/bps_data_matching
-NEXTAUTH_SECRET=your_nextauth_secret_here
-NEXTAUTH_URL=http://localhost:3000
-NODE_ENV=development
-MATCHING_PROVIDER=model_service
-MODEL_SERVICE_URL=http://localhost:8000
-```
+## Troubleshooting
 
-Notes on the session cookie:
+| Gejala | Penyebab / solusi |
+|---|---|
+| Login berhasil (HTTP 200) tetapi kembali ke halaman login | Cookie `Secure` di HTTP: kosongkan `SESSION_COOKIE_SECURE`, pastikan `NEXTAUTH_URL` diawali `http://` |
+| Semua pengguna logout setelah restart | `NEXTAUTH_SECRET` belum diisi |
+| Pencocokan gagal | Model Service belum berjalan atau `MODEL_SERVICE_URL` / `DATABASE_URL` Model Service salah; cek `GET http://localhost:8000/health` |
+| `relation "users" already exists` saat migrate | DB lama dibuat dengan `db:push`; reset volume: `docker compose down -v`, lalu migrate + seed |
+| Port terpakai | `npm run dev -- -p 3001` |
+| Unggah ditolak "Unsupported dataset type" | Gunakan tipe `DATASET_A`–`DATASET_D` (dropdown form unggah) |
 
-- `NEXTAUTH_SECRET` (or `SESSION_SECRET`) signs the session cookie (HMAC-SHA256). Set it to a random value, e.g. `openssl rand -hex 32`. When it is missing, a random per-process secret is used and every restart logs all users out.
-- The cookie is only marked `Secure` when `NEXTAUTH_URL` starts with `https://` or `SESSION_COOKIE_SECURE=true`. Leave both unset when the app is served over plain HTTP on a LAN, otherwise browsers drop the cookie and login appears to fail.
+## Keamanan dan data
 
-### 4. Start the Database
+- **Jangan commit** dataset asli BPS, `.env*` (kecuali `.env.example`), dump basis data, atau berkas unggahan. Folder `datasets/` dan workspace laporan di-ignore.
+- Dataset asli bersifat terbatas: gunakan nama generik (Dataset A–D) di dokumentasi publik dan data sintetis untuk demonstrasi atau tangkapan layar.
+- Endpoint `POST /api/dev/seed` hanya aktif saat `NODE_ENV=development`.
 
-```bash
-docker-compose up -d postgres
-```
-
-Wait for PostgreSQL to be healthy:
-```bash
-docker-compose logs postgres
-```
-
-### 5. Run Database Migrations
-
-```bash
-npm run db:migrate
-```
-
-Migration files live in `drizzle/` and are committed to git — they are the source of truth for the schema. Never edit them by hand; generate new ones with `npm run db:generate`.
-
-> **Existing database?** If your database was created with `npm run db:push` before migrations were introduced, it already has all tables but no migration history. Running the baseline migration will fail with `relation "users" already exists`. Reset it first:
-> ```bash
-> docker-compose down -v && docker-compose up -d postgres
-> npm run db:migrate && npm run db:seed
-> ```
-
-### 6. Seed Test Data (Development Only)
-
-Populate the database with 7 test users, 10 dataset records, and 8 assignments:
-
-```bash
-npm run db:seed
-```
-
-For dataset-only seeding:
-```bash
-npm run db:seed -- --dataset
-```
-
-### 7. Start the Development Server
-
-```bash
-npm run dev
-```
-
-The application will be available at `http://localhost:3000`
-
-## Testing Credentials
-
-After seeding, use these credentials to log in:
-
-| Role | Username | Password | Email |
-|------|----------|----------|-------|
-| **Superadmin** (role `ADMIN`) | `superadmin` | `superadmin123` | `superadmin@bps.go.id` |
-| **Superadmin** (role `ADMIN`) | `admin` | `admin123` | `admin@bps.go.id` |
-| **Head (Kepala)** | `kepala` | `kepala123` | `kepala@bps.go.id` |
-| **Employee 1** | `karyawan1` | `karyawan123` | `karyawan1@bps.go.id` |
-| **Employee 2** | `karyawan2` | `karyawan123` | `karyawan2@bps.go.id` |
-| **Employee 3** | `karyawan3` | `karyawan123` | `karyawan3@bps.go.id` |
-| **Employee (Inactive)** | `karyawan_nonaktif` | `karyawan123` | `karyawan_nonaktif@bps.go.id` |
-
-## Local Development Setup
-
-See [DEVELOPMENT.md](./DEVELOPMENT.md) for detailed information on:
-- Running tests
-- Linting and formatting
-- Database migrations
-- Debugging tips
-- Hot reload development
-
-## Docker Setup
-
-### Quick Start with Docker Compose
-
-Run the entire stack (app + PostgreSQL) in Docker:
-
-```bash
-docker-compose up
-```
-
-This will:
-1. Build the Next.js application
-2. Start PostgreSQL with persistence
-3. Run migrations and seed data automatically
-4. Start the app on port 3000
-
-### Database Persistence
-
-PostgreSQL data is persisted in the `postgres_data` volume. To reset:
-
-```bash
-docker-compose down -v  # WARNING: Deletes all data
-docker-compose up       # Starts fresh
-```
-
-### Logs
-
-View application logs:
-```bash
-docker-compose logs app
-```
-
-View database logs:
-```bash
-docker-compose logs postgres
-```
-
-## Database Seeding
-
-### Test Users (7 Total)
-- **1 SUPERADMIN** - Full system access
-- **1 ADMIN** - Administrative tasks
-- **1 HEAD** - Department head/reviewer
-- **4 EMPLOYEE** - Data labeling (3 active, 1 inactive)
-
-### Test Data
-- **1 Test Dataset** - Business registry data
-- **10 Dataset Records** - Individual records with location data
-- **8 Assignments** - Distributed across employees with varying statuses:
-  - 3 PENDING
-  - 2 IN_PROGRESS
-  - 3 COMPLETED (with verification results)
-
-Seed data is for development/testing only. Do NOT use in production.
-
-## Project Structure
-
-```
-matching-app/
-├── src/
-│   ├── app/
-│   │   ├── api/              # API routes
-│   │   ├── dashboard/        # Pengalihan dashboard
-│   │   ├── datasets/         # Manajemen dataset
-│   │   ├── employee/         # Halaman Employee
-│   │   ├── kepala-bps/       # Halaman Kepala BPS
-│   │   ├── superadmin/       # Halaman Superadmin
-│   │   └── matching/         # Pencocokan data
-│   ├── components/           # Komponen React
-│   │   ├── assignments/     # Alur penugasan
-│   │   ├── datasets/        # Unggah & pratinjau dataset
-│   │   ├── employee/        # Halaman Employee
-│   │   ├── layouts/         # Layout per peran
-│   │   ├── matching/        # Alur pencocokan
-│   │   └── reports/         # Laporan
-│   └── lib/
-│       ├── auth/            # Autentikasi & otorisasi
-│       ├── config/          # Konfigurasi unggah
-│       ├── constants/       # Konstanta & skema dataset
-│       ├── db/              # Skema & koneksi database
-│       └── services/        # Logika layanan
-├── drizzle/                 # Migrasi database
-├── tests/                   # Skrip pengujian
-├── docker-compose.yml       # Konfigurasi Docker
-├── Dockerfile               # Konfigurasi container
-└── package.json             # Dependensi & skrip
-```
-
-## Common Troubleshooting
-
-### Database Connection Failed
-
-**Problem**: `ERROR: password authentication failed for user "bps_user"`
-
-**Solution**:
-1. Verify `DATABASE_URL` in `.env`
-2. Ensure PostgreSQL is running: `docker-compose logs postgres`
-3. Restart PostgreSQL: `docker-compose restart postgres`
-
-### Port Already in Use
-
-**Problem**: `Error: listen EADDRINUSE: address already in use :::3000`
-
-**Solution**: 
-```bash
-# Kill the process using port 3000
-npx kill-port 3000
-
-# Or use a different port
-PORT=3001 npm run dev
-```
-
-### Database Migrations Failed
-
-**Problem**: `Error: column "..." does not exist`
-
-**Solution**:
-```bash
-npm run db:push --force  # Careful: may drop/recreate tables
-```
-
-### Hot Reload Not Working
-
-**Problem**: Changes don't reflect in browser
-
-**Solution**:
-1. Check that `npm run dev` is running
-2. Clear `.next` cache: `rm -rf .next`
-3. Restart dev server
-
-### Seed Data Already Exists
-
-**Problem**: `duplicate key value violates unique constraint`
-
-**Solution**:
-The seed script is idempotent - it skips existing users. To reset:
-```bash
-docker-compose down -v
-docker-compose up
-npm run db:seed
-```
-
-## Team Contribution Guidelines
-
-### Before Starting Work
-
-1. Create a feature branch: `git checkout -b feature/your-feature-name`
-2. Pull latest changes: `git pull origin main`
-3. Install dependencies: `npm install`
-
-### During Development
-
-1. Follow the existing code style and structure
-2. Keep commits atomic and descriptive
-3. Write tests for new functionality
-4. Update documentation as needed
-
-### Before Pushing
-
-1. Run linting: `npm run lint:fix`
-2. Type check: `npm run type-check`
-3. Run tests: `npm run test` and `npm run test:e2e`
-4. Build: `npm run build`
-
-### Pull Request Process
-
-1. Push to your feature branch
-2. Create a pull request with clear description
-3. Reference any related issues (#123)
-4. Ensure all checks pass (lint, type-check, tests, build)
-5. Request review from team members
-6. Address review comments
-7. Merge when approved
-
-### Code Standards
-
-- **TypeScript**: Use strict mode, avoid `any`
-- **Components**: Use functional components with React hooks
-- **Database**: Use Drizzle ORM for queries
-- **Styling**: Use Tailwind CSS for UI
-- **Testing**: Write tests for business logic
-- **Comments**: Document complex logic
-- **Git**: Use conventional commits (feat:, fix:, docs:, etc.)
-
-## Available Scripts
-
-```bash
-npm run dev              # Start development server
-npm run build            # Build for production
-npm run start            # Start production server
-npm run lint             # Run ESLint
-npm run lint:fix         # Fix linting issues
-npm run type-check       # TypeScript type checking
-npm run test             # Run assignment tests
-npm run test:ui          # Run UI tests
-npm run test:labeling    # Run employee labeling tests
-npm run test:e2e         # Run Playwright E2E tests
-npm run db:generate      # Generate migration files
-npm run db:migrate       # Run migrations
-npm run db:push          # Push schema to database
-npm run db:studio        # Open Drizzle Studio (visual DB editor)
-npm run db:seed          # Seed test data
-```
-
-## Technology Stack
-
-- **Frontend**: Next.js 16, React 19, TypeScript, Tailwind CSS
-- **Backend**: Next.js API Routes, NextAuth for authentication
-- **Database**: PostgreSQL 16, Drizzle ORM
-- **Testing**: Playwright (E2E), TypeScript
-- **DevOps**: Docker, Docker Compose
-- **Security**: bcryptjs for password hashing
-
-## Support & Documentation
-
-- See [DEVELOPMENT.md](./DEVELOPMENT.md) for development workflow details
-- Database schema is defined in `src/lib/db/schema.ts`
-- API documentation available in route files
-- Migration history in `drizzle/` directory
-
-## License
-
-Internal use only - BPS Data Matching System
-
-## Contact
-
-For questions or issues, contact the development team.
+Dokumentasi tambahan: `DEVELOPMENT.md`, `docs/`.

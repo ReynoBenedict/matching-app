@@ -8,7 +8,7 @@ export function UploadForm() {
   const fileInputRef = useRef<HTMLInputElement>(null);
 
   const [file, setFile] = useState<File | null>(null);
-  const [datasetType, setDatasetType] = useState('DB_KENDEDES');
+  const [datasetType, setDatasetType] = useState('DATASET_A');
   const [datasetName, setDatasetName] = useState('');
   const [loading, setLoading] = useState(false);
   const [error, setError] = useState('');
@@ -16,10 +16,10 @@ export function UploadForm() {
   const [progress, setProgress] = useState(0);
 
   const datasetTypes = [
-    { value: 'DB_KENDEDES', label: 'Database Kendedes' },
-    { value: 'DIR_PAJAK', label: 'Direktori Pajak' },
-    { value: 'OSS_BADAN_USAHA', label: 'OSS - Badan Usaha' },
-    { value: 'OSS_PERORANGAN', label: 'OSS - Perorangan' },
+    { value: 'DATASET_A', label: 'Dataset A' },
+    { value: 'DATASET_B', label: 'Dataset B' },
+    { value: 'DATASET_C', label: 'Dataset C' },
+    { value: 'DATASET_D', label: 'Dataset D' },
   ];
 
   const handleFileChange = (e: React.ChangeEvent<HTMLInputElement>) => {

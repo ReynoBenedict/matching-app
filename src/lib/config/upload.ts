@@ -14,10 +14,10 @@ export const UPLOAD_CONFIG = {
 
   // Dataset types that can be uploaded
   SUPPORTED_DATASET_TYPES: [
-    'DB_KENDEDES',
-    'DIR_PAJAK',
-    'OSS_BADAN_USAHA',
-    'OSS_PERORANGAN',
+    'DATASET_A',
+    'DATASET_B',
+    'DATASET_C',
+    'DATASET_D',
   ],
 
   // Maximum records per dataset for safety

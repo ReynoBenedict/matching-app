@@ -82,10 +82,10 @@ export default function DatasetDetailPage() {
 
   const datasetTypeLabel = (type: string) => {
     const labels: Record<string, string> = {
-      DB_KENDEDES: 'Database Kendedes',
-      DIR_PAJAK: 'Direktori Pajak',
-      OSS_BADAN_USAHA: 'OSS - Badan Usaha',
-      OSS_PERORANGAN: 'OSS - Perorangan',
+      DATASET_A: 'Dataset A',
+      DATASET_B: 'Dataset B',
+      DATASET_C: 'Dataset C',
+      DATASET_D: 'Dataset D',
     };
     return labels[type] || type;
   };
