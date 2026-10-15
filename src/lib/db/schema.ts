@@ -125,7 +125,7 @@ export const datasetStatusEnum = pgEnum('dataset_status', [
  * Datasets table
  * Stores metadata about imported/uploaded datasets
  * One dataset instance represents one upload (e.g., one CSV file)
- * Can represent DB_KENDENDES, Dir Pajak, OSS Badan Usaha, or OSS Perorangan
+ * Can represent one of the configured source types (DATASET_A … DATASET_D)
  */
 export const datasets = pgTable(
   'datasets',

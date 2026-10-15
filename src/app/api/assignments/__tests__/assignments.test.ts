@@ -109,7 +109,7 @@ async function seedTestData(testIndex: number) {
     .insert(datasets)
     .values({
       name: 'Dataset B',
-      datasetType: 'OSS_BADAN_USAHA',
+      datasetType: 'DATASET_C',
       originalFileName: 'dataset_b.csv',
       source: 'test',
       status: 'READY',

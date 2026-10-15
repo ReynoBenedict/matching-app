@@ -166,7 +166,7 @@ function DatasetsContent() {
             Manajemen Dataset
           </h2>
           <p className="font-body-md text-body-md text-on-surface-variant">
-            Kelola dataset usaha (DB Kendedes, Direktori Pajak, OSS) yang akan dicocokkan.
+            Kelola dataset usaha (Dataset A–D) yang akan dicocokkan.
           </p>
         </div>
         <div className="flex gap-sm md:flex-col items-stretch">

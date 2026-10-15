@@ -53,10 +53,10 @@ export const DATASET_OPTIONAL_FIELDS: DatasetFieldDefinition[] = [
 ];
 
 export const DATASET_SOURCES = [
-  { id: 'DB_KENDEDES', label: 'DB Kendedes', description: 'Database Kendedes (CSV)' },
-  { id: 'DIR_PAJAK', label: 'Dir Pajak', description: 'Direktori Pajak (CSV)' },
-  { id: 'OSS_BADAN_USAHA', label: 'OSS – Badan Usaha', description: 'OSS Badan Usaha (CSV)' },
-  { id: 'OSS_PERORANGAN', label: 'OSS – Perorangan', description: 'OSS Perorangan (CSV)' },
+  { id: 'DATASET_A', label: 'Dataset A', description: 'Sumber data A (CSV)' },
+  { id: 'DATASET_B', label: 'Dataset B', description: 'Sumber data B (CSV)' },
+  { id: 'DATASET_C', label: 'Dataset C', description: 'Sumber data C (CSV)' },
+  { id: 'DATASET_D', label: 'Dataset D', description: 'Sumber data D (CSV)' },
 ];
 
 export const TOTAL_SCHEMA_FIELDS = DATASET_REQUIRED_FIELDS.length + DATASET_OPTIONAL_FIELDS.length;

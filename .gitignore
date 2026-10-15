@@ -71,7 +71,14 @@ __pycache__/
 bps-data-matching-system/
 
 # Data BPS bersifat terbatas (restricted) - jangan pernah di-commit
-datasets/
+/datasets/
 # Dokumen referensi pihak ketiga dan workspace laporan PKL (repo terpisah)
-Referensi_Skripsi_UB_Pak_Tri/
-skripsi-latex-workflow/
+/Referensi_Skripsi_UB_Pak_Tri/
+/skripsi-latex-workflow/
+
+# berkas tangkapan Next.js dev (AGENTS.md/CLAUDE.md dibuat otomatis oleh next dev)
+/AGENTS.md
+/CLAUDE.md
+# keluaran uji Playwright
+/test-results/
+/playwright-report/
