@@ -12,13 +12,16 @@
  */
 
 import { NextRequest, NextResponse } from 'next/server';
-import { requireEmployee } from '@/lib/auth/authorization';
+import { requireAuth, UserRole } from '@/lib/auth/authorization';
 import { saveVerificationResult } from '@/lib/services/assignment';
 
 export async function POST(request: NextRequest) {
   try {
-    // Enforce employee role
-    const employee = await requireEmployee();
+    // Employee (pemilik penugasan) atau Superadmin (semua penugasan); diperiksa di server
+    const employee = await requireAuth();
+    if (employee.role !== UserRole.EMPLOYEE && employee.role !== UserRole.SUPERADMIN) {
+      return NextResponse.json({ success: false, error: 'Forbidden' }, { status: 403 });
+    }
 
     // Parse request body
     const body = await request.json();
@@ -43,6 +46,7 @@ export async function POST(request: NextRequest) {
       employee.id,
       body.verificationResult,
       typeof body.verificationNote === 'string' ? body.verificationNote : null,
+      { role: employee.role },
     );
 
     if (!result.success) {
