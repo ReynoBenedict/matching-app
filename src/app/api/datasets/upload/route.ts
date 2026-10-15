@@ -5,7 +5,7 @@
  */
 
 import { NextRequest, NextResponse } from 'next/server';
-import { requireAuth } from '@/lib/auth/authorization';
+import { requireSuperadmin } from '@/lib/auth/authorization';
 import { uploadDataset } from '@/lib/services/dataset-upload';
 import { UPLOAD_CONFIG } from '@/lib/config/upload';
 import { recordAuditLog } from '@/lib/audit';
@@ -13,12 +13,13 @@ import { recordAuditLog } from '@/lib/audit';
 export async function POST(request: NextRequest) {
   try {
     // Authenticate user
-    const user = await requireAuth();
+    const user = await requireSuperadmin();
 
     // Parse multipart form data
     const formData = await request.formData();
     const file = formData.get('file') as File | null;
     const datasetType = formData.get('datasetType') as string | null;
+    const requestedName = String(formData.get('datasetName') ?? '').trim().slice(0, 255);
 
     // Validate inputs
     if (!file) {
@@ -98,7 +99,7 @@ export async function POST(request: NextRequest) {
     // Process the upload through the service layer
     const uploadResult = await uploadDataset(
       fileContent,
-      file.name.replace(/\.[^/.]+$/, ''), // Remove extension for dataset name
+      requestedName || file.name.replace(/\.[^/.]+$/, ''), // nama dari formulir, bawaan nama berkas tanpa ekstensi
       datasetType.toUpperCase(),
       file.name,
       user.id

@@ -37,14 +37,16 @@ export function MatchingResults({ matchingRunId, results }: MatchingResultsProps
   const [limit, setLimit] = useState(20);
   const [total, setTotal] = useState(results.summary.totalCandidates);
   const [totalPages, setTotalPages] = useState(Math.max(1, Math.ceil(total / limit)));
-  const [loading, setLoading] = useState(true);
+  // Memuat = data untuk kombinasi (run, halaman, limit) saat ini belum tiba.
+  const [loadedKey, setLoadedKey] = useState<string | null>(null);
+  const loading = loadedKey !== `${matchingRunId}:${page}:${limit}`;
   const [error, setError] = useState<string | null>(null);
   const [detailTarget, setDetailTarget] = useState<MatchingCandidateRow | null>(null);
   const [datasetNames, setDatasetNames] = useState<{ a: string; b: string } | null>(null);
 
   useEffect(() => {
     let cancelled = false;
-    setLoading(true);
+    const requestKey = `${matchingRunId}:${page}:${limit}`;
     fetch(`/api/matching/${matchingRunId}/results?page=${page}&limit=${limit}`, { cache: 'no-store' })
       .then(async (response) => {
         const payload: PageResponse = await response.json();
@@ -59,7 +61,7 @@ export function MatchingResults({ matchingRunId, results }: MatchingResultsProps
       .catch((err) => {
         if (!cancelled) setError(err instanceof Error ? err.message : 'Gagal memuat hasil matching');
       })
-      .finally(() => { if (!cancelled) setLoading(false); });
+      .finally(() => { if (!cancelled) setLoadedKey(requestKey); });
     return () => { cancelled = true; };
   }, [matchingRunId, page, limit]);
 
@@ -75,7 +77,7 @@ export function MatchingResults({ matchingRunId, results }: MatchingResultsProps
           <div><p className="text-sm text-on-surface-variant">Dataset Pertama</p><p className="font-semibold text-on-surface mt-1">{datasetNames?.a ?? `Dataset #${results.datasetA.id}`}</p></div>
           <div><p className="text-sm text-on-surface-variant">Dataset Kedua</p><p className="font-semibold text-on-surface mt-1">{datasetNames?.b ?? `Dataset #${results.datasetB.id}`}</p></div>
           <div><p className="text-sm text-on-surface-variant">Threshold</p><p className="font-semibold text-on-surface mt-1">{thresholdToPercent(results.config.threshold)}%</p></div>
-          <div><p className="text-sm text-on-surface-variant">Pasangan Cocok</p><p className="font-semibold text-primary text-lg mt-1">{total.toLocaleString('id-ID')}</p></div>
+          <div><p className="text-sm text-on-surface-variant">Kandidat Pasangan</p><p className="font-semibold text-primary text-lg mt-1">{total.toLocaleString('id-ID')}</p></div>
         </div>
       </div>
 

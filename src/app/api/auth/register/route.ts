@@ -1,8 +1,12 @@
 import { NextRequest, NextResponse } from 'next/server';
 import { getDatabase } from '@/lib/db';
-import { registrationRequests } from '@/lib/db/schema';
+import { registrationRequests, users } from '@/lib/db/schema';
 import { hashPassword } from '@/lib/auth/password';
 import { recordAuditLog } from '@/lib/audit';
+import { and, eq, or } from 'drizzle-orm';
+
+/** SRS SMD-F-01-02: format email divalidasi di server, bukan hanya di formulir. */
+const EMAIL_PATTERN = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
 
 /**
  * Public registration is restricted to employee accounts only.
@@ -50,11 +54,45 @@ export async function POST(request: NextRequest) {
       );
     }
 
+    if (!EMAIL_PATTERN.test(trimmedEmail)) {
+      return NextResponse.json(
+        { error: 'Format email tidak valid' },
+        { status: 400 }
+      );
+    }
+
+    // SRS skenario registrasi 4c: username (atau email) yang sudah dipakai akun
+    // aktif maupun permohonan yang masih menunggu verifikasi tidak dapat diajukan lagi.
+    const db = getDatabase();
+    const [existingUser] = await db
+      .select({ id: users.id })
+      .from(users)
+      .where(or(eq(users.username, trimmedUsername), eq(users.email, trimmedEmail)))
+      .limit(1);
+    const [pendingRequest] = await db
+      .select({ id: registrationRequests.id })
+      .from(registrationRequests)
+      .where(
+        and(
+          eq(registrationRequests.status, 'PENDING'),
+          or(
+            eq(registrationRequests.username, trimmedUsername),
+            eq(registrationRequests.email, trimmedEmail)
+          )
+        )
+      )
+      .limit(1);
+    if (existingUser || pendingRequest) {
+      return NextResponse.json(
+        { error: 'Username atau email sudah terdaftar' },
+        { status: 400 }
+      );
+    }
+
     // Hash password
     const passwordHash = await hashPassword(trimmedPassword);
 
     // Insert into registration_requests table
-    const db = getDatabase();
     const result = await db.insert(registrationRequests).values({
       fullName: trimmedFullName,
       email: trimmedEmail,

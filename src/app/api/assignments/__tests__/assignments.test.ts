@@ -22,7 +22,18 @@ dotenv.config({ path: path.join(process.cwd(), '.env.local') });
 import { getDatabase } from '@/lib/db';
 import { users, datasetRecords, assignments, datasets } from '@/lib/db/schema';
 import { createAssignment, getEmployeeAssignments } from '@/lib/services/assignment';
-import { eq, inArray } from 'drizzle-orm';
+import { eq, inArray, sql } from 'drizzle-orm';
+
+/**
+ * ID yang dijamin tidak ada di tabel: lebih besar dari id terbesar saat ini.
+ * Nilai tetap (mis. 99999) bisa saja benar-benar ada pada basis data berisi
+ * dataset besar, sehingga uji "record tidak ditemukan" menjadi keliru.
+ */
+async function missingId(table: typeof datasetRecords | typeof users): Promise<number> {
+  const db = getDatabase();
+  const [row] = await db.select({ max: sql<number>`coalesce(max(${table.id}), 0)` }).from(table);
+  return Number(row?.max ?? 0) + 1_000_000;
+}
 
 // Tracks every row created by this test run so it can be removed afterwards.
 const createdDatasetIds: number[] = [];
@@ -396,11 +407,12 @@ export async function testInvalidRecordReferences() {
   console.log('\n=== TEST 6: Invalid Record References ===');
   try {
     const { superadminId, employeeId } = await seedTestData(6);
+    const missingRecordId = await missingId(datasetRecords);
 
     // Try to create assignment with non-existent records
     const result = await createAssignment({
-      recordAId: 99999, // Non-existent
-      recordBId: 88888, // Non-existent
+      recordAId: missingRecordId, // Non-existent
+      recordBId: missingRecordId + 1, // Non-existent
       employeeId,
       similarityScore: 0.92,
       createdBy: superadminId,

@@ -19,7 +19,7 @@ const results: TestResult[] = [];
 async function makeRequest(
   method: string,
   endpoint: string,
-  body?: Record<string, any>,
+  body?: Record<string, unknown>,
   withAuth = true
 ) {
   const options: RequestInit = {
@@ -78,7 +78,7 @@ async function startAndWaitForMatching(body: Record<string, unknown>) {
 
   const jobId: string | undefined = start.data?.data?.jobId;
   if (start.status !== 202 || !start.data?.success || !jobId) {
-    return { start, terminal: null as any };
+    return { start, terminal: null as null };
   }
 
   const deadline = Date.now() + JOB_WAIT_TIMEOUT_MS;

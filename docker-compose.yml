@@ -11,6 +11,8 @@ services:
       - DATABASE_URL=postgresql://bps_user:bps_password@postgres:5432/bps_data_matching
       - MODEL_SERVICE_URL=http://model:8000
       - MATCHING_PROVIDER=model_service
+      # Rahasia penandatanganan cookie sesi; isi lewat .env (lihat .env.example)
+      - NEXTAUTH_SECRET=${NEXTAUTH_SECRET:-ganti-dengan-rahasia-acak-minimal-32-karakter}
     depends_on:
       postgres:
         condition: service_healthy

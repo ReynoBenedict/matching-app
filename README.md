@@ -50,7 +50,14 @@ DATABASE_URL=postgresql://bps_user:bps_password@localhost:5432/bps_data_matching
 NEXTAUTH_SECRET=your_nextauth_secret_here
 NEXTAUTH_URL=http://localhost:3000
 NODE_ENV=development
+MATCHING_PROVIDER=model_service
+MODEL_SERVICE_URL=http://localhost:8000
 ```
+
+Notes on the session cookie:
+
+- `NEXTAUTH_SECRET` (or `SESSION_SECRET`) signs the session cookie (HMAC-SHA256). Set it to a random value, e.g. `openssl rand -hex 32`. When it is missing, a random per-process secret is used and every restart logs all users out.
+- The cookie is only marked `Secure` when `NEXTAUTH_URL` starts with `https://` or `SESSION_COOKIE_SECURE=true`. Leave both unset when the app is served over plain HTTP on a LAN, otherwise browsers drop the cookie and login appears to fail.
 
 ### 4. Start the Database
 
@@ -104,8 +111,8 @@ After seeding, use these credentials to log in:
 
 | Role | Username | Password | Email |
 |------|----------|----------|-------|
-| **Super Admin** | `superadmin` | `superadmin123` | `superadmin@bps.go.id` |
-| **Admin** | `admin` | `admin123` | `admin@bps.go.id` |
+| **Superadmin** (role `ADMIN`) | `superadmin` | `superadmin123` | `superadmin@bps.go.id` |
+| **Superadmin** (role `ADMIN`) | `admin` | `admin123` | `admin@bps.go.id` |
 | **Head (Kepala)** | `kepala` | `kepala123` | `kepala@bps.go.id` |
 | **Employee 1** | `karyawan1` | `karyawan123` | `karyawan1@bps.go.id` |
 | **Employee 2** | `karyawan2` | `karyawan123` | `karyawan2@bps.go.id` |

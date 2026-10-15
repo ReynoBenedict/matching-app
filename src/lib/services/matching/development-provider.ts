@@ -202,12 +202,9 @@ export class DevelopmentMatchingProvider implements IMatchingProvider {
           // Calculate similarity for each mapped column
           for (const mapping of req.columnMappings) {
             // Handle both snake_case (from metadata) and camelCase (from fallback) column names
-            let valueA: unknown;
-            let valueB: unknown;
-            
             // Try the mapped name directly first (works for camelCase from DB)
-            valueA = (recordA as Record<string, unknown>)[toCamelCase(mapping.columnA)];
-            valueB = (recordB as Record<string, unknown>)[toCamelCase(mapping.columnB)];
+            const valueA: unknown = (recordA as Record<string, unknown>)[toCamelCase(mapping.columnA)];
+            const valueB: unknown = (recordB as Record<string, unknown>)[toCamelCase(mapping.columnB)];
             
             // If not found and the mapped name is already camelCase, the access should have worked
             // If not found, it might be because the column truly doesn't exist in the dataset

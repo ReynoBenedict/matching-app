@@ -17,12 +17,15 @@ export const AUDIT_ACTION_META: Record<string, AuditActionMeta> = {
   CREATE_ASSIGNMENT: { label: 'Penugasan Dibuat', icon: 'assignment', color: 'text-secondary' },
   VERIFY_ASSIGNMENT: { label: 'Verifikasi Disubmit', icon: 'fact_check', color: 'text-primary' },
   LOGIN: { label: 'Masuk', icon: 'login', color: 'text-on-surface-variant' },
+  LOGIN_FAILED: { label: 'Masuk Gagal', icon: 'gpp_bad', color: 'text-error' },
   LOGOUT: { label: 'Keluar', icon: 'logout', color: 'text-on-surface-variant' },
   DATASET_UPLOADED: { label: 'Dataset Diunggah', icon: 'upload_file', color: 'text-secondary' },
   DATASET_UPLOAD_FAILED: { label: 'Unggah Dataset Gagal', icon: 'report', color: 'text-error' },
   REGISTRATION_SUBMITTED: { label: 'Registrasi Diajukan', icon: 'person_add', color: 'text-secondary' },
   REGISTRATION_APPROVED: { label: 'Registrasi Disetujui', icon: 'how_to_reg', color: 'text-primary' },
   REGISTRATION_REJECTED: { label: 'Registrasi Ditolak', icon: 'person_remove', color: 'text-error' },
+  EXPORT_RESULTS: { label: 'Hasil Diekspor', icon: 'download', color: 'text-secondary' },
+  DELETE_DATASET: { label: 'Dataset Dihapus', icon: 'delete', color: 'text-error' },
 };
 
 export function getAuditActionMeta(action: string): AuditActionMeta {
@@ -91,6 +94,12 @@ export function describeAuditLog(
     }
     case 'LOGIN':
       return 'Masuk ke sistem.';
+    case 'LOGIN_FAILED': {
+      const reason = pick(data, 'reason');
+      const username = pick(data, 'username');
+      const who = username ? ` dengan username "${username}"` : '';
+      return reason ? `Percobaan masuk gagal${who} (${reason}).` : `Percobaan masuk gagal${who}.`;
+    }
     case 'LOGOUT':
       return 'Keluar dari sistem.';
     case 'DATASET_UPLOADED': {
@@ -115,6 +124,11 @@ export function describeAuditLog(
       return username
         ? `Menyetujui registrasi akun "${username}".`
         : 'Menyetujui pengajuan registrasi.';
+    }
+    case 'EXPORT_RESULTS': {
+      const rows = pick(data, 'rows');
+      const filter = pick(data, 'verification');
+      return `Mengekspor ${rows ?? '-'} baris hasil akhir (filter ${filter ?? 'ALL'}) ke CSV.`;
     }
     case 'REGISTRATION_REJECTED': {
       const username = pick(data, 'username');

@@ -13,13 +13,17 @@
  */
 
 import { NextRequest, NextResponse } from 'next/server';
-import { requireSuperadmin } from '@/lib/auth/authorization';
+import { requireAuth, UserRole } from '@/lib/auth/authorization';
 import { getHistory } from '@/lib/services/history';
 
 export async function GET(request: NextRequest) {
   try {
-    // Enforce superadmin role
-    await requireSuperadmin();
+    // SRS SMD-F-13-01 (Kepala BPS): riwayat proses dapat dipantau oleh Superadmin
+    // dan Kepala BPS. Endpoint ini hanya-baca, sehingga akses Kepala BPS tetap read-only.
+    const user = await requireAuth();
+    if (user.role !== UserRole.SUPERADMIN && user.role !== UserRole.KEPALA_BPS) {
+      throw new Error('Forbidden: Superadmin or Kepala BPS access required');
+    }
 
     const searchParams = request.nextUrl.searchParams;
     const action = searchParams.get('action') || undefined;
@@ -62,7 +66,7 @@ export async function GET(request: NextRequest) {
       }
       if (error.message.includes('Forbidden')) {
         return NextResponse.json(
-          { success: false, error: 'Forbidden: Superadmin access required' },
+          { success: false, error: 'Forbidden: Superadmin or Kepala BPS access required' },
           { status: 403 }
         );
       }

@@ -468,12 +468,12 @@ async function testCandidateInformationDisplayed(): Promise<TestResult> {
     const hasRecordBData =
       detail.data.recordB &&
       detail.data.recordB.idsbr &&
-      detail.data.recordB.namaUsaha &&
-      detail.data.recordB.alamatUsaha;
+      detail.data.recordB?.namaUsaha &&
+      detail.data.recordB?.alamatUsaha;
 
     if (hasRecordAData && hasRecordBData) {
-      console.log(`✓ Record A data present: ${detail.data.recordA.idsbr}, ${detail.data.recordA.namaUsaha}`);
-      console.log(`✓ Record B data present: ${detail.data.recordB.idsbr}, ${detail.data.recordB.namaUsaha}`);
+      console.log(`✓ Record A data present: ${detail.data.recordA?.idsbr}, ${detail.data.recordA?.namaUsaha}`);
+      console.log(`✓ Record B data present: ${detail.data.recordB?.idsbr}, ${detail.data.recordB?.namaUsaha}`);
       return { passed: true };
     }
 
@@ -724,7 +724,7 @@ async function testBackendFailureProducesError(): Promise<TestResult> {
   console.log('\n=== TEST 11: Backend/API Failure Produces Error State ===');
   try {
     // Try to verify with invalid result value
-    const result = await saveVerificationResult(99999, 99999, 'INVALID' as any);
+    const result = await saveVerificationResult(99999, 99999, 'INVALID' as unknown as 'MATCH');
 
     if (!result.success && result.error?.includes('Invalid')) {
       console.log(`✓ Invalid verification result rejected`);

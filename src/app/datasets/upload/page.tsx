@@ -18,7 +18,7 @@ export default function UploadDatasetPage() {
       <div className="mb-xl">
         <h2 className="font-headline-lg-mobile md:font-headline-lg text-headline-lg-mobile md:text-headline-lg text-primary mb-xs">Unggah Dataset Baru</h2>
         <p className="font-body-md text-on-surface-variant">
-          Proses unggah, validasi, dan integrasi data sensus ke dalam sistem utama BPS.
+          Unggah berkas CSV dataset usaha, lalu sistem memvalidasi header dan menyimpan record untuk pencocokan.
         </p>
       </div>
 
@@ -54,36 +54,6 @@ export default function UploadDatasetPage() {
       <div className="grid grid-cols-1 lg:grid-cols-3 gap-gutter">
         {/* Main Upload Form Area */}
         <div className="lg:col-span-2 flex flex-col gap-lg">
-          <div className="bg-surface border border-outline-variant rounded p-lg shadow-sm hover:shadow-md transition-shadow">
-            <h3 className="font-headline-sm text-headline-sm text-on-surface mb-md">Informasi Dataset</h3>
-            <div className="grid grid-cols-1 md:grid-cols-2 gap-md mb-md">
-              <div className="flex flex-col gap-xs">
-                <label className="font-label-md text-on-surface-variant" htmlFor="dataset_name">
-                  Nama Dataset
-                </label>
-                <input
-                  className="w-full border border-outline-variant rounded bg-surface px-md py-sm font-body-md text-on-surface focus:border-secondary focus:ring-2 focus:ring-secondary/20 outline-none transition-all"
-                  id="dataset_name"
-                  placeholder="Misal: Sensus Penduduk Malang 2024"
-                  type="text"
-                />
-              </div>
-              <div className="flex flex-col gap-xs">
-                <label className="font-label-md text-on-surface-variant" htmlFor="dataset_source">
-                  Sumber Data
-                </label>
-                <select
-                  className="w-full border border-outline-variant rounded bg-surface px-md py-sm font-body-md text-on-surface focus:border-secondary focus:ring-2 focus:ring-secondary/20 outline-none transition-all"
-                  id="dataset_source"
-                >
-                  <option>BPS Provinsi</option>
-                  <option>Dinas Dukcapil</option>
-                  <option>Survei Internal</option>
-                </select>
-              </div>
-            </div>
-          </div>
-
           {/* Upload Form Component */}
           <UploadForm />
         </div>
@@ -96,8 +66,8 @@ export default function UploadDatasetPage() {
               <div className="flex items-start gap-sm">
                 <span className="material-symbols-outlined text-secondary text-[20px] mt-[2px]">check_circle</span>
                 <div>
-                  <p className="font-label-md text-on-surface">Struktur File Valid</p>
-                  <p className="font-body-sm text-on-surface-variant">Format CSV terdeteksi dengan benar.</p>
+                  <p className="font-label-md text-on-surface">Validasi Otomatis</p>
+                  <p className="font-body-sm text-on-surface-variant">Header unik dan tipe kolom kontrak diperiksa saat unggah.</p>
                 </div>
               </div>
               <div className="flex items-start gap-sm">
@@ -106,7 +76,7 @@ export default function UploadDatasetPage() {
                   <p className="font-label-md text-on-surface">Ringkasan Data</p>
                   <ul className="font-body-sm text-on-surface-variant list-disc pl-md mt-xs">
                     <li>Format: CSV</li>
-                    <li>Maksimal: 500MB</li>
+                    <li>Maksimal: 200MB</li>
                     <li>Encoding: UTF-8</li>
                   </ul>
                 </div>

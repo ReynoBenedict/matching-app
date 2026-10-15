@@ -439,21 +439,21 @@ export function MonitoringContent() {
             value={formatNumber(summary.runningProcesses)}
             icon="sync"
             tone="text-secondary"
-            subtext="Riwayat proses pencocokan belum tersedia."
+            subtext="Job pencocokan yang sedang diproses"
           />
           <StatCard
             label="Proses Selesai"
             value={formatNumber(summary.completedProcesses)}
             icon="check_circle"
             tone="text-primary"
-            subtext="Riwayat proses pencocokan belum tersedia."
+            subtext="Run pencocokan tersimpan (matching_runs)"
           />
           <StatCard
             label="Proses Gagal"
             value={formatNumber(summary.failedProcesses)}
             icon="error"
             tone="text-error"
-            subtext="Riwayat proses pencocokan belum tersedia."
+            subtext="Dicatat pada log audit (MATCHING_FAIL)"
           />
         </div>
         {summary.runningProcesses + summary.completedProcesses + summary.failedProcesses === 0 && (
@@ -462,8 +462,8 @@ export function MonitoringContent() {
               info
             </span>
             <p className="font-label-md text-xs text-on-surface-variant">
-              Riwayat proses pencocokan belum tersedia. Sistem belum menyimpan riwayat proses pencocokan ke basis data,
-              sehingga metrik proses ditampilkan sebagai 0. Untuk progres verifikasi, gunakan tab Progres Penugasan dan Progres Petugas.
+              Belum ada proses pencocokan yang dijalankan. Jalankan pencocokan melalui menu Pencocokan Data;
+              run yang selesai akan tercatat di sini. Untuk progres verifikasi, gunakan tab Progres Penugasan dan Progres Petugas.
             </p>
           </div>
         )}

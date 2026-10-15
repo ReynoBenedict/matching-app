@@ -29,7 +29,7 @@ export async function seedTestUsers() {
       email: 'superadmin@bps.go.id',
       username: 'superadmin',
       password: 'superadmin123',
-      role: 'SUPERADMIN',
+      role: 'ADMIN',
       status: 'ACTIVE' as const,
     },
     {
