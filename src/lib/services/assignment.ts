@@ -243,7 +243,8 @@ export async function getEmployeeAssignments(employeeId: number): Promise<
  * Get a single assignment with full details (records + assignment info)
  * Server-side enforces ownership - only the assigned employee can view
  */
-export async function getAssignmentDetail(assignmentId: number, employeeId: number): Promise<{
+// `employeeId` null = pemanggil Superadmin: tidak dibatasi kepemilikan.
+export async function getAssignmentDetail(assignmentId: number, employeeId: number | null): Promise<{
   success: boolean;
   error?: string;
   data?: {
@@ -270,11 +271,13 @@ export async function getAssignmentDetail(assignmentId: number, employeeId: numb
   try {
     const db = getDatabase();
 
-    // Get assignment - enforce employee ownership
+    // Get assignment - enforce employee ownership (Superadmin: tanpa batasan)
     const assignment = await db
       .select()
       .from(assignments)
-      .where(and(eq(assignments.id, assignmentId), eq(assignments.employeeId, employeeId)))
+      .where(employeeId === null
+        ? eq(assignments.id, assignmentId)
+        : and(eq(assignments.id, assignmentId), eq(assignments.employeeId, employeeId)))
       .limit(1);
 
     if (assignment.length === 0) {
@@ -396,11 +399,15 @@ export async function getEmployeeProgress(employeeId: number): Promise<{
  * Phase 5D: Updates assignment status to COMPLETED after verification
  * Enforces employee ownership and valid result values
  */
+// `actor.role === 'ADMIN'` (Superadmin) boleh memverifikasi atau mengubah hasil penugasan
+// mana pun; Employee hanya penugasan miliknya. Hasil yang sudah ada ditimpa (tanpa riwayat
+// versi); setiap penyimpanan dicatat ke audit_logs.
 export async function saveVerificationResult(
   assignmentId: number,
   employeeId: number,
   verificationResult: 'MATCH' | 'NON_MATCH' | 'REVIEW',
   verificationNote?: string | null,
+  actor: { role?: string } = {},
 ): Promise<{
   success: boolean;
   error?: string;
@@ -416,11 +423,13 @@ export async function saveVerificationResult(
       };
     }
 
-    // Get assignment and verify ownership
+    // Get assignment and verify ownership (Superadmin tidak dibatasi kepemilikan)
     const assignment = await db
       .select()
       .from(assignments)
-      .where(and(eq(assignments.id, assignmentId), eq(assignments.employeeId, employeeId)))
+      .where(actor.role === 'ADMIN'
+        ? eq(assignments.id, assignmentId)
+        : and(eq(assignments.id, assignmentId), eq(assignments.employeeId, employeeId)))
       .limit(1);
 
     if (assignment.length === 0) {

@@ -5,7 +5,7 @@
  */
 
 import { NextRequest, NextResponse } from 'next/server';
-import { requireEmployee } from '@/lib/auth/authorization';
+import { requireAuth, UserRole } from '@/lib/auth/authorization';
 import { getAssignmentDetail } from '@/lib/services/assignment';
 
 export async function GET(
@@ -13,8 +13,11 @@ export async function GET(
   context: { params: Promise<{ id: string }> }
 ) {
   try {
-    // Authenticate user and enforce employee role
-    const employee = await requireEmployee();
+    // Employee (pemilik) atau Superadmin (semua penugasan)
+    const employee = await requireAuth();
+    if (employee.role !== UserRole.EMPLOYEE && employee.role !== UserRole.SUPERADMIN) {
+      return NextResponse.json({ success: false, error: 'Forbidden' }, { status: 403 });
+    }
 
     const params = await context.params;
     const assignmentId = parseInt(params.id, 10);
@@ -30,7 +33,7 @@ export async function GET(
     }
 
     // Get assignment detail (service enforces ownership)
-    const result = await getAssignmentDetail(assignmentId, employee.id);
+    const result = await getAssignmentDetail(assignmentId, employee.role === UserRole.SUPERADMIN ? null : employee.id);
 
     if (!result.success) {
       return NextResponse.json(
