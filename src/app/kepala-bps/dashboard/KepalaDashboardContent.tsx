@@ -219,11 +219,11 @@ export function KepalaDashboardContent() {
       {/* KPI Cards */}
       <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-md">
         <StatCard
-          label="Total Kandidat"
+          label="Kandidat Ditugaskan"
           value={formatNumber(verification.totalCandidates)}
           icon="fact_check"
           tone="text-secondary"
-          subtext="Kandidat pencocokan tersimpan"
+          subtext="Pasangan yang dikirim ke petugas"
         />
         <StatCard
           label="MATCH"
@@ -244,14 +244,14 @@ export function KepalaDashboardContent() {
           value={formatNumber(verification.unverified)}
           icon="schedule"
           tone="text-warning"
-          subtext="Menunggu verifikasi petugas"
+          subtext="Belum MATCH/NON-MATCH, termasuk Perlu Review"
         />
         <StatCard
           label="Tingkat Verifikasi"
           value={`${verification.verificationRate}%`}
           icon="verified"
           tone="text-primary"
-          subtext={`${formatNumber(verification.verified)} dari ${formatNumber(verification.totalCandidates)} kandidat`}
+          subtext={`${formatNumber(verification.verified)} dari ${formatNumber(verification.totalCandidates)} ditugaskan`}
         />
         <StatCard
           label="Total Pegawai"
@@ -386,7 +386,7 @@ export function KepalaDashboardContent() {
               <span className="font-body-md text-body-md text-on-surface font-semibold">{formatNumber(assignments.total)}</span>
             </div>
             <div className="flex items-center justify-between">
-              <span className="font-body-md text-body-md text-on-surface-variant">Menunggu Verifikasi</span>
+              <span className="font-body-md text-body-md text-on-surface-variant">Belum Dibuka Petugas</span>
               <span className="font-body-md text-body-md text-on-surface font-semibold">{formatNumber(assignments.pending)}</span>
             </div>
             <div className="flex items-center justify-between">
@@ -464,7 +464,7 @@ export function KepalaDashboardContent() {
                   <th className="text-left p-md font-label-lg text-label-lg text-on-surface-variant">Nama Pegawai</th>
                   <th className="text-center p-md font-label-lg text-label-lg text-on-surface-variant">Ditugaskan</th>
                   <th className="text-center p-md font-label-lg text-label-lg text-on-surface-variant">Selesai</th>
-                  <th className="text-center p-md font-label-lg text-label-lg text-on-surface-variant">Menunggu Verifikasi</th>
+                  <th className="text-center p-md font-label-lg text-label-lg text-on-surface-variant">Belum Diverifikasi</th>
                   <th className="text-center p-md font-label-lg text-label-lg text-on-surface-variant">Progres</th>
                   <th className="text-center p-md font-label-lg text-label-lg text-on-surface-variant">Status</th>
                 </tr>
@@ -483,7 +483,8 @@ export function KepalaDashboardContent() {
                       <span className="font-headline-sm text-headline-sm text-primary">{formatNumber(employee.completed)}</span>
                     </td>
                     <td className="p-md text-center">
-                      <span className="font-headline-sm text-headline-sm text-warning">{formatNumber(employee.pending)}</span>
+                      {/* Termasuk tugas yang sudah dibuka (IN_PROGRESS) tetapi belum diputuskan. */}
+                      <span className="font-headline-sm text-headline-sm text-warning">{formatNumber(employee.pending + employee.inProgress)}</span>
                     </td>
                     <td className="p-md text-center">
                       <span className="font-label-md text-label-md text-on-surface">{employee.completionRate}%</span>

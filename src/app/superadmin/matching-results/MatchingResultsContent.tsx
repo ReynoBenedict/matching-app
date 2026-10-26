@@ -9,6 +9,7 @@ import { useCallback, useEffect, useState } from 'react';
 import Link from 'next/link';
 import { CandidateDetailDialog } from '@/components/assignments/CandidateDetailDialog';
 import { formatPercent, scoreBadgeClass } from '@/components/assignments/score';
+import { fetchSavedRuns, type SavedRun } from '@/components/assignments/saved-runs';
 import type {
   MatchingCandidateRow,
   MatchingCandidateSummary,
@@ -65,6 +66,8 @@ interface CandidatesOk {
 interface CandidatesError {
   success: false;
   error: string;
+  /** Pasangan dataset + threshold ini belum pernah dijalankan (bukan kegagalan sistem). */
+  notFound?: boolean;
 }
 
 type CandidatesResult = CandidatesOk | CandidatesError;
@@ -112,7 +115,11 @@ async function fetchCandidates(
   const payload = await response.json();
 
   if (!response.ok || !payload.success) {
-    return { success: false, error: payload.error || 'Gagal memuat hasil pencocokan' };
+    return {
+      success: false,
+      error: payload.error || 'Gagal memuat hasil pencocokan',
+      notFound: response.status === 404,
+    };
   }
 
   return {
@@ -258,6 +265,8 @@ export function MatchingResultsContent() {
   const [loading, setLoading] = useState(true);
   const [refreshing, setRefreshing] = useState(false);
   const [error, setError] = useState<string | null>(null);
+  const [noRun, setNoRun] = useState(false);
+  const [savedRuns, setSavedRuns] = useState<SavedRun[]>([]);
   const [detailTarget, setDetailTarget] = useState<MatchingCandidateRow | null>(null);
 
   const applyResult = useCallback((result: CandidatesOk) => {
@@ -265,7 +274,25 @@ export function MatchingResultsContent() {
     setSummary(result.summary);
     setDatasetLabels({ a: result.datasetA.name, b: result.datasetB.name });
     setPagination(result.pagination);
+    setNoRun(false);
   }, []);
+
+  // Pasangan yang belum pernah dijalankan bukan error: tampilkan panel informasi.
+  const applyFailure = useCallback((result: CandidatesError) => {
+    setRows([]);
+    setSummary(null);
+    setNoRun(Boolean(result.notFound));
+    setError(result.notFound ? null : result.error);
+  }, []);
+
+  const handleSelectSavedRun = (run: SavedRun) => {
+    setLoading(true);
+    setError(null);
+    setPage(1);
+    setThreshold(run.threshold);
+    setDatasetAId(run.datasetA.id);
+    setDatasetBId(run.datasetB.id);
+  };
 
   // Load the READY datasets (same source as /datasets and the Penugasan page).
   useEffect(() => {
@@ -277,9 +304,17 @@ export function MatchingResultsContent() {
         if (cancelled) return;
 
         setDatasets(list);
+        const runs = await fetchSavedRuns().catch(() => [] as SavedRun[]);
+        if (cancelled) return;
+        setSavedRuns(runs);
+
         if (list.length >= 2) {
-          setDatasetAId(list[0].id);
-          setDatasetBId(list[1].id);
+          // Buka langsung proses tersimpan terbaru agar halaman tidak kosong.
+          const ids = new Set(list.map((dataset) => dataset.id));
+          const latest = runs.find((run) => ids.has(run.datasetA.id) && ids.has(run.datasetB.id));
+          if (latest) setThreshold(latest.threshold);
+          setDatasetAId(latest?.datasetA.id ?? list[0].id);
+          setDatasetBId(latest?.datasetB.id ?? list[1].id);
           setLoading(true);
         } else {
           setLoading(false);
@@ -310,9 +345,7 @@ export function MatchingResultsContent() {
         if (cancelled) return;
 
         if (!result.success) {
-          setRows([]);
-          setSummary(null);
-          setError(result.error);
+          applyFailure(result);
           return;
         }
 
@@ -331,7 +364,7 @@ export function MatchingResultsContent() {
     return () => {
       cancelled = true;
     };
-  }, [datasetAId, datasetBId, threshold, page, applyResult]);
+  }, [datasetAId, datasetBId, threshold, page, applyResult, applyFailure]);
 
   const handleSelectDatasetA = (value: number) => {
     setLoading(true);
@@ -366,9 +399,7 @@ export function MatchingResultsContent() {
     try {
       const result = await fetchCandidates(datasetAId, datasetBId, threshold, page);
       if (!result.success) {
-        setRows([]);
-        setSummary(null);
-        setError(result.error);
+        applyFailure(result);
       } else {
         applyResult(result);
         setError(null);
@@ -386,9 +417,7 @@ export function MatchingResultsContent() {
     try {
       const result = await fetchCandidates(datasetAId, datasetBId, threshold, page);
       if (!result.success) {
-        setRows([]);
-        setSummary(null);
-        setError(result.error);
+        applyFailure(result);
       } else {
         applyResult(result);
         setError(null);
@@ -534,16 +563,54 @@ export function MatchingResultsContent() {
         </div>
       )}
 
+      {/* Pasangan belum pernah diproses */}
+      {!loading && noRun && (
+        <div className="bg-surface-container-low border border-outline-variant rounded-xl p-lg space-y-md">
+          <div className="flex items-start gap-md">
+            <span className="material-symbols-outlined text-secondary flex-shrink-0">info</span>
+            <div>
+              <p className="font-body-md text-on-surface font-semibold">
+                Belum ada proses pencocokan untuk pasangan dan threshold ini.
+              </p>
+              <p className="font-body-md text-on-surface-variant mt-xs">
+                Jalankan pencocokan di menu Pencocokan Data, atau buka salah satu proses yang sudah tersimpan.
+              </p>
+            </div>
+          </div>
+          {savedRuns.length > 0 && (
+            <div className="flex flex-wrap gap-sm">
+              {savedRuns.slice(0, 6).map((run) => (
+                <button
+                  key={run.id}
+                  onClick={() => handleSelectSavedRun(run)}
+                  className="px-md py-xs rounded-lg border border-outline-variant bg-surface text-primary font-label-md hover:bg-surface-container transition-colors"
+                >
+                  {run.datasetA.name} ↔ {run.datasetB.name} · {Math.round(run.threshold * 100)}%
+                  {run.totalCandidates != null && ` · ${formatNumber(run.totalCandidates)} kandidat`}
+                </button>
+              ))}
+            </div>
+          )}
+          <Link
+            href="/matching"
+            className="inline-flex items-center gap-sm px-md py-sm rounded-lg bg-primary text-on-primary font-label-md hover:bg-primary-container transition-colors"
+          >
+            <span className="material-symbols-outlined" style={{ fontSize: '20px' }}>play_arrow</span>
+            Jalankan Pencocokan
+          </Link>
+        </div>
+      )}
+
       {/* Loading State */}
       {loading ? (
         <div className="flex flex-col items-center justify-center py-3xl gap-md">
           <span className="material-symbols-outlined animate-spin text-primary" style={{ fontSize: '48px' }}>
             progress_activity
           </span>
-          <p className="text-on-surface-variant font-body-lg">Menjalankan pencocokan &amp; memuat hasil...</p>
+          <p className="text-on-surface-variant font-body-lg">Memuat hasil pencocokan...</p>
         </div>
       ) : (
-        hasDatasetPair && !error && (
+        hasDatasetPair && !error && !noRun && (
           <>
             {/* Summary Cards */}
             {summary && (
@@ -624,8 +691,8 @@ export function MatchingResultsContent() {
                     Tidak ada kandidat yang memenuhi threshold.
                   </p>
                   <p className="text-on-surface-variant font-body-md mt-sm">
-                    Coba turunkan threshold atau pilih pasangan dataset lain. Bila riwayat proses pencocokan belum
-                    dipersistenkan, halaman ini menampilkan kandidat berdasarkan pencocokan terkini.
+                    Proses pencocokan untuk pasangan ini tidak menghasilkan kandidat. Coba jalankan ulang dengan
+                    threshold lebih rendah atau pilih pasangan dataset lain.
                   </p>
                 </div>
               ) : (
@@ -729,8 +796,8 @@ export function MatchingResultsContent() {
                     Tentang Halaman Hasil Matching
                   </h3>
                   <p className="text-on-surface-variant font-body-md">
-                    Kandidat dihitung langsung oleh proses pencocokan untuk pasangan dataset dan threshold yang dipilih,
-                    sehingga mencakup kandidat yang belum ditugaskan. Nama dataset diambil dari Manajemen Dataset.
+                    Kandidat diambil dari proses pencocokan terakhir yang tersimpan untuk pasangan dataset dan threshold
+                    yang dipilih, termasuk kandidat yang belum ditugaskan. Nama dataset diambil dari Manajemen Dataset.
                   </p>
                   <p className="text-on-surface-variant font-body-md mt-sm">
                     Persentase MATCH dihitung hanya dari kandidat yang sudah terverifikasi

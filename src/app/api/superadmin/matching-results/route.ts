@@ -50,10 +50,11 @@ export async function GET(request: NextRequest) {
       limit: Number.isNaN(limit) ? 20 : limit,
     });
 
+    // Semua kegagalan dari service berarti run/dataset belum ada (bukan input salah).
     if (!result.success) {
       return NextResponse.json(
         { success: false, error: result.error },
-        { status: 400 }
+        { status: 404 }
       );
     }
 

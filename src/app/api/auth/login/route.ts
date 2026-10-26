@@ -1,7 +1,7 @@
 import { NextRequest, NextResponse } from 'next/server';
 import { getDatabase } from '@/lib/db';
-import { users } from '@/lib/db/schema';
-import { eq } from 'drizzle-orm';
+import { registrationRequests, users } from '@/lib/db/schema';
+import { desc, eq } from 'drizzle-orm';
 import { verifyPassword } from '@/lib/auth/password';
 import { createSession } from '@/lib/auth/session';
 import { recordAuditLog } from '@/lib/audit';
@@ -57,6 +57,31 @@ export async function POST(request: NextRequest) {
 
     // User not found or not ACTIVE
     if (userQuery.length === 0) {
+      // Pendaftar yang belum disetujui belum punya baris di `users`. Status pendaftaran
+      // hanya diungkap bila kata sandinya cocok, agar username tidak bisa ditebak-tebak.
+      const [registration] = await db
+        .select({ status: registrationRequests.status, passwordHash: registrationRequests.passwordHash })
+        .from(registrationRequests)
+        .where(eq(registrationRequests.username, trimmedUsername))
+        .orderBy(desc(registrationRequests.createdAt))
+        .limit(1);
+      if (registration && (await verifyPassword(trimmedPassword, registration.passwordHash))) {
+        if (registration.status === 'PENDING') {
+          await recordFailedLogin('REGISTRATION_PENDING');
+          return NextResponse.json(
+            { error: 'Pendaftaran Anda masih menunggu persetujuan Superadmin.' },
+            { status: 403 }
+          );
+        }
+        if (registration.status === 'REJECTED') {
+          await recordFailedLogin('REGISTRATION_REJECTED');
+          return NextResponse.json(
+            { error: 'Pendaftaran Anda ditolak. Hubungi Superadmin untuk informasi lebih lanjut.' },
+            { status: 403 }
+          );
+        }
+      }
+
       await recordFailedLogin('USER_NOT_FOUND');
       return NextResponse.json(
         { error: 'Username atau kata sandi salah' },

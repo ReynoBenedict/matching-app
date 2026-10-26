@@ -109,6 +109,13 @@ function RecordField({ label, value }: { label: string; value: string | null | u
   );
 }
 
+// Normalisasi yang sama dengan Model Service (NFKC, huruf kecil, tanda baca → spasi), agar
+// penanda "Berbeda" selaras dengan skor: "JL. MAWAR NO 12" dan "Jl Mawar No.12" dianggap sama.
+const PUNCTUATION = new RegExp('[^\\p{L}\\p{N}_\\s]', 'gu');
+function normalizeForCompare(value: string): string {
+  return value.normalize('NFKC').toLowerCase().replace(PUNCTUATION, ' ').replace(/\s+/g, ' ').trim();
+}
+
 function RecordColumn({ title, record, counterpart, fields }: {
   title: string;
   record: DatasetRecord | null;
@@ -125,7 +132,7 @@ function RecordColumn({ title, record, counterpart, fields }: {
       <div>
         {fields.map((field) => {
           const value = field.valueOf(record);
-          const differs = value.toLowerCase() !== field.valueOf(counterpart).toLowerCase();
+          const differs = normalizeForCompare(value) !== normalizeForCompare(field.valueOf(counterpart));
           return (
             <div key={field.id} className="px-4 py-3 border-b border-outline-variant last:border-b-0 grid grid-cols-1 sm:grid-cols-[130px_1fr] gap-1 sm:gap-3">
               <span className="font-label-md text-on-surface-variant break-words">{field.label}</span>

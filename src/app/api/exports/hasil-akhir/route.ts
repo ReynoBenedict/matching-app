@@ -15,6 +15,24 @@ import { recordAuditLog } from '@/lib/audit';
 const FILTERS: VerificationFilter[] = ['ALL', 'MATCH', 'NON_MATCH', 'REVIEW', 'UNVERIFIED'];
 const PAGE = 100;
 const MAX_ROWS = 200_000;
+// Excel dengan pengaturan regional Indonesia memakai ';' sebagai pemisah kolom dan
+// ',' sebagai pemisah desimal; dengan koma, seluruh baris masuk ke kolom A.
+const DELIMITER = ';';
+
+const jakartaTime = new Intl.DateTimeFormat('sv-SE', {
+  timeZone: 'Asia/Jakarta',
+  year: 'numeric',
+  month: '2-digit',
+  day: '2-digit',
+  hour: '2-digit',
+  minute: '2-digit',
+  second: '2-digit',
+});
+
+function formatScore(value: string | number): string {
+  const score = Number(value);
+  return Number.isFinite(score) ? score.toFixed(4).replace('.', ',') : '';
+}
 
 function csvCell(value: unknown): string {
   if (value === null || value === undefined) return '';
@@ -36,7 +54,7 @@ export async function GET(request: NextRequest) {
       'assignment_id', 'dataset_a', 'idsbr_a', 'nama_usaha_a', 'dataset_b', 'idsbr_b', 'nama_usaha_b',
       'similarity_score', 'status_penugasan', 'hasil_verifikasi', 'waktu_verifikasi', 'petugas',
     ];
-    const lines: string[] = [header.join(',')];
+    const lines: string[] = [header.join(DELIMITER)];
 
     let page = 1;
     let exported = 0;
@@ -51,12 +69,12 @@ export async function GET(request: NextRequest) {
           row.recordB?.datasetName ?? '',
           row.recordB?.idsbr ?? '',
           row.recordB?.namaUsaha ?? '',
-          row.similarityScore,
+          formatScore(row.similarityScore),
           row.status,
           row.verificationResult ?? '',
-          row.verifiedAt ?? '',
+          row.verifiedAt ? `${jakartaTime.format(new Date(row.verifiedAt))} WIB` : '',
           row.employee?.fullName ?? '',
-        ].map(csvCell).join(','));
+        ].map(csvCell).join(DELIMITER));
         exported += 1;
       }
       if (page >= data.pagination.totalPages || data.rows.length === 0 || exported >= MAX_ROWS) break;

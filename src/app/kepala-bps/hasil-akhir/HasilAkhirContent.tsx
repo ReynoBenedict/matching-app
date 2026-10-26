@@ -297,11 +297,11 @@ export function HasilAkhirContent() {
       {summary && (
         <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-5 gap-md">
           <StatCard
-            label="Total Kandidat"
+            label="Kandidat Ditugaskan"
             value={formatNumber(summary.totalCandidates)}
             icon="fact_check"
             tone="text-secondary"
-            subtext="Kandidat pencocokan tersimpan"
+            subtext="Pasangan yang dikirim ke petugas"
           />
           <StatCard
             label="MATCH"
@@ -322,7 +322,7 @@ export function HasilAkhirContent() {
             value={formatNumber(summary.unverified)}
             icon="schedule"
             tone="text-warning"
-            subtext="Menunggu verifikasi petugas"
+            subtext="Belum MATCH/NON-MATCH, termasuk Perlu Review"
           />
           <StatCard
             label="Tingkat Verifikasi"

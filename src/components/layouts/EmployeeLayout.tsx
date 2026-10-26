@@ -4,6 +4,7 @@ import { useEffect, useState } from 'react';
 import { usePathname, useRouter } from 'next/navigation';
 import Link from 'next/link';
 import { AccessCheckPlaceholder, useRequireRole } from '@/lib/auth/useRequireRole';
+import { CurrentUserBadge } from './CurrentUserBadge';
 
 interface EmployeeLayoutProps {
   children: React.ReactNode;
@@ -134,10 +135,7 @@ export function EmployeeLayout({ children, pageTitle }: EmployeeLayoutProps) {
               />
             </div>
             <div className="flex items-center gap-md border-l border-outline-variant pl-md">
-              <div className="hidden sm:flex flex-col items-end">
-                <span className="text-on-surface font-semibold text-sm whitespace-nowrap">Employee</span>
-                <span className="text-on-surface-variant text-xs whitespace-nowrap">Role: EMPLOYEE</span>
-              </div>
+              <CurrentUserBadge fallbackName="Petugas" fallbackRole="Petugas Verifikasi" />
               <div className="flex gap-sm">
                 <button className="p-2 md:p-1 text-on-surface-variant hover:text-primary transition-colors rounded-full hover:bg-surface-container-low relative">
                   <span className="material-symbols-outlined">notifications</span>

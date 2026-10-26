@@ -5,6 +5,7 @@ import { SuperadminLayout } from '@/components/layouts/SuperadminLayout';
 import { AssignCandidateDialog } from './AssignCandidateDialog';
 import { CandidateDetailDialog } from './CandidateDetailDialog';
 import { formatPercent, scoreBadgeClass } from './score';
+import { fetchSavedRuns, type SavedRun } from './saved-runs';
 import type { AssignmentCandidate, DatasetOption, Employee } from './types';
 
 const THRESHOLD_OPTIONS = [0.5, 0.6, 0.7, 0.8, 0.9];
@@ -44,58 +45,60 @@ interface AdminAssignment {
 }
 
 
-/**
- * Ambil kandidat pencocokan untuk sepasang dataset.
- * Memetakan seluruh kolom yang sama pada kedua dataset.
- */
+const PAGE_SIZE = 50;
+
+interface CandidateTotals {
+  totalCandidates: number;
+  assigned: number;
+  unassigned: number;
+}
+
+interface CandidatePage {
+  candidates: AssignmentCandidate[];
+  totals: CandidateTotals | null;
+  totalPages: number;
+  error?: string;
+  /** Pasangan dataset + threshold ini belum pernah dijalankan (bukan kegagalan sistem). */
+  notFound?: boolean;
+}
+
+/** Ambil satu halaman kandidat dari proses pencocokan tersimpan untuk sepasang dataset. */
 async function fetchCandidates(
   datasetAId: number,
   datasetBId: number,
-  threshold: number
-): Promise<{ candidates: AssignmentCandidate[]; error?: string }> {
+  threshold: number,
+  page: number
+): Promise<CandidatePage> {
   if (datasetAId === datasetBId) {
-    return { candidates: [], error: 'Dataset pertama dan dataset kedua harus berbeda.' };
-  }
-
-  const fetchColumnNames = async (datasetId: number): Promise<string[]> => {
-    const response = await fetch(`/api/datasets/${datasetId}/columns`);
-    const data = await response.json();
-    if (!response.ok || !data.success) {
-      throw new Error(data.error || `Gagal memuat kolom dataset ${datasetId}`);
-    }
-    return (data.data || []).map((column: { columnName: string }) => column.columnName);
-  };
-
-  const [columnsA, columnsB] = await Promise.all([
-    fetchColumnNames(datasetAId),
-    fetchColumnNames(datasetBId),
-  ]);
-
-  const columnMappings = columnsA
-    .filter((column) => columnsB.includes(column))
-    .map((column) => ({ columnA: column, columnB: column }));
-
-  if (columnMappings.length === 0) {
-    return { candidates: [], error: 'Kedua dataset tidak memiliki kolom yang sama untuk dipetakan.' };
+    return { candidates: [], totals: null, totalPages: 1, error: 'Dataset pertama dan dataset kedua harus berbeda.' };
   }
 
   const params = new URLSearchParams({
     datasetAId: String(datasetAId),
     datasetBId: String(datasetBId),
-    columnMappings: JSON.stringify(columnMappings),
     threshold: String(threshold),
-    page: '1',
-    limit: '100',
+    page: String(page),
+    limit: String(PAGE_SIZE),
   });
 
-  const response = await fetch(`/api/assignments/candidates?${params}`);
+  const response = await fetch(`/api/assignments/candidates?${params}`, { cache: 'no-store' });
   const data = await response.json();
 
   if (!response.ok || !data.success) {
-    return { candidates: [], error: data.error || 'Gagal memuat kandidat pencocokan' };
+    return {
+      candidates: [],
+      totals: null,
+      totalPages: 1,
+      error: data.error || 'Gagal memuat kandidat pencocokan',
+      notFound: response.status === 404,
+    };
   }
 
-  return { candidates: data.data || [] };
+  return {
+    candidates: data.data || [],
+    totals: data.summary ?? null,
+    totalPages: data.pagination?.totalPages ?? 1,
+  };
 }
 
 function StatCard({ label, value, icon, tone }: { label: string; value: number; icon: string; tone: string }) {
@@ -156,6 +159,11 @@ export function AssignmentContent() {
   }, [datasetAId, datasetBId]);
 
   const [candidates, setCandidates] = useState<AssignmentCandidate[]>([]);
+  const [totals, setTotals] = useState<CandidateTotals | null>(null);
+  const [page, setPage] = useState(1);
+  const [totalPages, setTotalPages] = useState(1);
+  const [noRun, setNoRun] = useState(false);
+  const [savedRuns, setSavedRuns] = useState<SavedRun[]>([]);
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState<string | null>(null);
   const [notice, setNotice] = useState<string | null>(null);
@@ -197,9 +205,17 @@ export function AssignmentContent() {
           console.warn('Gagal memuat daftar penugasan admin', assignmentError);
         }
 
+        const runs = await fetchSavedRuns().catch(() => [] as SavedRun[]);
+        if (cancelled) return;
+        setSavedRuns(runs);
+
         if (list.length >= 2) {
-          setDatasetAId(list[0].id);
-          setDatasetBId(list[1].id);
+          // Buka langsung proses tersimpan terbaru agar kandidat langsung tampil.
+          const ids = new Set(list.map((dataset) => dataset.id));
+          const latest = runs.find((run) => ids.has(run.datasetA.id) && ids.has(run.datasetB.id));
+          if (latest) setThreshold(latest.threshold);
+          setDatasetAId(latest?.datasetA.id ?? list[0].id);
+          setDatasetBId(latest?.datasetB.id ?? list[1].id);
           setLoading(true);
         } else {
           setLoading(false);
@@ -226,14 +242,18 @@ export function AssignmentContent() {
 
     (async () => {
       try {
-        const result = await fetchCandidates(datasetAId, datasetBId, threshold);
+        const result = await fetchCandidates(datasetAId, datasetBId, threshold, page);
         if (cancelled) return;
 
         setCandidates(result.candidates);
-        setError(result.error ?? null);
+        setTotals(result.totals);
+        setTotalPages(result.totalPages);
+        setNoRun(Boolean(result.notFound));
+        setError(result.notFound ? null : result.error ?? null);
       } catch (err) {
         if (cancelled) return;
         setCandidates([]);
+        setTotals(null);
         setError(err instanceof Error ? err.message : 'Gagal memuat kandidat pencocokan');
       } finally {
         if (!cancelled) setLoading(false);
@@ -243,7 +263,17 @@ export function AssignmentContent() {
     return () => {
       cancelled = true;
     };
-  }, [datasetAId, datasetBId, threshold, refreshToken]);
+  }, [datasetAId, datasetBId, threshold, page, refreshToken]);
+
+  const handleSelectSavedRun = (run: SavedRun) => {
+    setLoading(true);
+    setNotice(null);
+    setError(null);
+    setPage(1);
+    setThreshold(run.threshold);
+    setDatasetAId(run.datasetA.id);
+    setDatasetBId(run.datasetB.id);
+  };
 
   const loadEmployees = async () => {
     if (employees.length > 0 || employeesLoading) return;
@@ -328,8 +358,10 @@ export function AssignmentContent() {
     }
   };
 
-  const assignedCount = candidates.filter((candidate) => candidate.assigned).length;
-  const availableCount = candidates.length - assignedCount;
+  // Statistik dari seluruh kandidat pada run (bukan hanya halaman yang sedang tampil).
+  const totalCount = totals?.totalCandidates ?? 0;
+  const assignedCount = totals?.assigned ?? 0;
+  const availableCount = totals?.unassigned ?? 0;
 
   return (
     <SuperadminLayout pageTitle="Manajemen Penugasan">
@@ -393,6 +425,7 @@ export function AssignmentContent() {
                   setLoading(true);
                   setNotice(null);
                   setError(null);
+                  setPage(1);
                   setDatasetAId(Number(event.target.value));
                 }}
                 className="w-full px-md py-sm rounded-lg border border-outline-variant bg-surface text-on-surface text-body-md focus:outline-none focus:ring-2 focus:ring-secondary-container"
@@ -415,6 +448,7 @@ export function AssignmentContent() {
                   setLoading(true);
                   setNotice(null);
                   setError(null);
+                  setPage(1);
                   setDatasetBId(Number(event.target.value));
                 }}
                 className="w-full px-md py-sm rounded-lg border border-outline-variant bg-surface text-on-surface text-body-md focus:outline-none focus:ring-2 focus:ring-secondary-container"
@@ -436,6 +470,7 @@ export function AssignmentContent() {
                 onChange={(event) => {
                   setLoading(true);
                   setNotice(null);
+                  setPage(1);
                   setThreshold(Number(event.target.value));
                 }}
                 className="w-full px-md py-sm rounded-lg border border-outline-variant bg-surface text-on-surface text-body-md focus:outline-none focus:ring-2 focus:ring-secondary-container"
@@ -466,10 +501,42 @@ export function AssignmentContent() {
         </div>
       )}
 
+      {/* Pasangan belum pernah diproses */}
+      {!loading && noRun && (
+        <div className="bg-surface-container-low border border-outline-variant rounded-xl p-lg mb-lg space-y-md">
+          <div className="flex items-start gap-sm">
+            <span className="material-symbols-outlined text-secondary flex-shrink-0" style={{ fontSize: '20px' }}>
+              info
+            </span>
+            <div>
+              <p className="font-body-md text-on-surface font-semibold">
+                Belum ada proses pencocokan untuk pasangan dan threshold ini.
+              </p>
+              <p className="text-body-sm text-on-surface-variant mt-xs">
+                Pilih salah satu proses tersimpan di bawah, atau jalankan pencocokan baru di menu Pencocokan Data.
+              </p>
+            </div>
+          </div>
+          {savedRuns.length > 0 && (
+            <div className="flex flex-wrap gap-sm">
+              {savedRuns.slice(0, 6).map((run) => (
+                <button
+                  key={run.id}
+                  onClick={() => handleSelectSavedRun(run)}
+                  className="px-md py-xs rounded-lg border border-outline-variant bg-surface text-primary font-label-md hover:bg-surface-container transition-colors"
+                >
+                  {run.datasetA.name} ↔ {run.datasetB.name} · {Math.round(run.threshold * 100)}%
+                </button>
+              ))}
+            </div>
+          )}
+        </div>
+      )}
+
       {/* Stats */}
       {!datasetsLoading && datasets.length >= 2 && (
         <div className="grid grid-cols-1 sm:grid-cols-3 gap-md mb-lg">
-          <StatCard label="Total Kandidat" value={candidates.length} icon="fact_check" tone="text-secondary" />
+          <StatCard label="Total Kandidat" value={totalCount} icon="fact_check" tone="text-secondary" />
           <StatCard label="Belum Ditugaskan" value={availableCount} icon="pending_actions" tone="text-primary" />
           <StatCard label="Sudah Ditugaskan" value={assignedCount} icon="check_circle" tone="text-on-surface-variant" />
         </div>
@@ -482,8 +549,8 @@ export function AssignmentContent() {
           <span className="text-sm text-on-surface-variant">{adminAssignments.length} task</span>
         </div>
         {adminAssignments.length === 0 ? <div className="p-lg text-sm text-on-surface-variant">Belum ada penugasan.</div> : (
-          <div className="overflow-x-auto"><table className="w-full min-w-[850px] text-left"><thead><tr className="bg-surface-container-highest border-b border-outline-variant"><th className="px-md py-sm text-xs font-semibold">ID Matching</th><th className="px-md py-sm text-xs font-semibold">Dataset A</th><th className="px-md py-sm text-xs font-semibold">Dataset B</th><th className="px-md py-sm text-xs font-semibold">Petugas</th><th className="px-md py-sm text-xs font-semibold">Tanggal Penugasan</th><th className="px-md py-sm text-xs font-semibold">Status</th></tr></thead><tbody>
-            {adminAssignments.map((task) => <tr key={task.id} className="border-b border-outline-variant last:border-b-0"><td className="px-md py-sm font-mono text-sm">{task.matchingRunId ?? `#${task.id}`}</td><td className="px-md py-sm text-sm">{task.datasetA?.name ?? '-'}</td><td className="px-md py-sm text-sm">{task.datasetB?.name ?? '-'}</td><td className="px-md py-sm text-sm">{task.employee?.fullName ?? '-'}</td><td className="px-md py-sm text-sm">{new Date(task.assignedAt).toLocaleString('id-ID')}</td><td className="px-md py-sm text-sm font-semibold">{task.status === 'PENDING' ? 'Belum Dikerjakan' : task.status === 'IN_PROGRESS' ? 'Sedang Dikerjakan' : 'Selesai'}</td></tr>)}
+          <div className="overflow-x-auto"><table className="w-full min-w-[850px] text-left"><thead><tr className="bg-surface-container-highest border-b border-outline-variant"><th className="px-md py-sm text-xs font-semibold">ID Penugasan</th><th className="px-md py-sm text-xs font-semibold">Dataset A</th><th className="px-md py-sm text-xs font-semibold">Dataset B</th><th className="px-md py-sm text-xs font-semibold">Petugas</th><th className="px-md py-sm text-xs font-semibold">Tanggal Penugasan</th><th className="px-md py-sm text-xs font-semibold">Status</th><th className="px-md py-sm text-xs font-semibold">Hasil</th></tr></thead><tbody>
+            {adminAssignments.map((task) => <tr key={task.id} className="border-b border-outline-variant last:border-b-0"><td className="px-md py-sm font-mono text-sm">#{task.id}</td><td className="px-md py-sm text-sm">{task.datasetA?.name ?? '-'}</td><td className="px-md py-sm text-sm">{task.datasetB?.name ?? '-'}</td><td className="px-md py-sm text-sm">{task.employee?.fullName ?? '-'}</td><td className="px-md py-sm text-sm">{new Date(task.assignedAt).toLocaleString('id-ID')}</td><td className="px-md py-sm text-sm font-semibold">{task.status === 'PENDING' ? 'Belum Dikerjakan' : task.status === 'IN_PROGRESS' ? 'Sedang Dikerjakan' : 'Selesai'}</td><td className="px-md py-sm text-sm">{task.verificationResult === 'MATCH' ? 'MATCH' : task.verificationResult === 'NON_MATCH' ? 'NON-MATCH' : task.verificationResult === 'REVIEW' ? 'Perlu Review' : '-'}</td></tr>)}
           </tbody></table></div>
         )}
       </div>
@@ -528,7 +595,7 @@ export function AssignmentContent() {
                     key={`${candidate.recordAId}-${candidate.recordBId}`}
                     className="border-b border-outline-variant last:border-b-0 hover:bg-surface-container-highest/40 transition-colors"
                   >
-                    <td className="px-md py-sm font-data-tabular text-on-surface-variant">{index + 1}</td>
+                    <td className="px-md py-sm font-data-tabular text-on-surface-variant">{(page - 1) * PAGE_SIZE + index + 1}</td>
                     <td className="px-md py-sm">
                       <p className="font-data-tabular text-on-surface font-semibold">{candidate.idsbrA}</p>
                       {candidate.recordA?.namaUsaha && (
@@ -584,6 +651,30 @@ export function AssignmentContent() {
                 ))}
               </tbody>
             </table>
+          </div>
+        )}
+
+        {!loading && totalPages > 1 && (
+          <div className="px-lg py-md border-t border-outline-variant flex flex-wrap items-center justify-between gap-sm">
+            <span className="text-body-sm text-on-surface-variant">
+              Halaman {page} dari {totalPages} · {totalCount.toLocaleString('id-ID')} kandidat, urut skor tertinggi
+            </span>
+            <div className="flex items-center gap-sm">
+              <button
+                onClick={() => { setLoading(true); setPage(page - 1); }}
+                disabled={page <= 1}
+                className="px-md py-xs rounded-lg border border-outline-variant text-on-surface font-label-md hover:bg-surface-container-low disabled:opacity-40 disabled:cursor-not-allowed"
+              >
+                Sebelumnya
+              </button>
+              <button
+                onClick={() => { setLoading(true); setPage(page + 1); }}
+                disabled={page >= totalPages}
+                className="px-md py-xs rounded-lg border border-outline-variant text-on-surface font-label-md hover:bg-surface-container-low disabled:opacity-40 disabled:cursor-not-allowed"
+              >
+                Berikutnya
+              </button>
+            </div>
           </div>
         )}
       </div>

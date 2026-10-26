@@ -260,7 +260,7 @@ export default function SuperadminDashboardPage() {
           value={formatNumber(assignments.total)}
           icon="fact_check"
           tone="text-primary-container"
-          subtext={`${formatNumber(assignments.pending)} menunggu verifikasi`}
+          subtext={`${formatNumber(assignments.pending + assignments.inProgress)} belum diverifikasi`}
         />
 
         {/* Pegawai Aktif */}
@@ -357,7 +357,7 @@ export default function SuperadminDashboardPage() {
               <span className="material-symbols-outlined text-outline" style={{ fontSize: '40px' }}>
                 donut_large
               </span>
-              <p className="text-on-surface-variant font-body-md">Belum ada kandidat tersimpan.</p>
+              <p className="text-on-surface-variant font-body-md">Belum ada kandidat yang ditugaskan.</p>
               <p className="text-on-surface-variant font-body-sm text-center px-4">
                 Diagram terisi setelah kandidat pencocokan ditugaskan dan diverifikasi.
               </p>
@@ -368,7 +368,7 @@ export default function SuperadminDashboardPage() {
                 <div className="w-48 h-48 rounded-full" style={{ background: donutGradient }} />
                 <div className="absolute w-32 h-32 bg-surface rounded-full flex flex-col items-center justify-center">
                   <span className="font-headline-sm text-headline-sm text-primary">{formatNumber(totalCandidates)}</span>
-                  <span className="font-label-md text-xs text-on-surface-variant">Total Kandidat</span>
+                  <span className="font-label-md text-xs text-on-surface-variant">Ditugaskan</span>
                 </div>
               </div>
               <div className="flex flex-col gap-1 font-label-md text-xs">
@@ -382,7 +382,7 @@ export default function SuperadminDashboardPage() {
                 </div>
                 <div className="flex items-center gap-2">
                   <div className="w-3 h-3 rounded bg-outline-variant" />
-                  <span>Belum Diverifikasi ({formatNumber(verification.unverified)} · {Math.round(unverifiedPercent)}%)</span>
+                  <span>Belum Diputuskan / Review ({formatNumber(verification.unverified)} · {Math.round(unverifiedPercent)}%)</span>
                 </div>
               </div>
             </div>

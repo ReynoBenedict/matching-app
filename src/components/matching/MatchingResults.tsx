@@ -77,7 +77,7 @@ export function MatchingResults({ matchingRunId, results }: MatchingResultsProps
           <div><p className="text-sm text-on-surface-variant">Dataset Pertama</p><p className="font-semibold text-on-surface mt-1">{datasetNames?.a ?? `Dataset #${results.datasetA.id}`}</p></div>
           <div><p className="text-sm text-on-surface-variant">Dataset Kedua</p><p className="font-semibold text-on-surface mt-1">{datasetNames?.b ?? `Dataset #${results.datasetB.id}`}</p></div>
           <div><p className="text-sm text-on-surface-variant">Threshold</p><p className="font-semibold text-on-surface mt-1">{thresholdToPercent(results.config.threshold)}%</p></div>
-          <div><p className="text-sm text-on-surface-variant">Kandidat Pasangan</p><p className="font-semibold text-primary text-lg mt-1">{total.toLocaleString('id-ID')}</p></div>
+          <div><p className="text-sm text-on-surface-variant">Kandidat Pasangan</p><p className="font-semibold text-primary text-lg mt-1">{loadedKey === null ? '…' : total.toLocaleString('id-ID')}</p></div>
         </div>
       </div>
 

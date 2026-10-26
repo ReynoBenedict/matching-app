@@ -4,6 +4,7 @@ import { useEffect, useState } from 'react';
 import { usePathname, useRouter } from 'next/navigation';
 import Link from 'next/link';
 import { AccessCheckPlaceholder, useRequireRole } from '@/lib/auth/useRequireRole';
+import { CurrentUserBadge } from './CurrentUserBadge';
 
 interface SuperadminLayoutProps {
   children: React.ReactNode;
@@ -105,9 +106,13 @@ export function SuperadminLayout({ children, pageTitle }: SuperadminLayoutProps)
 
         {/* Tombol aksi cepat */}
         <div className="px-md mb-lg">
-          <button className="w-full bg-secondary-container text-on-secondary-container py-2 rounded-lg font-label-md hover:bg-secondary hover:text-on-primary transition-colors duration-200 ease-in-out">
+          <Link
+            href="/matching"
+            onClick={() => setSidebarOpen(false)}
+            className="block w-full text-center bg-secondary-container text-on-secondary-container py-2 rounded-lg font-label-md hover:bg-secondary hover:text-on-primary transition-colors duration-200 ease-in-out"
+          >
             Mulai Pencocokan Baru
-          </button>
+          </Link>
         </div>
 
         {/* Navigasi Superadmin */}
@@ -199,10 +204,7 @@ export function SuperadminLayout({ children, pageTitle }: SuperadminLayoutProps)
               />
             </div>
             <div className="flex items-center gap-md border-l border-outline-variant pl-md">
-              <div className="hidden sm:flex flex-col items-end">
-                <span className="text-on-surface font-semibold text-sm whitespace-nowrap">Administrator BPS</span>
-                <span className="text-on-surface-variant text-xs whitespace-nowrap">Role: ADMIN</span>
-              </div>
+              <CurrentUserBadge fallbackName="Administrator BPS" fallbackRole="Superadmin" />
               <div className="flex gap-sm">
                 <button className="p-2 md:p-1 text-on-surface-variant hover:text-primary transition-colors rounded-full hover:bg-surface-container-low relative">
                   <span className="material-symbols-outlined">notifications</span>

@@ -8,7 +8,7 @@ import { NextRequest, NextResponse } from 'next/server';
 import { requireAuth } from '@/lib/auth/authorization';
 import { getDatabase } from '@/lib/db';
 import { datasets, datasetColumns } from '@/lib/db/schema';
-import { eq, desc, sql, count, inArray } from 'drizzle-orm';
+import { eq, desc, sql, count, inArray, ilike } from 'drizzle-orm';
 
 export async function GET(request: NextRequest) {
   try {
@@ -21,6 +21,7 @@ export async function GET(request: NextRequest) {
     const limit = parseInt(searchParams.get('limit') || '10', 10);
     const status = searchParams.get('status');
     const datasetType = searchParams.get('datasetType');
+    const search = (searchParams.get('search') || '').trim();
 
     // Validate pagination params
     const validLimit = Math.min(Math.max(1, limit), 100);
@@ -39,6 +40,10 @@ export async function GET(request: NextRequest) {
 
     if (datasetType) {
       conditions.push(eq(datasets.datasetType, datasetType));
+    }
+
+    if (search) {
+      conditions.push(ilike(datasets.name, `%${search}%`));
     }
 
     // Build and execute query

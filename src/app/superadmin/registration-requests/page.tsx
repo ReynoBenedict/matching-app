@@ -290,7 +290,7 @@ export default function RegistrationRequestsPage() {
                           {request.status === 'PENDING' && (
                             <span style={{ display: 'inline-flex', alignItems: 'center', gap: '6px', backgroundColor: '#ffdbcb', color: '#4e1c00', padding: '2px 12px', borderRadius: '12px', fontSize: '12px', fontWeight: '600', border: '1px solid #ffb693' }}>
                               <span style={{ width: '6px', height: '6px', borderRadius: '50%', backgroundColor: '#f59e0b', display: 'inline-block' }}></span>
-                              Pending Verification
+                              Menunggu Persetujuan
                             </span>
                           )}
                           {request.status === 'APPROVED' && (
@@ -310,10 +310,8 @@ export default function RegistrationRequestsPage() {
                           {request.status === 'PENDING' && (
                             <>
                               <button
-                                onClick={() => {
-                                  // Reject action - placeholder
-                                  console.log('Reject:', request.id);
-                                }}
+                                // Penolakan memerlukan alasan, yang diisi di halaman detail.
+                                onClick={() => router.push(`/superadmin/registration-requests/${request.id}`)}
                                 style={{
                                   background: 'none',
                                   border: 'none',

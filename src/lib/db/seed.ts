@@ -33,7 +33,7 @@ export async function seedTestUsers() {
       status: 'ACTIVE' as const,
     },
     {
-      fullName: 'Admin Test',
+      fullName: 'Administrator BPS',
       email: 'admin@bps.go.id',
       username: 'admin',
       password: 'admin123',

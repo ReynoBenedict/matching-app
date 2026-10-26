@@ -4,7 +4,7 @@
  * assignments/verifications. Requires the Kepala BPS role.
  *
  * Query params:
- * - verification: ALL | MATCH | NON_MATCH | UNVERIFIED (optional, default ALL)
+ * - verification: ALL | MATCH | NON_MATCH | REVIEW | UNVERIFIED (optional, default ALL)
  * - page: number (optional, default 1)
  * - limit: number (optional, default 20, max 100)
  */
@@ -13,7 +13,7 @@ import { NextRequest, NextResponse } from 'next/server';
 import { requireKepalaBPS } from '@/lib/auth/authorization';
 import { getFinalResults, type VerificationFilter } from '@/lib/services/final-results';
 
-const VALID_FILTERS: VerificationFilter[] = ['ALL', 'MATCH', 'NON_MATCH', 'UNVERIFIED'];
+const VALID_FILTERS: VerificationFilter[] = ['ALL', 'MATCH', 'NON_MATCH', 'REVIEW', 'UNVERIFIED'];
 
 export async function GET(request: NextRequest) {
   try {

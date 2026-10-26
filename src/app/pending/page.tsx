@@ -60,9 +60,9 @@ function PendingContent() {
                 </li>
                 <li className="flex items-start gap-2">
                   <span className="material-symbols-outlined text-[16px] flex-shrink-0 mt-0.5">
-                    mail
+                    login
                   </span>
-                  <span>Anda akan menerima email notifikasi ketika akses disetujui.</span>
+                  <span>Setelah disetujui Superadmin, Anda dapat langsung login.</span>
                 </li>
                 <li className="flex items-start gap-2">
                   <span className="material-symbols-outlined text-[16px] flex-shrink-0 mt-0.5">
@@ -135,14 +135,14 @@ function PendingContent() {
               </div>
               <div className="flex items-start gap-2">
                 <span className="material-symbols-outlined text-[#006493] flex-shrink-0 mt-0.5">
-                  mail_outline
+                  login
                 </span>
                 <div>
                   <p className="text-sm font-semibold text-[#002b5a]">
-                    Pemberitahuan Email
+                    Cek Status dengan Login
                   </p>
                   <p className="text-xs text-[#424750] mt-1">
-                    Kami akan mengirimkan notifikasi ketika persetujuan selesai.
+                    Selama belum disetujui, halaman login akan menampilkan status menunggu persetujuan.
                   </p>
                 </div>
               </div>
@@ -157,7 +157,7 @@ function PendingContent() {
               <ul className="space-y-2 text-xs text-[#424750]">
                 <li className="flex gap-2">
                   <span className="text-[#006493] font-bold flex-shrink-0">•</span>
-                  <span>Pastikan email Anda aktif untuk menerima pemberitahuan.</span>
+                  <span>Ingat username dan kata sandi yang Anda daftarkan.</span>
                 </li>
                 <li className="flex gap-2">
                   <span className="text-[#006493] font-bold flex-shrink-0">•</span>

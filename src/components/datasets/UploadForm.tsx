@@ -22,8 +22,20 @@ export function UploadForm() {
     { value: 'DATASET_D', label: 'Dataset D' },
   ];
 
+  const [dragging, setDragging] = useState(false);
+
   const handleFileChange = (e: React.ChangeEvent<HTMLInputElement>) => {
-    const selectedFile = e.target.files?.[0];
+    selectFile(e.target.files?.[0]);
+  };
+
+  const handleDrop = (e: React.DragEvent<HTMLDivElement>) => {
+    // Tanpa preventDefault browser membuka berkas dan meninggalkan aplikasi.
+    e.preventDefault();
+    setDragging(false);
+    if (!loading) selectFile(e.dataTransfer.files?.[0]);
+  };
+
+  const selectFile = (selectedFile: File | undefined) => {
     if (selectedFile) {
       if (!selectedFile.name.endsWith('.csv')) {
         setError('Hanya file CSV yang didukung');
@@ -81,10 +93,16 @@ export function UploadForm() {
         xhr.onload = () => {
           if (xhr.status === 201) {
             resolve(JSON.parse(xhr.responseText));
-          } else {
-            const response = JSON.parse(xhr.responseText);
-            reject(new Error(response.error || 'Upload gagal'));
+            return;
           }
+          // Kegagalan validasi mengirim { message, errors[] } tanpa field `error`.
+          let message = 'Upload gagal';
+          try {
+            const response = JSON.parse(xhr.responseText);
+            const detail = response.errors?.[0]?.message;
+            message = response.error || [response.message, detail].filter(Boolean).join(': ') || message;
+          } catch {}
+          reject(new Error(message));
         };
 
         xhr.onerror = () => {
@@ -195,11 +213,14 @@ export function UploadForm() {
           </label>
           <div
             className={`border-2 border-dashed rounded-lg p-xl text-center cursor-pointer transition-colors ${
-              file
+              file || dragging
                 ? 'border-primary bg-primary-container/10'
                 : 'border-outline-variant hover:border-primary'
             }`}
             onClick={() => fileInputRef.current?.click()}
+            onDragOver={(e) => { e.preventDefault(); setDragging(true); }}
+            onDragLeave={() => setDragging(false)}
+            onDrop={handleDrop}
           >
             <input
               ref={fileInputRef}

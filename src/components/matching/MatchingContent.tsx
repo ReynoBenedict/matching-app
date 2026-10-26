@@ -110,7 +110,8 @@ export function MatchingContent() {
   useEffect(() => {
     const stored = localStorage.getItem(JOB_STORAGE_KEY);
     if (!stored) return;
-    setState((prev) => ({ ...prev, loading: true }));
+    // Panel "Pencocokan sedang berjalan" hanya tampil pada langkah threshold.
+    setState((prev) => ({ ...prev, loading: true, step: 'threshold' }));
     setActiveJobId(stored);
   }, []);
 
@@ -137,6 +138,8 @@ export function MatchingContent() {
           setState((prev) => ({
             ...prev,
             loading: false,
+            // Job yang dipulihkan setelah refresh tidak membawa konfigurasi: mulai dari awal.
+            step: prev.columnMappings.length === 0 ? 'dataset-a' : prev.step,
             error:
               response.status === 403
                 ? 'Tidak berhak melihat status pencocokan ini.'

@@ -70,8 +70,16 @@ export async function uploadDataset(
         .set({ status: 'VALIDATING' })
         .where(sql`id = ${datasetId}`);
 
-      // Step 3: Parse CSV
-      const parseResult = parseCSV(csvContent);
+      // Step 3: Parse CSV. Kesalahan format (header ganda, jumlah kolom tidak cocok)
+      // adalah kesalahan berkas, bukan kegagalan penyimpanan: laporkan apa adanya.
+      let parseResult: ReturnType<typeof parseCSV>;
+      try {
+        parseResult = parseCSV(csvContent);
+      } catch (parseError) {
+        const reason = parseError instanceof Error ? parseError.message : 'Format CSV tidak dapat dibaca';
+        await markDatasetFailed(datasetId, `CSV parse failed: ${reason}`);
+        return { success: false, datasetId, status: 'FAILED', message: `Berkas CSV tidak valid: ${reason}` };
+      }
 
       // Step 4: Validate CSV structure. Unknown/missing legacy columns are allowed.
       if (parseResult.rows.length > UPLOAD_CONFIG.MAX_RECORDS_PER_DATASET) {

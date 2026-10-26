@@ -174,7 +174,8 @@ export async function getMonitoringDashboard(): Promise<MonitoringDashboardData>
     runningProcesses: countActiveMatchingJobs(),
     completedProcesses: Number(completedRuns[0]?.value ?? 0),
     failedProcesses: Number(failedRuns[0]?.value ?? 0),
-    totalEmployees: employees.length,
+    // Sama dengan dasbor: hanya pegawai berstatus ACTIVE.
+    totalEmployees: employees.filter((employee) => employee.accountStatus === 'ACTIVE').length,
     averageCompletionRate,
   };
 

@@ -121,7 +121,7 @@ export async function generateReport({
         { label: 'Total Dataset', value: formatNumber(datasetRows.length) },
         { label: 'Dataset READY', value: formatNumber(readyDatasets) },
         { label: 'Total Record Dataset', value: formatNumber(totalDatasetRecords) },
-        { label: 'Total Kandidat', value: formatNumber(totalCandidates) },
+        { label: 'Kandidat Ditugaskan', value: formatNumber(totalCandidates) },
         { label: 'MATCH', value: formatNumber(matchCount) },
         { label: 'NON-MATCH', value: formatNumber(nonMatchCount) },
         { label: 'Belum Diverifikasi', value: formatNumber(totalCandidates - verified) },

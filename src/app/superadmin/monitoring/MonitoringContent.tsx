@@ -16,6 +16,95 @@ import type {
 
 type MonitoringTab = 'penugasan' | 'petugas' | 'proses';
 
+interface MatchingRunRow {
+  id: number;
+  datasetA: { id: number; name: string };
+  datasetB: { id: number; name: string };
+  threshold: number;
+  status: string;
+  totalCandidates: number | null;
+  createdAt: string;
+  completedAt: string | null;
+}
+
+/** Daftar proses pencocokan tersimpan (tabel matching_runs), terbaru lebih dulu. */
+function MatchingRunsPanel() {
+  const [runs, setRuns] = useState<MatchingRunRow[] | null>(null);
+  const [error, setError] = useState<string | null>(null);
+
+  useEffect(() => {
+    let cancelled = false;
+    fetch('/api/matching/runs?limit=50', { cache: 'no-store' })
+      .then(async (response) => {
+        const payload = await response.json();
+        if (!response.ok || !payload.success) throw new Error(payload.error || 'Gagal memuat proses pencocokan');
+        if (!cancelled) setRuns(payload.data as MatchingRunRow[]);
+      })
+      .catch((err) => {
+        if (!cancelled) setError(err instanceof Error ? err.message : 'Gagal memuat proses pencocokan');
+      });
+    return () => {
+      cancelled = true;
+    };
+  }, []);
+
+  if (error) {
+    return <div className="bg-error-container text-on-error-container border border-error rounded-xl p-lg">{error}</div>;
+  }
+  if (!runs) {
+    return <div className="p-8 text-center text-on-surface-variant">Memuat proses pencocokan...</div>;
+  }
+  if (runs.length === 0) {
+    return (
+      <div className="bg-surface-container-lowest border border-outline-variant rounded-xl p-8 text-center">
+        <p className="font-body-md text-on-surface-variant">Belum ada proses pencocokan yang dijalankan.</p>
+        <Link href="/matching" className="inline-block mt-md text-primary font-label-md hover:underline">
+          Jalankan pencocokan
+        </Link>
+      </div>
+    );
+  }
+
+  return (
+    <div className="bg-surface-container-lowest border border-outline-variant rounded-xl overflow-hidden">
+      <div className="overflow-x-auto">
+        <table className="w-full min-w-[760px] text-left">
+          <thead className="bg-surface-container-high border-b border-outline-variant">
+            <tr>
+              <th className="px-4 py-3 text-sm font-semibold">ID Proses</th>
+              <th className="px-4 py-3 text-sm font-semibold">Pasangan Dataset</th>
+              <th className="px-4 py-3 text-sm font-semibold text-center">Threshold</th>
+              <th className="px-4 py-3 text-sm font-semibold text-center">Kandidat</th>
+              <th className="px-4 py-3 text-sm font-semibold">Status</th>
+              <th className="px-4 py-3 text-sm font-semibold">Selesai</th>
+            </tr>
+          </thead>
+          <tbody>
+            {runs.map((run) => (
+              <tr key={run.id} className="border-b border-outline-variant last:border-b-0">
+                <td className="px-4 py-3 font-mono text-sm">#{run.id}</td>
+                <td className="px-4 py-3 text-sm">{run.datasetA.name} ↔ {run.datasetB.name}</td>
+                <td className="px-4 py-3 text-sm text-center">{Math.round(run.threshold * 100)}%</td>
+                <td className="px-4 py-3 text-sm text-center">{formatNumber(run.totalCandidates ?? 0)}</td>
+                <td className="px-4 py-3 text-sm font-semibold">{run.status === 'COMPLETED' ? 'Selesai' : run.status}</td>
+                <td className="px-4 py-3 text-sm">
+                  {new Date(run.completedAt ?? run.createdAt).toLocaleString('id-ID', { dateStyle: 'medium', timeStyle: 'short' })}
+                </td>
+              </tr>
+            ))}
+          </tbody>
+        </table>
+      </div>
+      <div className="px-4 py-3 bg-surface-container-high border-t border-outline-variant flex justify-between text-xs text-on-surface-variant">
+        <span>{formatNumber(runs.length)} proses tersimpan</span>
+        <Link href="/superadmin/matching-results" className="text-primary font-label-md hover:underline">
+          Lihat hasil matching
+        </Link>
+      </div>
+    </div>
+  );
+}
+
 function formatNumber(value: number): string {
   return value.toLocaleString('id-ID');
 }
@@ -645,21 +734,7 @@ export function MonitoringContent() {
       )}
 
       {/* Matching Process Tab */}
-      {activeTab === 'proses' && (
-        <div className="bg-surface-container-lowest border border-outline-variant rounded-xl p-8 text-center">
-          <span className="material-symbols-outlined text-[48px] text-on-surface-variant opacity-30">
-            history_toggle_off
-          </span>
-          <p className="font-body-md text-on-surface-variant mt-4">
-            Belum ada riwayat proses pencocokan yang tersimpan.
-          </p>
-          <p className="font-body-sm text-body-sm text-on-surface-variant mt-2 max-w-[520px] mx-auto">
-            Sistem menjalankan pencocokan secara langsung dan belum menyimpan riwayat proses pencocokan ke basis data.
-            Karena itu, tidak ada proses berjalan, selesai, maupun gagal yang dapat ditampilkan, dan metrik proses
-            ditampilkan sebagai 0. Riwayat akan tampil di sini setelah proses pencocokan mulai dipersistenkan.
-          </p>
-        </div>
-      )}
+      {activeTab === 'proses' && <MatchingRunsPanel />}
     </SuperadminLayout>
   );
 }

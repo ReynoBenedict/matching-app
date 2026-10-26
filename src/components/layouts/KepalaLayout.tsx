@@ -4,6 +4,7 @@ import { useEffect, useState } from 'react';
 import { usePathname, useRouter } from 'next/navigation';
 import Link from 'next/link';
 import { AccessCheckPlaceholder, useRequireRole } from '@/lib/auth/useRequireRole';
+import { CurrentUserBadge } from './CurrentUserBadge';
 
 interface KepalaLayoutProps {
   children: React.ReactNode;
@@ -169,10 +170,7 @@ export function KepalaLayout({ children, pageTitle }: KepalaLayoutProps) {
               />
             </div>
             <div className="flex items-center gap-md border-l border-outline-variant pl-md">
-              <div className="hidden sm:flex flex-col items-end">
-                <span className="text-on-surface font-semibold text-sm whitespace-nowrap">Kepala BPS Malang</span>
-                <span className="text-on-surface-variant text-xs whitespace-nowrap">Role: KEPALA_BPS</span>
-              </div>
+              <CurrentUserBadge fallbackName="Kepala BPS Malang" fallbackRole="Kepala BPS" />
               <div className="flex gap-sm">
                 <button className="p-2 md:p-1 text-on-surface-variant hover:text-primary transition-colors rounded-full hover:bg-surface-container-low relative">
                   <span className="material-symbols-outlined">notifications</span>

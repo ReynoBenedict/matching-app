@@ -209,10 +209,10 @@ export default function DatasetDetailPage() {
             {/* Secondary Info Card */}
             <div className="bg-surface border border-outline-variant rounded-xl p-lg shadow-sm hover:shadow-md transition-shadow flex flex-col justify-between">
               <div>
-                <h4 className="font-label-md text-on-surface-variant uppercase tracking-wider mb-sm">Status Kualitas Data</h4>
+                <h4 className="font-label-md text-on-surface-variant uppercase tracking-wider mb-sm">Validasi Unggah</h4>
                 <div className="mb-md">
                   <div className="flex justify-between items-center mb-xs">
-                    <span className="font-body-sm">Kelengkapan</span>
+                    <span className="font-body-sm">Baris lolos validasi</span>
                     <span className="font-label-md text-primary">
                       {dataset.validRecords && dataset.totalRecords
                         ? Math.round((dataset.validRecords / dataset.totalRecords) * 100)
