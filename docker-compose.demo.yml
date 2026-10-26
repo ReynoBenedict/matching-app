@@ -1,0 +1,49 @@
+# Stack khusus demo: PostgreSQL + Model Service, terpisah dari docker-compose.yml.
+# Dijalankan oleh scripts/demo.ps1 (lewat demo-bps.cmd / demo-pkl.cmd), tidak perlu dipanggil manual.
+#
+# Satu server Postgres berisi dua database:
+#   bps_demo -> data asli BPS (folder datasets/)       — untuk demo ke BPS
+#   pkl_demo -> data sintetis (tests/fixtures/)         — untuk presentasi PKL
+# Model Service membaca record dari database yang dipilih lewat DEMO_DB.
+#
+# Port sengaja bukan 5432/8000/3000 (sudah dipakai container/proses lain) dan hanya
+# dibuka ke localhost karena berisi data BPS yang bersifat terbatas.
+name: bps-demo
+
+services:
+  postgres:
+    image: postgres:16-alpine
+    environment:
+      POSTGRES_DB: bps_demo
+      POSTGRES_USER: bps_user
+      POSTGRES_PASSWORD: bps_password
+    ports:
+      - "127.0.0.1:5433:5432"
+    volumes:
+      - pgdata:/var/lib/postgresql/data
+    healthcheck:
+      test: ["CMD-SHELL", "pg_isready -U bps_user -d bps_demo"]
+      interval: 3s
+      timeout: 5s
+      retries: 30
+
+  model:
+    build:
+      context: ./model_service
+      dockerfile: Dockerfile
+    ports:
+      - "127.0.0.1:8100:8000"
+    environment:
+      - DATABASE_URL=postgresql://bps_user:bps_password@postgres:5432/${DEMO_DB:-bps_demo}
+      - MATCHING_TOP_K=10
+    healthcheck:
+      test: ["CMD", "python", "-c", "import urllib.request; urllib.request.urlopen('http://localhost:8000/health')"]
+      interval: 3s
+      timeout: 5s
+      retries: 30
+    depends_on:
+      postgres:
+        condition: service_healthy
+
+volumes:
+  pgdata:

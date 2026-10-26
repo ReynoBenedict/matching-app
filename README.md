@@ -81,6 +81,17 @@ npm run dev                       # http://localhost:3000
 
 Production build lokal: `npm run build && npm start` (port 3000; port lain: `npm start -- -p 3100`).
 
+## Menjalankan untuk demo
+
+Dua mode dengan database terpisah (stack `docker-compose.demo.yml`, project `bps-demo`):
+
+| Perintah (dari root project) | Untuk | Dataset | Database |
+|---|---|---|---|
+| `.\demo-bps.cmd` | Demo ke BPS | data asli BPS di `datasets/` (tidak di-commit) | `bps_demo` |
+| `.\demo-pkl.cmd` | Presentasi PKL | data sintetis `tests/fixtures/` | `pkl_demo` |
+
+Script `scripts/demo.ps1` menyalakan Docker Desktop bila perlu, Postgres (`127.0.0.1:5433`) dan Model Service (`127.0.0.1:8100`), menjalankan migrasi + seed, mengunggah dataset bila database masih kosong (`scripts/load-demo-data.ts`; untuk mode BPS daftar berkasnya dibaca dari `datasets/demo-manifest.json` yang ikut di-ignore, format `[{ "file": "datasets/a.csv", "name": "Dataset A", "type": "DATASET_A" }, …]`), lalu menjalankan production build di **http://localhost:3100**. Tambahkan `-Build` setelah kode berubah, `-Lan` agar bisa dibuka dari perangkat lain di jaringan yang sama. Berhenti dengan Ctrl+C.
+
 ## Menjalankan seluruh stack dengan Docker Compose
 
 ```bash
@@ -132,6 +143,19 @@ npm run build               # production build
 ```
 
 `npm run test:e2e` (Playwright) dan `tests/matching.test.ts` mengasumsikan server di `localhost:3001`/`3000` dengan data awal tertentu dan belum menjadi bagian pengujian rutin.
+
+### Uji end-to-end alur demo
+
+`scripts/e2e-demo.mjs` menjalankan seluruh fitur per peran lewat Chromium (registrasi → unggah/hapus dataset → pencocokan → hasil → penugasan → verifikasi MATCH/NON-MATCH/REVIEW → hasil akhir & ekspor CSV → guard peran) dan menulis laporan bergambar ke `test-results/demo-e2e/index.html` (di-ignore git karena berisi data BPS). Skrip ini **mengubah data**, jadi jalankan terhadap salinan uji `bps_e2e`, bukan `bps_demo`:
+
+```powershell
+# database uji bersih dari template bps_e2e_base (berisi 4 dataset BPS)
+docker compose -f docker-compose.demo.yml exec -T postgres psql -U bps_user -d postgres -c "DROP DATABASE IF EXISTS bps_e2e WITH (FORCE)" -c "CREATE DATABASE bps_e2e TEMPLATE bps_e2e_base"
+docker start bps-e2e-model   # Model Service uji, port 8200, membaca bps_e2e
+$env:DATABASE_URL="postgresql://bps_user:bps_password@localhost:5433/bps_e2e"; $env:MODEL_SERVICE_URL="http://localhost:8200"; $env:MATCHING_PROVIDER="model_service"; npx next start -p 3200
+# terminal lain:
+node scripts/e2e-demo.mjs
+```
 
 ## Troubleshooting
 
